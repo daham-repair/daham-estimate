@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="icon" href="logo.png" type="image/png">
     <title>다함 인테리어 | 통합 견적 시스템</title>
     <link rel="stylesheet" href="style.css?v=4">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="icon" href="logo.png" type="image/png">
 </head>
 <body>
 <div class="container">
@@ -14,7 +15,9 @@
         <div class="notice-banner no-print">⚠️ 본 문서는 현장 실측 전 참고용 '공식 가견적서'입니다.</div>
         <div class="header-card">
             <div class="header-top">
-                <div class="logo-box"><img src="logo.png" alt="다함 인테리어" class="img-logo"></div>
+                <div class="logo-box">
+                    <img src="logo.png" alt="다함 인테리어" class="img-logo">
+                </div>
                 <div class="rep-info"><strong>대표 김재영</strong><div style="color:var(--danger-red); font-weight:900;">010.5404.8747</div></div>
             </div>
             <div class="info-grid">
@@ -28,13 +31,44 @@
             <div id="estimate-body"></div>
         </div>
         <div class="total-card"><div id="final-sum" class="total-val">0 원</div><div style="font-size:14px; margin-top:10px; font-weight:700;">※ 위 가견적은 실측 및 자재 협의 결과에 따라 변동될 수 있습니다.</div></div>
+
+        <div class="notice-footer no-print">
+            <h3>[안내 및 면책 공고]</h3>
+            <ul>
+                <li>본 견적서는 현장 실측 전 작성된 가견적서이며, 최종 계약 시 금액이 확정됩니다.</li>
+                <li>현장 여건 및 자재 사양 변경에 따라 최종 단가가 조정될 수 있습니다.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="view-detailed">
+        <div class="header-card">
+            <div class="header-top">
+                <div class="logo-box">
+                    <img src="logo.png" alt="다함 인테리어" class="img-logo">
+                </div>
+                <div class="rep-info"><strong>공급자: 김재영 (인)</strong><div style="color:var(--danger-red); font-weight:900;">010.5404.8747</div></div>
+            </div>
+            <div class="info-grid">
+                <div class="input-group"><label>발주처</label><div id="d-name-display" class="info-display"></div></div>
+                <div class="input-group"><label>연락처</label><div id="d-tel-display" class="info-display"></div></div>
+                <div class="input-group full-row"><label>현장 주소</label><div id="d-addr-display" class="info-display"></div></div>
+            </div>
+        </div>
+        <div class="estimate-section">
+            <div class="grid-header detail-grid" style="padding:15px 25px;">
+                <div>공정 및 세부항목</div><div>자재 사양 / 모델명</div><div>수량</div><div>단가(원)</div><div style="text-align:right;">금액(원)</div>
+            </div>
+            <div id="detailed-body"></div>
+        </div>
+        <div class="total-card"><div>최종 시공 합계 금액</div><div id="d-total" class="total-val">0 원</div></div>
         
-        
-        <!--
-        <button class="btn-action btn-red no-print" onclick="smartPrint()">공식 가견적서 PDF 발행</button>
-        <button class="btn-action btn-navy no-print" onclick="switchToDetailed()">상세견적서(계약용) 작성하러 가기 ➔</button>
-        --!>
-        <div class="bottom-action-bar no-print">
+        <div class="no-print" style="margin-bottom: 150px;">
+            <button class="btn-action btn-gold" onclick="backToGeneral()">수정하기 (목록으로)</button>
+        </div>
+    </div>
+
+    <div class="bottom-action-bar no-print">
         <button class="action-btn btn-reset" onclick="resetForm()">
             <span class="icon">↺</span> 초기화
         </button>
@@ -50,42 +84,9 @@
     </div>
     
     <div id="toast-msg" class="toast">저장되었습니다!</div>
-        <div style="padding:30px; background:white; border-radius:16px; border-left:8px solid var(--accent-gold); font-size:14.5px; color:#555;" class="no-print">
-            <strong>[안내 및 면책 공고]</strong> 1. 본 견적서는 현장 실측 전 작성된 가견적서이며, 최종 계약 시 금액이 확정됩니다.<br>2. 현장 여건 및 자재 사양 변경에 따라 최종 단가가 조정될 수 있습니다.
-        </div>
-    </div>
-
-    <div id="view-detailed">
-        <div class="header-card">
-            <div class="header-top"><div class="logo-box"><img src="logo.png" alt="다함 인테리어" class="img-logo"></div><div class="rep-info"><strong>공급자: 김재영 (인)</strong><div style="color:var(--danger-red); font-weight:900;">010.5404.8747</div></div></div>
-            <div class="info-grid">
-                <div class="input-group"><label>발주처</label><div id="d-name-display" class="info-display"></div></div>
-                <div class="input-group"><label>연락처</label><div id="d-tel-display" class="info-display"></div></div>
-                <div class="input-group full-row"><label>현장 주소</label><div id="d-addr-display" class="info-display"></div></div>
-            </div>
-        </div>
-        <div class="estimate-section">
-            <div class="grid-header detail-grid" style="padding:15px 25px;">
-                <div>공정 및 세부항목</div><div>자재 사양 / 모델명</div><div>수량</div><div>단가(원)</div><div style="text-align:right;">금액(원)</div>
-            </div>
-            <div id="detailed-body"></div>
-        </div>
-        <div class="total-card"><div>최종 시공 합계 금액</div><div id="d-total" class="total-val">0 원</div></div>
-        <div class="no-print" style="display:flex; gap:10px;">
-            <button class="btn-action btn-red" style="flex:1" onclick="window.print()">정식 상세견적서 발행</button>
-            <button class="btn-action btn-gold" style="flex:1" onclick="backToGeneral()">가견적 수정하기</button>
-        </div>
-    </div>
 
 </div>
 
 <script src="script.js?v=4"></script>
 </body>
 </html>
-
-
-
-
-
-
-
