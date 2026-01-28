@@ -101,3 +101,83 @@ body { font-family: 'Pretendard', sans-serif; background-color: var(--bg-light);
      #view-detailed .detail-grid { gap: 5px !important; }
 
 }
+
+/* [UX 개선] 하단 고정 액션바 */
+.bottom-action-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: white;
+    padding: 10px 15px;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+    display: flex;
+    gap: 8px;
+    z-index: 1000;
+    padding-bottom: max(10px, env(safe-area-inset-bottom)); /* 아이폰 하단 바 대응 */
+}
+
+.action-btn {
+    flex: 1;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 5px;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: 0.2s;
+    color: white;
+}
+
+.action-btn .icon { font-size: 18px; margin-bottom: 2px; }
+
+/* 버튼 색상 */
+.btn-reset { background-color: #F1F3F5; color: #555; flex: 0.7; } /* 회색 */
+.btn-save { background-color: var(--accent-gold); } /* 금색 */
+.btn-print { background-color: var(--primary-navy); } /* 네이비 */
+.btn-next { background-color: var(--danger-red); } /* 빨간색 */
+
+/* 클릭 효과 */
+.action-btn:active { transform: scale(0.96); opacity: 0.9; }
+
+/* 저장 알림 (토스트 메시지) */
+.toast {
+    visibility: hidden;
+    min-width: 250px;
+    background-color: rgba(0,0,0,0.8);
+    color: #fff;
+    text-align: center;
+    border-radius: 50px;
+    padding: 16px;
+    position: fixed;
+    z-index: 2000;
+    left: 50%;
+    bottom: 90px; /* 액션바 위에 뜸 */
+    transform: translateX(-50%);
+    font-size: 15px;
+    font-weight: 700;
+    opacity: 0;
+    transition: opacity 0.3s, bottom 0.3s;
+}
+
+.toast.show {
+    visibility: visible;
+    opacity: 1;
+    bottom: 100px;
+}
+
+/* PC 화면에서는 하단 바가 너무 넓지 않게 제한 */
+@media (min-width: 950px) {
+    .bottom-action-bar {
+        width: 950px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 20px 20px 0 0;
+    }
+}
+
