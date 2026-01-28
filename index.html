@@ -27,8 +27,28 @@
             <div id="estimate-body"></div>
         </div>
         <div class="total-card"><div id="final-sum" class="total-val">0 원</div><div style="font-size:14px; margin-top:10px; font-weight:700;">※ 위 가견적은 실측 및 자재 협의 결과에 따라 변동될 수 있습니다.</div></div>
+        
+        
+        <!--
         <button class="btn-action btn-red no-print" onclick="smartPrint()">공식 가견적서 PDF 발행</button>
         <button class="btn-action btn-navy no-print" onclick="switchToDetailed()">상세견적서(계약용) 작성하러 가기 ➔</button>
+        --!>
+        <div class="bottom-action-bar no-print">
+        <button class="action-btn btn-reset" onclick="resetForm()">
+            <span class="icon">↺</span> 초기화
+        </button>
+        <button class="action-btn btn-save" onclick="saveToLocal()">
+            <span class="icon">💾</span> 임시저장
+        </button>
+        <button class="action-btn btn-print" onclick="smartPrint()">
+            <span class="icon">📄</span> 견적발행
+        </button>
+        <button class="action-btn btn-next" onclick="switchToDetailed()">
+            <span class="icon">➔</span> 계약서
+        </button>
+    </div>
+    
+    <div id="toast-msg" class="toast">저장되었습니다!</div>
         <div style="padding:30px; background:white; border-radius:16px; border-left:8px solid var(--accent-gold); font-size:14.5px; color:#555;" class="no-print">
             <strong>[안내 및 면책 공고]</strong> 1. 본 견적서는 현장 실측 전 작성된 가견적서이며, 최종 계약 시 금액이 확정됩니다.<br>2. 현장 여건 및 자재 사양 변경에 따라 최종 단가가 조정될 수 있습니다.
         </div>
@@ -61,4 +81,5 @@
 <script src="script.js"></script>
 </body>
 </html>
+
 
