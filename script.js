@@ -145,3 +145,89 @@ function backToGeneral() {
     document.getElementById('view-general').classList.add('active-view');
     window.scrollTo(0,0);
 }
+
+/* =========================================
+   [UX 개선] 로컬 저장 및 초기화 기능
+   ========================================= */
+
+// 1. 임시 저장 (브라우저에 저장)
+function saveToLocal() {
+    const saveData = {
+        name: document.getElementById('g-name').value,
+        tel: document.getElementById('g-tel').value,
+        addr: document.getElementById('g-addr').value,
+        items: []
+    };
+
+    // 체크된 항목들 저장
+    document.querySelectorAll('.item-line').forEach((row, idx) => {
+        const chk = row.querySelector('.chk');
+        if(chk.checked) {
+            saveData.items.push({
+                idx: idx, // 몇 번째 줄인지
+                qty: row.querySelector('.qty').value,
+                price: row.querySelector('.price').value
+            });
+        }
+    });
+
+    localStorage.setItem('daham_estimate_draft', JSON.stringify(saveData));
+    showToast("현재 작성 내용이 임시 저장되었습니다.");
+}
+
+// 2. 불러오기 (페이지 열릴 때 자동 실행)
+function loadFromLocal() {
+    const saved = localStorage.getItem('daham_estimate_draft');
+    if(!saved) return;
+
+    const data = JSON.parse(saved);
+    if(!confirm("이전에 작성하던 견적 내용이 있습니다. 불러오시겠습니까?")) {
+        // 아니오 누르면 저장된 거 삭제 (새로 시작)
+        localStorage.removeItem('daham_estimate_draft'); 
+        return;
+    }
+
+    // 데이터 복구
+    document.getElementById('g-name').value = data.name || '';
+    document.getElementById('g-tel').value = data.tel || '';
+    document.getElementById('g-addr').value = data.addr || '';
+
+    // 모든 체크 해제 후 저장된 것만 체크
+    document.querySelectorAll('.chk').forEach(chk => chk.checked = false);
+    
+    // 항목 복구
+    const rows = document.querySelectorAll('.item-line');
+    data.items.forEach(item => {
+        if(rows[item.idx]) {
+            const row = rows[item.idx];
+            row.querySelector('.chk').checked = true;
+            row.querySelector('.qty').value = item.qty;
+            row.querySelector('.price').value = item.price;
+        }
+    });
+
+    update(); // 합계 다시 계산
+    showToast("작성 내용을 불러왔습니다.");
+}
+
+// 3. 초기화 (새로운 고객)
+function resetForm() {
+    if(confirm("모든 내용을 지우고 새로 작성하시겠습니까?")) {
+        localStorage.removeItem('daham_estimate_draft');
+        location.reload(); // 새로고침
+    }
+}
+
+// 4. 알림 메시지 표시 함수
+function showToast(message) {
+    const x = document.getElementById("toast-msg");
+    x.innerText = message;
+    x.className = "toast show";
+    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+}
+
+// 페이지 열리면 자동 실행
+window.onload = function() {
+    loadFromLocal();
+}
+
