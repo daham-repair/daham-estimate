@@ -3,52 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>다함 인테리어 | 통합 견적 시스템</title>
-    
-    <link rel="stylesheet" href="style.css?v=7">
-    
+    <title>다함 인테리어</title>
+    <link rel="stylesheet" href="style.css?v=kakao_style">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
     <link rel="icon" href="logo.png" type="image/png">
 </head>
 <body>
 <div class="container">
 
     <div id="view-general" class="active-view">
-        <div class="notice-banner no-print">⚠️ 실측 전 참고용 '공식 가견적서'입니다</div>
-        
         <div class="header-card">
             <div class="header-top">
-                <div class="logo-box">
-                    <img src="logo.png" alt="다함 인테리어" class="img-logo">
-                </div>
+                <div class="logo-box"><img src="logo.png" alt="다함 인테리어" class="img-logo"></div>
                 <div class="rep-info">
                     <strong>대표 김재영</strong>
-                    <div style="color:var(--danger-red);">010.5404.8747</div>
+                    <div>010.5404.8747</div>
                 </div>
             </div>
             <div class="info-grid">
                 <div class="input-group">
-                    <label>발주처(고객명)</label>
-                    <input type="text" id="g-name" class="input-field" placeholder="고객 성함을 입력하세요">
+                    <label>고객명</label>
+                    <input type="text" id="g-name" class="input-field" placeholder="성함을 입력해주세요">
                 </div>
                 <div class="input-group">
                     <label>연락처</label>
-                    <input type="text" id="g-tel" class="input-field" placeholder="010-0000-0000">
+                    <input type="tel" id="g-tel" class="input-field" placeholder="010.0000.0000" maxlength="13" oninput="autoFormatTel(this)">
                 </div>
-                <div class="input-group full-row">
+                <div class="input-group">
                     <label>현장 주소</label>
-                    <input type="text" id="g-addr" class="input-field" placeholder="시공할 현장 주소를 입력하세요">
+                    <input type="text" id="g-addr" class="input-field" placeholder="시공 주소">
                 </div>
             </div>
         </div>
 
         <div class="estimate-section">
             <div class="grid-header master-grid">
-                <div style="text-align:left; padding-left:10px;">공정 항목</div>
+                <div style="text-align:left;">공정항목</div>
                 <div>수량</div>
                 <div style="text-align:right;">단가</div>
-                <div style="text-align:right; padding-right:10px;">합계</div>
+                <div style="text-align:right;">합계</div>
             </div>
             <div id="estimate-body"></div>
         </div>
@@ -59,46 +52,40 @@
         </div>
 
         <div class="notice-footer no-print">
-            <h3>[안내 및 면책 공고]</h3>
-            <ul>
-                <li>본 견적서는 현장 실측 전 작성된 가견적서이며, 최종 계약 시 금액이 확정됩니다.</li>
-                <li>현장 여건 및 자재 사양 변경에 따라 최종 단가가 조정될 수 있습니다.</li>
-            </ul>
+            본 견적은 실측 전 가견적이며,<br>현장 상황에 따라 변동될 수 있습니다.
         </div>
     </div>
 
     <div id="view-detailed">
         <div class="header-card">
             <div class="header-top">
-                <div class="logo-box">
-                    <img src="logo.png" alt="다함 인테리어" class="img-logo">
-                </div>
+                <div class="logo-box"><img src="logo.png" alt="다함 인테리어" class="img-logo"></div>
                 <div class="rep-info">
-                    <strong>공급자: 김재영 (인)</strong>
-                    <div style="color:var(--danger-red);">010.5404.8747</div>
+                    <strong>공급자 : 김재영 (인)</strong>
+                    <div>010.5404.8747</div>
                 </div>
             </div>
             <div class="info-grid">
-                <div class="input-group full-row"><label>현장 주소</label><input type="text" id="d-addr-display" class="input-field" readonly></div>
-                <div class="input-group"><label>발주처</label><input type="text" id="d-name-display" class="input-field" readonly></div>
+                <div class="input-group"><label>주소</label><input type="text" id="d-addr-display" class="input-field" readonly></div>
+                <div class="input-group"><label>고객</label><input type="text" id="d-name-display" class="input-field" readonly></div>
                 <div class="input-group"><label>연락처</label><input type="text" id="d-tel-display" class="input-field" readonly></div>
             </div>
         </div>
 
         <div class="estimate-section">
-            <div class="grid-header detail-grid" style="padding:15px 20px;">
-                <div>공정 및 항목</div><div>자재 사양 / 모델명</div><div>수량</div><div>단가</div><div style="text-align:right;">금액</div>
+            <div class="grid-header detail-grid">
+                <div>항목</div><div>사양</div><div>수량</div><div>단가</div><div style="text-align:right;">금액</div>
             </div>
             <div id="detailed-body"></div>
         </div>
 
         <div class="total-card">
-            <div>최종 시공 합계</div>
+            <div>최종 계약 합계</div>
             <div id="d-total" class="total-val">0 원</div>
         </div>
         
         <div class="no-print" style="margin-bottom: 120px; text-align: center;">
-            <button class="action-btn btn-reset" onclick="backToGeneral()" style="width:100%; max-width:200px; display:inline-flex; background:#fff; color:#555; border:1px solid #ddd; height:50px; flex-direction:row;">
+            <button onclick="backToGeneral()" style="padding:10px 30px; border-radius:20px; border:1px solid #ddd; background:#fff;">
                 목록으로 돌아가기
             </button>
         </div>
@@ -106,16 +93,16 @@
 
     <div class="bottom-action-bar no-print">
         <button class="action-btn btn-reset" onclick="resetForm()">
-            <span class="icon">↺</span> 초기화
+            <span class="btn-icon">↺</span>초기화
         </button>
         <button class="action-btn btn-save" onclick="saveToLocal()">
-            <span class="icon">💾</span> 임시저장
+            <span class="btn-icon">💾</span>임시저장
         </button>
         <button class="action-btn btn-print" onclick="smartPrint()">
-            <span class="icon">📄</span> 견적발행
+            <span class="btn-icon">📄</span>견적발행
         </button>
         <button class="action-btn btn-next" onclick="switchToDetailed()">
-            <span class="icon">➔</span> 계약서
+            <span class="btn-icon">➔</span>계약서
         </button>
     </div>
     
@@ -123,8 +110,8 @@
 
 </div>
 
-<script src="data.js?v=7"></script>
-<script src="script.js?v=7"></script>
+<script src="data.js?v=kakao_style"></script>
+<script src="script.js?v=kakao_style"></script>
 
 </body>
 </html>
