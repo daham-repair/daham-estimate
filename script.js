@@ -1,26 +1,18 @@
 /* =========================================
-   다함 인테리어 견적 시스템 (로직 전용)
+   다함 인테리어 견적 시스템 (안정화 로직)
    ========================================= */
 
-// ▼▼▼ [1] 수파베이스 키 설정 (여기를 꼭 수정하세요) ▼▼▼
-const supabaseUrl = '여기에_Project_URL_붙여넣기';
-const supabaseKey = '여기에_API_Key_anon_public_붙여넣기';
-// ▲▲▲---------------------------------------------▲▲▲
-
+const supabaseUrl = 'YOUR_SUPABASE_URL';
+const supabaseKey = 'YOUR_SUPABASE_KEY';
 let dbClient = null;
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("화면 로딩 완료");
-
-    // DB 연결 시도
     try {
         if (typeof supabase !== 'undefined' && supabaseUrl.startsWith('http')) {
             dbClient = supabase.createClient(supabaseUrl, supabaseKey);
-            console.log("DB 연결 성공");
         }
-    } catch (e) { console.error("DB 연결 실패(무시):", e); }
+    } catch (e) { console.error("DB 연결 실패:", e); }
 
-    // 목록 생성 (data.js에서 데이터를 가져옵니다)
     const body = document.getElementById('estimate-body');
     if(body && typeof data !== 'undefined') {
         data.forEach((sec, idx) => {
@@ -43,14 +35,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 rows += `<div class="grid-row master-grid row-${idx} item-line">
                     <div style="text-align:left;"><label class="item-label"><input type="checkbox" class="chk" data-name="${item.n}" onchange="update()"><span class="checkmark"></span><span>${item.n}</span></label></div>
                     <div><input type="number" class="in-num qty" value="1" oninput="update()"></div>
-                    <div><input type="number" class="in-num price" value="${item.p}" oninput="update()" id="p-${idx}-${iIdx}"></div>
+                    <div><input type="number" class="in-num price" value="${item.p}" oninput="update()"></div>
                     <div class="row-total" style="text-align:right;">0</div>
                 </div>`;
             });
             c.innerHTML = rows; cont.appendChild(c); body.appendChild(cont);
         });
     }
-
     loadFromLocal();
 });
 
@@ -58,9 +49,9 @@ const paintMap = { water: 12, elastic: 22, ceramic: 30 };
 
 function changeP(sIdx, type) {
     const np = paintMap[type];
-    for(let i=0; i<4; i++) {
-        const el = document.getElementById(`p-${sIdx}-${i}`);
-        if(el) el.value = np;
+    const sectionContent = document.getElementById(`c-${sIdx}`);
+    if (sectionContent) {
+        sectionContent.querySelectorAll('.price').forEach(el => { el.value = np; });
     }
     update();
 }
@@ -70,80 +61,69 @@ function toggleSec(idx, master) {
     update();
 }
 
-function formatKRW(num) { if (!num) return "0"; return Math.floor(num * 10000).toLocaleString(); }
+function formatKRW(num) { 
+    if (!num && num !== 0) return "0"; 
+    return Math.floor(num * 10000).toLocaleString(); 
+}
 
 function update() {
     let total = 0;
     document.querySelectorAll('#view-general .item-line').forEach(row => {
         const chk = row.querySelector('.chk');
+        const qtyVal = parseFloat(row.querySelector('.qty').value) || 0;
+        const priceVal = parseFloat(row.querySelector('.price').value) || 0;
         if(chk.checked) {
-            const sum = (parseFloat(row.querySelector('.qty').value)||0)*(parseFloat(row.querySelector('.price').value)||0);
+            const sum = qtyVal * priceVal;
             total += sum; row.querySelector('.row-total').innerText = formatKRW(sum);
-        } else if (row.querySelector('.row-total')) row.querySelector('.row-total').innerText = "0";
+        } else {
+            row.querySelector('.row-total').innerText = "0";
+        }
     });
     const sumEl = document.getElementById('final-sum');
     if(sumEl) sumEl.innerText = formatKRW(total) + " 원";
 }
 
 async function smartPrint() {
-    const inputs = document.querySelectorAll('.in-num');
     const name = document.getElementById('g-name').value;
-    const tel = document.getElementById('g-tel').value;
-    const addr = document.getElementById('g-addr').value;
+    if(!name) { alert("고객명을 입력해야 발행이 가능합니다."); return; }
 
-    if(!name) { alert("고객명을 입력해야 저장이 가능합니다."); return; }
-
-    let selectedData = [];
-    let totalAmt = 0;
-    document.querySelectorAll('#view-general .item-line').forEach(row => {
-        const chk = row.querySelector('.chk');
-        if(chk.checked) {
-            const qty = parseFloat(row.querySelector('.qty').value)||0;
-            const price = parseFloat(row.querySelector('.price').value)||0;
-            selectedData.push({ item: chk.dataset.name, qty: qty, price: price, sum: qty * price });
-            totalAmt += (qty * price);
-        }
+    const inputs = document.querySelectorAll('.in-num');
+    inputs.forEach(input => { 
+        if (input.classList.contains('price')) { 
+            input.dataset.orig = input.value; 
+            input.type = "text"; 
+            input.value = formatKRW(parseFloat(input.value)||0); 
+        } 
     });
 
-    if(dbClient) {
-        try {
-            await dbClient.from('estimates').insert([{ 
-                client_name: name, client_phone: tel, client_address: addr,
-                total_price: formatKRW(totalAmt), detail_data: selectedData
-            }]);
-        } catch (err) { console.error("DB 저장 실패:", err); }
-    }
-
-    inputs.forEach(input => { if (input.classList.contains('price')) { input.dataset.orig = input.value; input.type = "text"; input.value = formatKRW(parseFloat(input.value)||0); } });
     const ps = document.getElementById('p-sel');
-    if(ps) { const txt = ps.options[ps.selectedIndex].text; document.getElementById('pv-11').innerText = ` [${txt}]`; }
+    if(ps) { 
+        const txt = ps.options[ps.selectedIndex].text;
+        const pValEls = document.querySelectorAll('.paint-print-val');
+        pValEls.forEach(el => { if(el.offsetParent !== null) el.innerText = ` [${txt}]`; });
+    }
     
-    // 인쇄 모드 전환
-    for(let idx=0; idx<13; idx++) {
+    data.forEach((_, idx) => {
         const rows = document.querySelectorAll(`.row-${idx}`);
         let hasChecked = false;
         rows.forEach(r => { 
             if(!r.querySelector('.chk').checked) { r.classList.add('hidden-print'); } 
             else { r.classList.remove('hidden-print'); hasChecked = true; } 
         });
-
         const cont = document.getElementById('cont-'+idx);
         const content = document.getElementById('c-'+idx);
         if(cont && content) {
-            if(hasChecked) {
-                cont.classList.remove('hidden-print');
-                content.classList.add('show');
-            } else {
-                cont.classList.add('hidden-print');
-            }
+            if(hasChecked) { cont.classList.remove('hidden-print'); content.classList.add('show'); }
+            else { cont.classList.add('hidden-print'); }
         }
-    }
+    });
 
     window.print();
 
     setTimeout(() => {
         inputs.forEach(input => { if (input.classList.contains('price')) { input.type = "number"; input.value = input.dataset.orig; } });
-        document.querySelectorAll('.section-container').forEach(el => el.classList.remove('hidden-print'));
+        document.querySelectorAll('.section-container, .grid-row').forEach(el => el.classList.remove('hidden-print'));
+        document.querySelectorAll('.paint-print-val').forEach(el => el.innerText = "");
         update();
     }, 1000);
 }
@@ -156,7 +136,7 @@ function switchToDetailed() {
     const dBody = document.getElementById('detailed-body'); dBody.innerHTML = '';
     let dTotal = 0;
     
-    document.querySelectorAll('.item-line').forEach(row => {
+    document.querySelectorAll('#view-general .item-line').forEach(row => {
         const chk = row.querySelector('.chk');
         if(chk && chk.checked) {
             const n = chk.dataset.name;
@@ -182,7 +162,6 @@ function switchToDetailed() {
 function backToGeneral() {
     document.getElementById('view-detailed').classList.remove('active-view');
     document.getElementById('view-general').classList.add('active-view');
-    window.scrollTo(0,0);
 }
 
 function saveToLocal() {
@@ -205,9 +184,7 @@ function saveToLocal() {
 function loadFromLocal() {
     const saved = localStorage.getItem('daham_estimate_draft');
     if(!saved) return;
-    if(!confirm("이전에 작성하던 내용이 있습니다. 불러오시겠습니까?")) {
-        localStorage.removeItem('daham_estimate_draft'); return;
-    }
+    if(!confirm("이전에 작성하던 내용이 있습니다. 불러오시겠습니까?")) return;
     const data = JSON.parse(saved);
     document.getElementById('g-name').value = data.name || '';
     document.getElementById('g-tel').value = data.tel || '';
@@ -223,12 +200,11 @@ function loadFromLocal() {
             }
         });
         update();
-        showToast("불러오기 완료");
-    }, 100);
+    }, 200);
 }
 
 function resetForm() {
-    if(confirm("초기화 하시겠습니까?")) {
+    if(confirm("모든 내용을 초기화 하시겠습니까?")) {
         localStorage.removeItem('daham_estimate_draft');
         location.reload();
     }
@@ -236,5 +212,6 @@ function resetForm() {
 
 function showToast(message) {
     const x = document.getElementById("toast-msg");
-    if(x) { x.innerText = message; x.className = "toast show"; setTimeout(() => x.className = x.className.replace("show", ""), 3000); }
+    x.innerText = message; x.className = "toast show"; 
+    setTimeout(() => x.className = x.className.replace("show", ""), 3000);
 }
