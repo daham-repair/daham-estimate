@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>다함 인테리어 | 통합 견적 시스템</title>
     
-    <link rel="stylesheet" href="style.css?v=7">
+    <link rel="stylesheet" href="style.css?v=8">
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
@@ -34,7 +34,7 @@
                 </div>
                 <div class="input-group">
                     <label>연락처</label>
-                    <input type="text" id="g-tel" class="input-field" placeholder="010-0000-0000">
+                    <input type="tel" id="g-tel" class="input-field" placeholder="010.0000.0000" maxlength="13" oninput="autoFormatTel(this)">
                 </div>
                 <div class="input-group full-row">
                     <label>현장 주소</label>
@@ -123,8 +123,8 @@
 
 </div>
 
-<script src="data.js?v=7"></script>
-<script src="script.js?v=7"></script>
+<script src="data.js?v=8"></script>
+<script src="script.js?v=8"></script>
 
 </body>
 </html>
