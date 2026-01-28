@@ -1,58 +1,53 @@
 /* =========================================
-   다함 인테리어 견적 시스템 V_FINAL
+   다함 인테리어 견적 시스템 (로직 전용)
    ========================================= */
 
-// ▼▼▼ Supabase 설정 (기존 키 유지하세요) ▼▼▼
+// ▼▼▼ [1] 수파베이스 키 설정 (여기를 꼭 수정하세요) ▼▼▼
 const supabaseUrl = '여기에_Project_URL_붙여넣기';
 const supabaseKey = '여기에_API_Key_anon_public_붙여넣기';
-// ▲▲▲--------------------------------------▲▲▲
+// ▲▲▲---------------------------------------------▲▲▲
 
 let dbClient = null;
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("System Ready");
+    console.log("화면 로딩 완료");
 
-    // DB 연결
+    // DB 연결 시도
     try {
         if (typeof supabase !== 'undefined' && supabaseUrl.startsWith('http')) {
             dbClient = supabase.createClient(supabaseUrl, supabaseKey);
-            console.log("DB Connected");
+            console.log("DB 연결 성공");
         }
-    } catch (e) { console.error("DB Error:", e); }
+    } catch (e) { console.error("DB 연결 실패(무시):", e); }
 
-    // 견적 리스트 생성
+    // 목록 생성 (data.js에서 데이터를 가져옵니다)
     const body = document.getElementById('estimate-body');
     if(body && typeof data !== 'undefined') {
         data.forEach((sec, idx) => {
             const cont = document.createElement('div'); cont.className = 'section-container'; cont.id = 'cont-'+idx;
-            
-            // ★★★ [수정됨] 아이콘 태그 제거함 ★★★
             const h = document.createElement('div'); h.className = 'section-header'; 
-            h.innerHTML = `<span>${sec.category}<span id="pv-${idx}" class="paint-print-val"></span></span><span class="no-print" style="font-size:10px; color:#aaa;">▼</span>`;
+            
+            // [원래 코드 유지] 아이콘(section-icon) 포함됨
+            h.innerHTML = `<span><div class="section-icon">${icons[sec.key]}</div> ${sec.category}<span id="pv-${idx}" class="paint-print-val"></span></span><span class="no-print">▼</span>`;
             
             h.onclick = () => document.getElementById('c-'+idx).classList.toggle('show');
             cont.appendChild(h);
             
-            // 섹션 내용
             const c = document.createElement('div'); c.className = 'section-content'; c.id = 'c-'+idx;
-            
-            // 전체 선택 및 옵션 행
-            let rows = `<div class="grid-row master-grid no-print bulk-row" style="background:#f9f9f9;">
+            let rows = `<div class="grid-row master-grid no-print bulk-row">
                 <div style="text-align:left;"><label class="item-label bulk-text"><input type="checkbox" onchange="toggleSec(${idx}, this)"><span class="checkmark"></span><span>전체선택</span></label></div>
                 <div style="grid-column: span 3; text-align:right;">
-                    ${sec.isPaint ? `<select id="p-sel" class="paint-select" onchange="changeP(${idx}, this.value)" style="padding:2px;">
+                    ${sec.isPaint ? `<select id="p-sel" class="paint-select" onchange="changeP(${idx}, this.value)">
                         <option value="water">수성 페인트</option><option value="elastic">탄성 코트</option><option value="ceramic">세라믹 코트</option>
                     </select>` : ''}
                 </div>
             </div>`;
-            
-            // 개별 아이템 행
             sec.items.forEach((item, iIdx) => {
                 rows += `<div class="grid-row master-grid row-${idx} item-line">
                     <div style="text-align:left;"><label class="item-label"><input type="checkbox" class="chk" data-name="${item.n}" onchange="update()"><span class="checkmark"></span><span>${item.n}</span></label></div>
                     <div><input type="number" class="in-num qty" value="1" oninput="update()"></div>
                     <div><input type="number" class="in-num price" value="${item.p}" oninput="update()" id="p-${idx}-${iIdx}"></div>
-                    <div class="row-total" style="text-align:right; font-weight:bold;">0</div>
+                    <div class="row-total" style="text-align:right;">0</div>
                 </div>`;
             });
             c.innerHTML = rows; cont.appendChild(c); body.appendChild(cont);
@@ -62,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadFromLocal();
 });
 
-// [기능 1] 전화번호 자동 포맷팅 (010.XXXX.XXXX)
+// [기능 추가 1] 전화번호 포맷팅 (010.xxxx.xxxx)
 function autoFormatTel(target) {
     let raw = target.value.replace(/[^0-9]/g, '');
     let fmt = '';
@@ -78,27 +73,15 @@ function autoFormatTel(target) {
     target.value = fmt;
 }
 
-// [기능 2] 필수 입력 검사 및 커서 이동
-function validateInputs() {
+// [기능 추가 2] 유효성 검사 및 커서 이동 공통 함수
+function checkInputs() {
     const elName = document.getElementById('g-name');
     const elTel = document.getElementById('g-tel');
     const elAddr = document.getElementById('g-addr');
 
-    if(!elName.value.trim()) {
-        alert("고객명을 입력해주세요.");
-        elName.focus();
-        return false;
-    }
-    if(!elTel.value.trim()) {
-        alert("연락처를 입력해주세요.");
-        elTel.focus();
-        return false;
-    }
-    if(!elAddr.value.trim()) {
-        alert("현장 주소를 입력해주세요.");
-        elAddr.focus();
-        return false;
-    }
+    if(!elName.value.trim()) { alert("고객명을 입력해주세요."); elName.focus(); return false; }
+    if(!elTel.value.trim()) { alert("연락처를 입력해주세요."); elTel.focus(); return false; }
+    if(!elAddr.value.trim()) { alert("현장 주소를 입력해주세요."); elAddr.focus(); return false; }
     return true;
 }
 
@@ -133,16 +116,15 @@ function update() {
     if(sumEl) sumEl.innerText = formatKRW(total) + " 원";
 }
 
-// [기능 3] 인쇄 (하단바는 CSS @media print로 자동 숨김)
 async function smartPrint() {
-    if(!validateInputs()) return;
+    // [적용] 유효성 검사
+    if(!checkInputs()) return;
 
     const inputs = document.querySelectorAll('.in-num');
     const name = document.getElementById('g-name').value;
     const tel = document.getElementById('g-tel').value;
     const addr = document.getElementById('g-addr').value;
 
-    // DB 저장 로직
     let selectedData = [];
     let totalAmt = 0;
     document.querySelectorAll('#view-general .item-line').forEach(row => {
@@ -161,14 +143,14 @@ async function smartPrint() {
                 client_name: name, client_phone: tel, client_address: addr,
                 total_price: formatKRW(totalAmt), detail_data: selectedData
             }]);
-        } catch (err) { console.error("DB Insert Failed:", err); }
+        } catch (err) { console.error("DB 저장 실패:", err); }
     }
 
-    // 인쇄용 뷰 변환
     inputs.forEach(input => { if (input.classList.contains('price')) { input.dataset.orig = input.value; input.type = "text"; input.value = formatKRW(parseFloat(input.value)||0); } });
     const ps = document.getElementById('p-sel');
     if(ps) { const txt = ps.options[ps.selectedIndex].text; document.getElementById('pv-11').innerText = ` [${txt}]`; }
     
+    // 인쇄 모드 전환
     for(let idx=0; idx<13; idx++) {
         const rows = document.querySelectorAll(`.row-${idx}`);
         let hasChecked = false;
@@ -191,7 +173,6 @@ async function smartPrint() {
 
     window.print();
 
-    // 복구
     setTimeout(() => {
         inputs.forEach(input => { if (input.classList.contains('price')) { input.type = "number"; input.value = input.dataset.orig; } });
         document.querySelectorAll('.section-container').forEach(el => el.classList.remove('hidden-print'));
@@ -199,9 +180,9 @@ async function smartPrint() {
     }, 1000);
 }
 
-// [기능 4] 계약서 발행 (이때 하단 메뉴 숨김)
 function switchToDetailed() {
-    if(!validateInputs()) return;
+    // [적용] 유효성 검사
+    if(!checkInputs()) return;
     
     const name = document.getElementById('g-name').value;
     const tel = document.getElementById('g-tel').value;
@@ -219,20 +200,20 @@ function switchToDetailed() {
             const sum = q * p; dTotal += sum;
             const div = document.createElement('div');
             div.className = 'grid-row detail-grid';
-            div.innerHTML = `<div>${n}</div><input type="text" class="spec-field" style="width:100%; border:1px solid #ddd;" placeholder="사양 입력"><div>${q}</div><div>${parseInt(p).toLocaleString()}</div><div style="text-align:right;">${formatKRW(sum)}</div>`;
+            div.innerHTML = `<strong>${n}</strong><input type="text" class="spec-field" placeholder="사양 입력"><div>${q}</div><div>${parseInt(p).toLocaleString()}</div><div style="text-align:right;">${formatKRW(sum)}</div>`;
             dBody.appendChild(div);
         }
     });
     
-    document.getElementById('d-name-display').value = name;
-    document.getElementById('d-tel-display').value = tel;
-    document.getElementById('d-addr-display').value = addr;
+    document.getElementById('d-name-display').innerText = name;
+    document.getElementById('d-tel-display').innerText = tel;
+    document.getElementById('d-addr-display').innerText = addr;
     document.getElementById('d-total').innerText = formatKRW(dTotal) + " 원";
     
     document.getElementById('view-general').classList.remove('active-view');
     document.getElementById('view-detailed').classList.add('active-view');
 
-    // ★★★ 하단 메뉴바 숨김 ★★★
+    // [기능 추가 3] 하단 메뉴바 숨기기
     const actionBar = document.querySelector('.bottom-action-bar');
     if(actionBar) actionBar.style.display = 'none';
 
@@ -243,9 +224,9 @@ function backToGeneral() {
     document.getElementById('view-detailed').classList.remove('active-view');
     document.getElementById('view-general').classList.add('active-view');
     
-    // ★★★ 하단 메뉴바 복구 ★★★
+    // [기능 추가 3] 하단 메뉴바 다시 보이기
     const actionBar = document.querySelector('.bottom-action-bar');
-    if(actionBar) actionBar.style.display = 'flex';
+    if(actionBar) actionBar.style.display = ''; // 기존 CSS(flex 등) 복구
 
     window.scrollTo(0,0);
 }
@@ -270,7 +251,7 @@ function saveToLocal() {
 function loadFromLocal() {
     const saved = localStorage.getItem('daham_estimate_draft');
     if(!saved) return;
-    if(!confirm("작성 중인 내용이 있습니다. 불러오시겠습니까?")) {
+    if(!confirm("이전에 작성하던 내용이 있습니다. 불러오시겠습니까?")) {
         localStorage.removeItem('daham_estimate_draft'); return;
     }
     const data = JSON.parse(saved);
@@ -293,7 +274,7 @@ function loadFromLocal() {
 }
 
 function resetForm() {
-    if(confirm("모든 내용을 초기화 하시겠습니까?")) {
+    if(confirm("초기화 하시겠습니까?")) {
         localStorage.removeItem('daham_estimate_draft');
         location.reload();
     }
