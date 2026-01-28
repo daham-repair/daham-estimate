@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>다함 인테리어 | 통합 견적 시스템</title>
-    
-    <link rel="stylesheet" href="style.css?v=7">
-    
+    <link rel="stylesheet" href="style.css?v=final_fix">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
     <link rel="icon" href="logo.png" type="image/png">
 </head>
 <body>
@@ -24,7 +21,7 @@
                 </div>
                 <div class="rep-info">
                     <strong>대표 김재영</strong>
-                    <div style="color:var(--danger-red);">010.5404.8747</div>
+                    <div>010.5404.8747</div>
                 </div>
             </div>
             <div class="info-grid">
@@ -75,7 +72,7 @@
                 </div>
                 <div class="rep-info">
                     <strong>공급자: 김재영 (인)</strong>
-                    <div style="color:var(--danger-red);">010.5404.8747</div>
+                    <div>010.5404.8747</div>
                 </div>
             </div>
             <div class="info-grid">
@@ -98,14 +95,14 @@
         </div>
         
         <div class="no-print" style="margin-bottom: 120px; text-align: center;">
-            <button class="action-btn btn-reset" onclick="backToGeneral()" style="width:100%; max-width:200px; display:inline-flex; background:#fff; color:#555; border:1px solid #ddd; height:50px; flex-direction:row;">
+            <button class="action-btn" onclick="backToGeneral()" style="width:100%; max-width:200px; display:inline-flex; background:#fff; height:50px; flex-direction:row; justify-content:center; align-items:center; border:1px solid #ddd;">
                 목록으로 돌아가기
             </button>
         </div>
     </div>
 
     <div class="bottom-action-bar no-print">
-        <button class="action-btn btn-reset" onclick="resetForm()">
+        <button class="action-btn" onclick="resetForm()">
             <span class="icon">↺</span> 초기화
         </button>
         <button class="action-btn btn-save" onclick="saveToLocal()">
@@ -123,8 +120,8 @@
 
 </div>
 
-<script src="data.js?v=7"></script>
-<script src="script.js?v=7"></script>
+<script src="data.js?v=final_fix"></script>
+<script src="script.js?v=final_fix"></script>
 
 </body>
 </html>
