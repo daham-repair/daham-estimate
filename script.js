@@ -1,11 +1,31 @@
 /* =========================================
-   [긴급 복구 모드] 화면 로딩 안전장치 추가
+   다함 인테리어 견적 시스템 (DB 연결 + 안전모드 최종본)
    ========================================= */
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log("화면 로딩 완료! 스크립트 실행 시작");
+// ▼▼▼ [1] 수파베이스 키 설정 (본인 키로 변경 필수!) ▼▼▼
+const supabaseUrl = '여기에_Project_URL_붙여넣기';
+const supabaseKey = '여기에_API_Key_anon_public_붙여넣기';
+// ▲▲▲---------------------------------------------▲▲▲
 
-    /* [1] 데이터 및 아이콘 설정 */
+let dbClient = null;
+
+// [안전장치 1] 화면(HTML)이 다 준비된 뒤에만 스크립트를 실행한다.
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("화면 로딩 완료");
+
+    // [안전장치 2] DB 연결 시도 (오류 나도 무시하고 진행)
+    try {
+        if (typeof supabase !== 'undefined' && supabaseUrl.startsWith('http')) {
+            dbClient = supabase.createClient(supabaseUrl, supabaseKey);
+            console.log("DB 연결 성공");
+        } else {
+            console.log("DB 설정이 없거나 라이브러리 로드 실패 (저장 기능만 꺼짐)");
+        }
+    } catch (e) {
+        console.error("DB 연결 중 에러(무시):", e);
+    }
+
+    // [2] 데이터 및 아이콘 설정
     const icons = {
         demolition: `<svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`,
         carpentry: `<svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM7 19V5h10v14H7z"/></svg>`,
@@ -37,10 +57,9 @@ document.addEventListener('DOMContentLoaded', function() {
         { category: "기타 (Others)", key: "plus", items: [{n:"화장실 돔천장", p:20},{n:"입주 청소", p:30},{n:"폐기물 처리", p:0},{n:"기타인건비", p:0}] }
     ];
 
-    const paintMap = { water: 12, elastic: 22, ceramic: 30 };
     const body = document.getElementById('estimate-body');
 
-    // [핵심] 목록 생성 로직
+    // [핵심] 목록 생성
     if(body) {
         data.forEach((sec, idx) => {
             const cont = document.createElement('div'); cont.className = 'section-container'; cont.id = 'cont-'+idx;
@@ -68,16 +87,16 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             c.innerHTML = rows; cont.appendChild(c); body.appendChild(cont);
         });
-        console.log("목록 생성 완료!");
-    } else {
-        alert("오류: 화면에서 'estimate-body'를 찾을 수 없습니다. index.html을 확인해주세요.");
     }
 
-    // 로컬 저장 내용 불러오기
+    // 로컬 저장된 내용 불러오기
     loadFromLocal();
 });
 
-// 전역 함수들 (HTML에서 onclick으로 부르는 함수들)
+
+/* =========================================
+   [전역 함수] 버튼 클릭시 실행되는 기능들
+   ========================================= */
 const paintMap = { water: 12, elastic: 22, ceramic: 30 };
 
 function changeP(sIdx, type) {
@@ -109,28 +128,56 @@ function update() {
     if(sumEl) sumEl.innerText = formatKRW(total) + " 원";
 }
 
-/* [임시] DB 없이 작동하는 스마트 출력 */
-function smartPrint() {
+// [핵심 기능] 견적 발행 및 DB 저장
+async function smartPrint() {
     const inputs = document.querySelectorAll('.in-num');
     const name = document.getElementById('g-name').value;
-    
-    // DB 저장 코드는 잠시 뺐습니다 (화면 복구가 우선!)
-    
+    const tel = document.getElementById('g-tel').value;
+    const addr = document.getElementById('g-addr').value;
+
+    if(!name) { alert("고객명을 입력해야 저장이 가능합니다."); return; }
+
+    // (1) 데이터 수집
+    let selectedData = [];
+    let totalAmt = 0;
+    document.querySelectorAll('#view-general .item-line').forEach(row => {
+        const chk = row.querySelector('.chk');
+        if(chk.checked) {
+            const qty = parseFloat(row.querySelector('.qty').value)||0;
+            const price = parseFloat(row.querySelector('.price').value)||0;
+            selectedData.push({
+                item: chk.dataset.name,
+                qty: qty,
+                price: price,
+                sum: qty * price
+            });
+            totalAmt += (qty * price);
+        }
+    });
+
+    // (2) DB 저장 (안전 모드)
+    if(dbClient) {
+        try {
+            await dbClient.from('estimates').insert([{ 
+                client_name: name, client_phone: tel, client_address: addr,
+                total_price: formatKRW(totalAmt), detail_data: selectedData
+            }]);
+            console.log("DB 저장 완료");
+        } catch (err) { console.error("DB 저장 실패 (인쇄는 진행):", err); }
+    }
+
+    // (3) 인쇄 화면 준비
     inputs.forEach(input => { if (input.classList.contains('price')) { input.dataset.orig = input.value; input.type = "text"; input.value = formatKRW(parseFloat(input.value)||0); } });
     const ps = document.getElementById('p-sel');
     if(ps) { const txt = ps.options[ps.selectedIndex].text; document.getElementById('pv-11').innerText = ` [${txt}]`; }
     
-    // 데이터(data) 변수를 여기서 못찾을 수 있으므로 직접 DOM조작
-    for(let idx=0; idx<13; idx++) { // 13개 섹션 반복
+    // 섹션 처리
+    for(let idx=0; idx<13; idx++) {
         const rows = document.querySelectorAll(`.row-${idx}`);
         let hasChecked = false;
         rows.forEach(r => { 
-            if(!r.querySelector('.chk').checked) {
-                r.classList.add('hidden-print'); 
-            } else { 
-                r.classList.remove('hidden-print'); 
-                hasChecked = true; 
-            } 
+            if(!r.querySelector('.chk').checked) { r.classList.add('hidden-print'); } 
+            else { r.classList.remove('hidden-print'); hasChecked = true; } 
         });
 
         const cont = document.getElementById('cont-'+idx);
@@ -147,6 +194,7 @@ function smartPrint() {
 
     window.print();
 
+    // 복구
     setTimeout(() => {
         inputs.forEach(input => { if (input.classList.contains('price')) { input.type = "number"; input.value = input.dataset.orig; } });
         document.querySelectorAll('.section-container').forEach(el => el.classList.remove('hidden-print'));
@@ -155,15 +203,15 @@ function smartPrint() {
 }
 
 function switchToDetailed() {
-    // 상세견적 로직 (간소화)
     const name = document.getElementById('g-name').value;
     const addr = document.getElementById('g-addr').value;
     if(!name || !addr) { alert("고객명과 주소를 입력해주세요."); return; }
     
+    const ps = document.getElementById('p-sel');
+    const paintLabel = ps ? ` <span class="paint-tag">${ps.options[ps.selectedIndex].text}</span>` : '';
     const dBody = document.getElementById('detailed-body'); dBody.innerHTML = '';
     let dTotal = 0;
     
-    // 화면에 있는 모든 체크된 항목 가져오기
     document.querySelectorAll('.item-line').forEach(row => {
         const chk = row.querySelector('.chk');
         if(chk && chk.checked) {
@@ -223,7 +271,6 @@ function loadFromLocal() {
     document.getElementById('g-tel').value = data.tel || '';
     document.getElementById('g-addr').value = data.addr || '';
     
-    // 약간의 지연 후 체크박스 복구 (DOM 생성 기다림)
     setTimeout(() => {
         const rows = document.querySelectorAll('.item-line');
         data.items.forEach(item => {
