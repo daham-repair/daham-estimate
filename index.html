@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>다함 인테리어 | 통합 견적 시스템</title>
-    <link rel="stylesheet" href="style.css?v=5">
+    <link rel="stylesheet" href="style.css?v=6">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="icon" href="logo.png" type="image/png">
 </head>
@@ -20,7 +20,7 @@
                 </div>
                 <div class="rep-info">
                     <strong>대표 김재영</strong>
-                    <div style="color:var(--danger-red); font-weight:800;">010.5404.8747</div>
+                    <div style="color:var(--danger-red);">010.5404.8747</div>
                 </div>
             </div>
             <div class="info-grid">
@@ -55,7 +55,7 @@
         </div>
 
         <div class="notice-footer no-print">
-            <h3><span style="font-size:18px;">ℹ️</span> 안내 및 면책 공고</h3>
+            <h3>[안내 및 면책 공고]</h3>
             <ul>
                 <li>본 견적서는 현장 실측 전 작성된 가견적서이며, 최종 계약 시 금액이 확정됩니다.</li>
                 <li>현장 여건 및 자재 사양 변경에 따라 최종 단가가 조정될 수 있습니다.</li>
@@ -71,13 +71,13 @@
                 </div>
                 <div class="rep-info">
                     <strong>공급자: 김재영 (인)</strong>
-                    <div style="color:var(--danger-red); font-weight:800;">010.5404.8747</div>
+                    <div style="color:var(--danger-red);">010.5404.8747</div>
                 </div>
             </div>
             <div class="info-grid">
-                <div class="input-group"><label>발주처</label><div id="d-name-display" class="info-display"></div></div>
-                <div class="input-group"><label>연락처</label><div id="d-tel-display" class="info-display"></div></div>
-                <div class="input-group full-row"><label>현장 주소</label><div id="d-addr-display" class="info-display"></div></div>
+                <div class="input-group full-row"><label>현장 주소</label><input type="text" id="d-addr-display" class="input-field" readonly></div>
+                <div class="input-group"><label>발주처</label><input type="text" id="d-name-display" class="input-field" readonly></div>
+                <div class="input-group"><label>연락처</label><input type="text" id="d-tel-display" class="input-field" readonly></div>
             </div>
         </div>
 
@@ -118,6 +118,6 @@
     <div id="toast-msg" class="toast">저장되었습니다!</div>
 
 </div>
-<script src="script.js?v=5"></script>
+<script src="script.js?v=6"></script>
 </body>
 </html>
