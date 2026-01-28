@@ -1,3 +1,17 @@
+/* =========================================
+   [1] 수파베이스 연결 설정 (본인 주소 확인 필수!)
+   ========================================= */
+const supabaseUrl = '여기에_Project_URL_붙여넣기';
+const supabaseKey = '여기에_API_Key_anon_public_붙여넣기';
+// 수파베이스 라이브러리가 로드되었는지 확인 후 초기화
+let supabase = null;
+if (typeof supabase !== 'undefined') {
+    supabase = supabase.createClient(supabaseUrl, supabaseKey);
+}
+
+/* =========================================
+   [2] 데이터 및 아이콘 설정
+   ========================================= */
 const icons = {
     demolition: `<svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`,
     carpentry: `<svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM7 19V5h10v14H7z"/></svg>`,
@@ -32,6 +46,7 @@ const data = [
 const paintMap = { water: 12, elastic: 22, ceramic: 30 };
 const body = document.getElementById('estimate-body');
 
+// 초기 렌더링
 data.forEach((sec, idx) => {
     const cont = document.createElement('div'); cont.className = 'section-container'; cont.id = 'cont-'+idx;
     const h = document.createElement('div'); h.className = 'section-header'; 
@@ -59,6 +74,7 @@ data.forEach((sec, idx) => {
     c.innerHTML = rows; cont.appendChild(c); body.appendChild(cont);
 });
 
+// 기능 함수들
 function changeP(sIdx, type) {
     const np = paintMap[type];
     for(let i=0; i<4; i++) {
@@ -87,21 +103,81 @@ function update() {
     document.getElementById('final-sum').innerText = formatKRW(total) + " 원";
 }
 
-function smartPrint() {
+/* =========================================
+   [3] 스마트 출력 함수 (문제 해결된 버전)
+   ========================================= */
+async function smartPrint() {
     const inputs = document.querySelectorAll('.in-num');
+    const name = document.getElementById('g-name').value;
+    const tel = document.getElementById('g-tel').value;
+    const addr = document.getElementById('g-addr').value;
+
+    if(!name) { alert("고객명을 입력해야 저장이 가능합니다."); return; }
+
+    // (1) 데이터 수집 및 DB 저장
+    let selectedData = [];
+    let totalAmt = 0;
+    
+    document.querySelectorAll('#view-general .item-line').forEach(row => {
+        const chk = row.querySelector('.chk');
+        if(chk.checked) {
+            const qty = parseFloat(row.querySelector('.qty').value)||0;
+            const price = parseFloat(row.querySelector('.price').value)||0;
+            selectedData.push({
+                item: chk.dataset.name,
+                qty: qty,
+                price: price,
+                sum: qty * price
+            });
+            totalAmt += (qty * price);
+        }
+    });
+
+    if(supabase) {
+        try {
+            await supabase.from('estimates').insert([{ 
+                client_name: name, client_phone: tel, client_address: addr,
+                total_price: formatKRW(totalAmt), detail_data: selectedData
+            }]);
+        } catch (err) { console.error("저장 실패:", err); }
+    }
+
+    // (2) 인쇄 준비 [핵심 수정: 닫힌 메뉴 강제 열기]
     inputs.forEach(input => { if (input.classList.contains('price')) { input.dataset.orig = input.value; input.type = "text"; input.value = formatKRW(parseFloat(input.value)||0); } });
     const ps = document.getElementById('p-sel');
     if(ps) { const txt = ps.options[ps.selectedIndex].text; document.getElementById('pv-11').innerText = ` [${txt}]`; }
+    
     data.forEach((sec, idx) => {
         const rows = document.querySelectorAll(`.row-${idx}`);
-        let check = false;
-        rows.forEach(r => { if(!r.querySelector('.chk').checked) r.classList.add('hidden-print'); else { r.classList.remove('hidden-print'); check = true; } });
-        if(!check) document.getElementById('cont-'+idx).classList.add('hidden-print');
+        let hasChecked = false;
+        
+        // 해당 섹션에 체크된 게 하나라도 있는지 확인
+        rows.forEach(r => { 
+            if(!r.querySelector('.chk').checked) {
+                r.classList.add('hidden-print'); 
+            } else { 
+                r.classList.remove('hidden-print'); 
+                hasChecked = true; 
+            } 
+        });
+
+        if(hasChecked) {
+            document.getElementById('cont-'+idx).classList.remove('hidden-print');
+            // ★ 핵심: 체크된 게 있으면 메뉴를 강제로 엽니다 (클래스 'show' 추가)
+            document.getElementById('c-'+idx).classList.add('show');
+        } else {
+            document.getElementById('cont-'+idx).classList.add('hidden-print');
+        }
     });
+
     window.print();
+
+    // (3) 인쇄 후 복구
     setTimeout(() => {
         inputs.forEach(input => { if (input.classList.contains('price')) { input.type = "number"; input.value = input.dataset.orig; } });
         document.querySelectorAll('.section-container').forEach(el => el.classList.remove('hidden-print'));
+        // 강제로 열었던 것들 다시 원래대로 (원하면 주석 처리해서 열어둘 수도 있음)
+        // document.querySelectorAll('.section-content').forEach(el => el.classList.remove('show')); 
         update();
     }, 1000);
 }
@@ -110,16 +186,23 @@ function switchToDetailed() {
     const name = document.getElementById('g-name').value;
     const addr = document.getElementById('g-addr').value;
     if(!name || !addr) { alert("고객명과 주소를 입력해주세요."); return; }
+    
     const ps = document.getElementById('p-sel');
     const paintLabel = ps ? ` <span class="paint-tag">${ps.options[ps.selectedIndex].text}</span>` : '';
     const dBody = document.getElementById('detailed-body'); dBody.innerHTML = '';
     let dTotal = 0;
+    
     data.forEach((sec, sIdx) => {
         const sel = [];
-        document.querySelectorAll(`.row-${sIdx} .chk:checked`).forEach(chk => {
-            const row = chk.closest('.item-line');
-            sel.push({ n: chk.dataset.name, q: row.querySelector('.qty').value, p: row.querySelector('.price').value });
+        // [핵심 수정] 닫혀있어도 데이터 가져오도록 수정
+        const allRows = document.querySelectorAll(`.row-${sIdx}`);
+        allRows.forEach(row => {
+            const chk = row.querySelector('.chk');
+            if(chk && chk.checked) {
+                sel.push({ n: chk.dataset.name, q: row.querySelector('.qty').value, p: row.querySelector('.price').value });
+            }
         });
+
         if(sel.length > 0) {
             const h = document.createElement('div'); h.className = 'section-header'; h.innerHTML = sec.isPaint ? `${sec.category}${paintLabel}` : sec.category;
             dBody.appendChild(h);
@@ -131,6 +214,7 @@ function switchToDetailed() {
             });
         }
     });
+    
     document.getElementById('d-name-display').innerText = name;
     document.getElementById('d-tel-display').innerText = document.getElementById('g-tel').value;
     document.getElementById('d-addr-display').innerText = addr;
@@ -147,10 +231,8 @@ function backToGeneral() {
 }
 
 /* =========================================
-   [UX 개선] 로컬 저장 및 초기화 기능
+   [4] 로컬 저장 및 초기화 기능
    ========================================= */
-
-// 1. 임시 저장 (브라우저에 저장)
 function saveToLocal() {
     const saveData = {
         name: document.getElementById('g-name').value,
@@ -158,44 +240,27 @@ function saveToLocal() {
         addr: document.getElementById('g-addr').value,
         items: []
     };
-
-    // 체크된 항목들 저장
     document.querySelectorAll('.item-line').forEach((row, idx) => {
         const chk = row.querySelector('.chk');
         if(chk.checked) {
-            saveData.items.push({
-                idx: idx, // 몇 번째 줄인지
-                qty: row.querySelector('.qty').value,
-                price: row.querySelector('.price').value
-            });
+            saveData.items.push({ idx: idx, qty: row.querySelector('.qty').value, price: row.querySelector('.price').value });
         }
     });
-
     localStorage.setItem('daham_estimate_draft', JSON.stringify(saveData));
     showToast("현재 작성 내용이 임시 저장되었습니다.");
 }
 
-// 2. 불러오기 (페이지 열릴 때 자동 실행)
 function loadFromLocal() {
     const saved = localStorage.getItem('daham_estimate_draft');
     if(!saved) return;
-
     const data = JSON.parse(saved);
     if(!confirm("이전에 작성하던 견적 내용이 있습니다. 불러오시겠습니까?")) {
-        // 아니오 누르면 저장된 거 삭제 (새로 시작)
-        localStorage.removeItem('daham_estimate_draft'); 
-        return;
+        localStorage.removeItem('daham_estimate_draft'); return;
     }
-
-    // 데이터 복구
     document.getElementById('g-name').value = data.name || '';
     document.getElementById('g-tel').value = data.tel || '';
     document.getElementById('g-addr').value = data.addr || '';
-
-    // 모든 체크 해제 후 저장된 것만 체크
     document.querySelectorAll('.chk').forEach(chk => chk.checked = false);
-    
-    // 항목 복구
     const rows = document.querySelectorAll('.item-line');
     data.items.forEach(item => {
         if(rows[item.idx]) {
@@ -205,20 +270,17 @@ function loadFromLocal() {
             row.querySelector('.price').value = item.price;
         }
     });
-
-    update(); // 합계 다시 계산
+    update();
     showToast("작성 내용을 불러왔습니다.");
 }
 
-// 3. 초기화 (새로운 고객)
 function resetForm() {
     if(confirm("모든 내용을 지우고 새로 작성하시겠습니까?")) {
         localStorage.removeItem('daham_estimate_draft');
-        location.reload(); // 새로고침
+        location.reload();
     }
 }
 
-// 4. 알림 메시지 표시 함수
 function showToast(message) {
     const x = document.getElementById("toast-msg");
     x.innerText = message;
@@ -226,8 +288,4 @@ function showToast(message) {
     setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
 }
 
-// 페이지 열리면 자동 실행
-window.onload = function() {
-    loadFromLocal();
-}
-
+window.onload = function() { loadFromLocal(); }
