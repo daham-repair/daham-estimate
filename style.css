@@ -1,237 +1,152 @@
+/* =========================================
+   다함 인테리어 - 원본 화이트 디자인 복구
+   ========================================= */
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
 
 :root {
-    --primary-color: #2c3e50;    /* 신뢰감을 주는 다크 네이비 */
-    --accent-color: #3498db;     /* 포인트 블루 */
-    --bg-color: #f4f6f9;         /* 고급스러운 연한 회색 배경 */
-    --card-bg: #ffffff;
-    --text-main: #333333;
-    --text-sub: #666666;
-    --border-color: #e0e0e0;
-    --danger-red: #e74c3c;
-    --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --text-color: #333;
+    --border-color: #ddd;
+    --bg-gray: #f9f9f9;
+    --primary-red: #e74c3c; /* 포인트 붉은색 */
 }
 
 * { box-sizing: border-box; outline: none; }
 
 body {
     font-family: 'Noto Sans KR', sans-serif;
-    background-color: var(--bg-color);
     margin: 0;
-    padding: 20px;
-    color: var(--text-main);
-    line-height: 1.5;
+    padding: 10px;
+    background-color: #fff;
+    color: var(--text-color);
 }
 
-/* 컨테이너 */
 .container {
     max-width: 800px;
     margin: 0 auto;
-    background-color: var(--card-bg);
-    box-shadow: var(--shadow-soft);
-    border-radius: 8px;
-    overflow: hidden;
-    padding-bottom: 80px; /* 하단 버튼 공간 확보 */
-    position: relative;
-    min-height: 100vh;
+    padding-bottom: 80px; /* 하단 버튼 공간 */
 }
-
-/* 화면 전환 애니메이션 */
-#view-general, #view-detailed { display: none; padding: 40px; }
-.active-view { display: block !important; }
 
 /* 상단 배너 */
 .notice-banner {
-    background-color: #fff3cd;
-    color: #856404;
-    text-align: center;
-    padding: 10px;
-    font-size: 13px;
-    font-weight: 500;
-    border-bottom: 1px solid #ffeeba;
+    background: #fff3cd; color: #856404;
+    text-align: center; padding: 8px; font-size: 13px;
+    margin-bottom: 20px; border-radius: 4px;
 }
 
 /* 헤더 영역 */
-.header-card { margin-bottom: 30px; border-bottom: 2px solid var(--primary-color); padding-bottom: 20px; }
+.header-card { margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 20px; }
 
-.header-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    margin-bottom: 25px;
-}
+.header-top { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; }
+.img-logo { height: 50px; object-fit: contain; }
 
-.img-logo { height: 60px; object-fit: contain; }
-
-.rep-info { text-align: right; font-size: 14px; }
-.rep-info strong { display: block; font-size: 18px; color: var(--primary-color); margin-bottom: 4px; }
+.rep-info { text-align: right; }
+.rep-info strong { font-size: 16px; display: block; margin-bottom: 5px; }
+/* 전화번호 붉은색 포인트 */
+.rep-info div { color: var(--primary-red); font-weight: 700; font-size: 18px; }
 
 /* 입력 폼 그리드 */
-.info-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-}
+.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .full-row { grid-column: span 2; }
 
-.input-group label {
-    display: block;
-    font-size: 12px;
-    color: var(--text-sub);
-    font-weight: 700;
-    margin-bottom: 5px;
-}
-
+.input-group label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 5px; }
 .input-field {
-    width: 100%;
-    padding: 10px;
+    width: 100%; padding: 10px;
     border: 1px solid var(--border-color);
-    border-radius: 4px;
-    font-size: 15px;
-    background: #fdfdfd;
-    transition: all 0.2s;
+    border-radius: 4px; font-size: 15px;
 }
-.input-field:focus { border-color: var(--accent-color); background: #fff; box-shadow: 0 0 0 2px rgba(52,152,219,0.1); }
-.input-field::placeholder { color: #ccc; }
 
-/* 견적 리스트 테이블 스타일 */
-.estimate-section { margin-top: 20px; border: 1px solid var(--border-color); border-radius: 6px; overflow: hidden; }
+/* 견적 리스트 테이블 */
+.estimate-section { border-top: 2px solid #333; margin-top: 30px; }
 
 .grid-header {
     display: grid;
-    background-color: var(--primary-color);
-    color: #fff;
-    font-weight: 500;
-    font-size: 14px;
-    padding: 12px 10px;
-    align-items: center;
+    background-color: #eee; /* 회색 배경 */
+    font-weight: 700; font-size: 13px;
+    padding: 10px; text-align: center;
+    border-bottom: 1px solid #ccc;
 }
+.master-grid { grid-template-columns: 2.5fr 1fr 1.5fr 1.5fr; }
+.detail-grid { grid-template-columns: 2fr 2fr 0.8fr 1.2fr 1.5fr; }
 
-.master-grid { grid-template-columns: 2fr 1fr 1.5fr 1.5fr; gap: 10px; }
-.detail-grid { grid-template-columns: 2fr 2fr 0.8fr 1.2fr 1.5fr; gap: 8px; }
-
+/* 섹션 헤더 (공정 항목) */
 .section-container { border-bottom: 1px solid #eee; }
-
-/* 섹션 헤더 (아이콘 제거됨) */
 .section-header {
-    background-color: #f8f9fa;
-    padding: 12px 15px;
-    font-weight: 700;
-    font-size: 15px;
-    color: var(--primary-color);
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #eee;
+    padding: 12px 10px; font-weight: 700; cursor: pointer;
+    font-size: 15px; display: flex; justify-content: space-between;
+    background: #fff;
 }
-.section-header:hover { background-color: #eff1f3; }
 
-.section-content { display: none; background: #fff; }
+/* ★★★ 요청하신 '공정 항목 옆 아이콘(붉은 원 +)' 숨김 처리 ★★★ */
+.section-icon { display: none !important; }
+
+/* 리스트 내용 */
+.section-content { display: none; }
 .section-content.show { display: block; }
 
 .grid-row {
-    display: grid;
-    padding: 10px;
-    align-items: center;
-    border-bottom: 1px solid #f1f1f1;
-    font-size: 14px;
+    display: grid; padding: 10px;
+    border-bottom: 1px solid #f0f0f0;
+    align-items: center; font-size: 14px;
 }
-.grid-row:last-child { border-bottom: none; }
+.item-line:nth-child(even) { background-color: #fafafa; }
 
-/* 리스트 내부 체크박스 및 인풋 */
-.item-label { display: flex; align-items: center; cursor: pointer; gap: 8px; }
 .in-num {
-    width: 100%;
-    text-align: right;
-    border: none;
-    border-bottom: 1px solid transparent;
-    padding: 4px;
-    font-size: 14px;
+    width: 100%; text-align: right; border: none;
+    border-bottom: 1px solid #eee; padding: 5px; font-size: 14px;
 }
-.in-num:focus { border-bottom: 1px solid var(--accent-color); }
+.in-num:focus { border-bottom: 1px solid var(--primary-red); }
 
-/* 합계 영역 */
+/* 합계 영역 (스크린샷처럼 흰 배경에 붉은 글씨) */
 .total-card {
-    background-color: var(--primary-color);
-    color: white;
-    padding: 20px;
-    margin-top: 20px;
-    border-radius: 6px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 18px;
-    font-weight: 700;
-}
-.total-val { font-size: 24px; color: #ffeb3b; }
-
-/* 하단 안내문 */
-.notice-footer { margin-top: 30px; font-size: 12px; color: #888; border-top: 1px solid #eee; padding-top: 15px; }
-.notice-footer ul { padding-left: 20px; margin: 5px 0; }
-
-/* 하단 액션바 (버튼 영역) */
-.bottom-action-bar {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    background: #fff;
-    border-top: 1px solid #ddd;
-    padding: 10px 20px;
-    display: flex;
-    justify-content: space-around;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-    z-index: 100;
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.action-btn {
-    flex: 1;
-    margin: 0 5px;
-    border: none;
-    background: transparent;
-    color: var(--text-sub);
-    font-size: 11px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    cursor: pointer;
-    padding: 8px 0;
-    border-radius: 8px;
-    transition: background 0.2s;
-}
-.action-btn:hover { background-color: #f1f1f1; color: var(--primary-color); }
-.action-btn .icon { font-size: 20px; margin-bottom: 4px; }
-
-/* 주요 버튼 강조 */
-.btn-print { color: var(--primary-color); font-weight: bold; }
-.btn-next { color: var(--accent-color); font-weight: bold; }
-.btn-save { color: #27ae60; }
-
-/* 토스트 메시지 */
-.toast {
-    visibility: hidden;
-    min-width: 250px;
-    background-color: #333;
-    color: #fff;
+    margin-top: 30px; padding: 20px;
+    border: 1px solid #ddd; border-radius: 8px;
     text-align: center;
-    border-radius: 4px;
-    padding: 12px;
-    position: fixed;
-    z-index: 101;
-    left: 50%; bottom: 80px;
-    transform: translateX(-50%);
-    font-size: 14px;
 }
-.toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+.total-card div:first-child { font-size: 14px; color: #555; margin-bottom: 10px; }
+.total-val {
+    font-size: 32px; font-weight: 700;
+    color: var(--primary-red); /* 크고 붉은 글씨 */
+}
 
-/* 인쇄용 CSS */
+/* 하단 버튼바 */
+.bottom-action-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: #fff; border-top: 1px solid #ccc;
+    display: flex; justify-content: space-around;
+    padding: 10px; z-index: 100;
+    max-width: 800px; margin: 0 auto;
+}
+.action-btn {
+    background: #fff; border: 1px solid #ddd;
+    padding: 8px 15px; border-radius: 4px;
+    cursor: pointer; font-size: 12px; color: #333;
+    display: flex; flex-direction: column; align-items: center;
+    flex: 1; margin: 0 4px;
+}
+.action-btn .icon { font-size: 18px; margin-bottom: 4px; }
+.action-btn:hover { background: #f0f0f0; }
+
+/* 주요 버튼 색상 */
+.btn-save { color: #2ecc71; border-color: #2ecc71; }
+.btn-print { color: #3498db; border-color: #3498db; }
+.btn-next { background-color: #333; color: #fff; border-color: #333; }
+.btn-next:hover { background-color: #555; }
+
+/* 안내문 */
+.notice-footer {
+    margin-top: 40px; font-size: 12px; color: #999;
+    padding-top: 10px; border-top: 1px solid #eee;
+    margin-bottom: 20px;
+}
+
+/* 인쇄 및 화면 숨김 설정 */
 @media print {
-    body { background: white; padding: 0; }
-    .container { box-shadow: none; border: none; padding: 0; width: 100%; max-width: 100%; }
-    .no-print, .bottom-action-bar, .notice-banner, .toast { display: none !important; }
-    .input-field { border: none; padding: 0; }
-    .estimate-section { border: 2px solid #333; }
-    .grid-header { background-color: #ddd !important; color: #000 !important; -webkit-print-color-adjust: exact; }
+    .no-print, .bottom-action-bar { display: none !important; }
+    .container { max-width: 100%; width: 100%; padding: 0; }
+    .section-content { display: block !important; }
     .hidden-print { display: none !important; }
 }
+
+/* 화면 전환 */
+#view-general, #view-detailed { display: none; }
+.active-view { display: block !important; }
