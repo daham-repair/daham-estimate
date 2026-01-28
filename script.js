@@ -1,50 +1,58 @@
 /* =========================================
-   다함 인테리어 견적 시스템 (로직 전용)
+   다함 인테리어 견적 시스템 V_FINAL
    ========================================= */
 
-// ▼▼▼ [1] 수파베이스 키 설정 (여기를 꼭 수정하세요) ▼▼▼
+// ▼▼▼ Supabase 설정 (기존 키 유지하세요) ▼▼▼
 const supabaseUrl = '여기에_Project_URL_붙여넣기';
 const supabaseKey = '여기에_API_Key_anon_public_붙여넣기';
-// ▲▲▲---------------------------------------------▲▲▲
+// ▲▲▲--------------------------------------▲▲▲
 
 let dbClient = null;
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("화면 로딩 완료");
+    console.log("System Ready");
 
-    // DB 연결 시도
+    // DB 연결
     try {
         if (typeof supabase !== 'undefined' && supabaseUrl.startsWith('http')) {
             dbClient = supabase.createClient(supabaseUrl, supabaseKey);
-            console.log("DB 연결 성공");
+            console.log("DB Connected");
         }
-    } catch (e) { console.error("DB 연결 실패(무시):", e); }
+    } catch (e) { console.error("DB Error:", e); }
 
-    // 목록 생성 (data.js에서 데이터를 가져옵니다)
+    // 견적 리스트 생성
     const body = document.getElementById('estimate-body');
     if(body && typeof data !== 'undefined') {
         data.forEach((sec, idx) => {
             const cont = document.createElement('div'); cont.className = 'section-container'; cont.id = 'cont-'+idx;
+            
+            // ★★★ [수정됨] 아이콘 태그 제거함 ★★★
             const h = document.createElement('div'); h.className = 'section-header'; 
-            h.innerHTML = `<span><div class="section-icon">${icons[sec.key]}</div> ${sec.category}<span id="pv-${idx}" class="paint-print-val"></span></span><span class="no-print">▼</span>`;
+            h.innerHTML = `<span>${sec.category}<span id="pv-${idx}" class="paint-print-val"></span></span><span class="no-print" style="font-size:10px; color:#aaa;">▼</span>`;
+            
             h.onclick = () => document.getElementById('c-'+idx).classList.toggle('show');
             cont.appendChild(h);
             
+            // 섹션 내용
             const c = document.createElement('div'); c.className = 'section-content'; c.id = 'c-'+idx;
-            let rows = `<div class="grid-row master-grid no-print bulk-row">
+            
+            // 전체 선택 및 옵션 행
+            let rows = `<div class="grid-row master-grid no-print bulk-row" style="background:#f9f9f9;">
                 <div style="text-align:left;"><label class="item-label bulk-text"><input type="checkbox" onchange="toggleSec(${idx}, this)"><span class="checkmark"></span><span>전체선택</span></label></div>
                 <div style="grid-column: span 3; text-align:right;">
-                    ${sec.isPaint ? `<select id="p-sel" class="paint-select" onchange="changeP(${idx}, this.value)">
+                    ${sec.isPaint ? `<select id="p-sel" class="paint-select" onchange="changeP(${idx}, this.value)" style="padding:2px;">
                         <option value="water">수성 페인트</option><option value="elastic">탄성 코트</option><option value="ceramic">세라믹 코트</option>
                     </select>` : ''}
                 </div>
             </div>`;
+            
+            // 개별 아이템 행
             sec.items.forEach((item, iIdx) => {
                 rows += `<div class="grid-row master-grid row-${idx} item-line">
                     <div style="text-align:left;"><label class="item-label"><input type="checkbox" class="chk" data-name="${item.n}" onchange="update()"><span class="checkmark"></span><span>${item.n}</span></label></div>
                     <div><input type="number" class="in-num qty" value="1" oninput="update()"></div>
                     <div><input type="number" class="in-num price" value="${item.p}" oninput="update()" id="p-${idx}-${iIdx}"></div>
-                    <div class="row-total" style="text-align:right;">0</div>
+                    <div class="row-total" style="text-align:right; font-weight:bold;">0</div>
                 </div>`;
             });
             c.innerHTML = rows; cont.appendChild(c); body.appendChild(cont);
@@ -54,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadFromLocal();
 });
 
-// [기능추가] 전화번호 자동 포맷팅 (010.1234.5678)
+// [기능 1] 전화번호 자동 포맷팅 (010.XXXX.XXXX)
 function autoFormatTel(target) {
     let raw = target.value.replace(/[^0-9]/g, '');
     let fmt = '';
@@ -70,7 +78,7 @@ function autoFormatTel(target) {
     target.value = fmt;
 }
 
-// [기능추가] 입력값 검증 및 커서 이동 공통 함수
+// [기능 2] 필수 입력 검사 및 커서 이동
 function validateInputs() {
     const elName = document.getElementById('g-name');
     const elTel = document.getElementById('g-tel');
@@ -125,8 +133,8 @@ function update() {
     if(sumEl) sumEl.innerText = formatKRW(total) + " 원";
 }
 
+// [기능 3] 인쇄 (하단바는 CSS @media print로 자동 숨김)
 async function smartPrint() {
-    // [수정] 유효성 검사 (실패시 함수 종료 및 커서이동)
     if(!validateInputs()) return;
 
     const inputs = document.querySelectorAll('.in-num');
@@ -134,6 +142,7 @@ async function smartPrint() {
     const tel = document.getElementById('g-tel').value;
     const addr = document.getElementById('g-addr').value;
 
+    // DB 저장 로직
     let selectedData = [];
     let totalAmt = 0;
     document.querySelectorAll('#view-general .item-line').forEach(row => {
@@ -152,14 +161,14 @@ async function smartPrint() {
                 client_name: name, client_phone: tel, client_address: addr,
                 total_price: formatKRW(totalAmt), detail_data: selectedData
             }]);
-        } catch (err) { console.error("DB 저장 실패:", err); }
+        } catch (err) { console.error("DB Insert Failed:", err); }
     }
 
+    // 인쇄용 뷰 변환
     inputs.forEach(input => { if (input.classList.contains('price')) { input.dataset.orig = input.value; input.type = "text"; input.value = formatKRW(parseFloat(input.value)||0); } });
     const ps = document.getElementById('p-sel');
     if(ps) { const txt = ps.options[ps.selectedIndex].text; document.getElementById('pv-11').innerText = ` [${txt}]`; }
     
-    // 인쇄 모드 전환
     for(let idx=0; idx<13; idx++) {
         const rows = document.querySelectorAll(`.row-${idx}`);
         let hasChecked = false;
@@ -182,6 +191,7 @@ async function smartPrint() {
 
     window.print();
 
+    // 복구
     setTimeout(() => {
         inputs.forEach(input => { if (input.classList.contains('price')) { input.type = "number"; input.value = input.dataset.orig; } });
         document.querySelectorAll('.section-container').forEach(el => el.classList.remove('hidden-print'));
@@ -189,8 +199,8 @@ async function smartPrint() {
     }, 1000);
 }
 
+// [기능 4] 계약서 발행 (이때 하단 메뉴 숨김)
 function switchToDetailed() {
-    // [수정] 유효성 검사 (이름/번호/주소 체크 + 커서이동)
     if(!validateInputs()) return;
     
     const name = document.getElementById('g-name').value;
@@ -209,20 +219,20 @@ function switchToDetailed() {
             const sum = q * p; dTotal += sum;
             const div = document.createElement('div');
             div.className = 'grid-row detail-grid';
-            div.innerHTML = `<strong>${n}</strong><input type="text" class="spec-field" placeholder="사양 입력"><div>${q}</div><div>${parseInt(p).toLocaleString()}</div><div style="text-align:right;">${formatKRW(sum)}</div>`;
+            div.innerHTML = `<div>${n}</div><input type="text" class="spec-field" style="width:100%; border:1px solid #ddd;" placeholder="사양 입력"><div>${q}</div><div>${parseInt(p).toLocaleString()}</div><div style="text-align:right;">${formatKRW(sum)}</div>`;
             dBody.appendChild(div);
         }
     });
     
-    document.getElementById('d-name-display').innerText = name;
-    document.getElementById('d-tel-display').innerText = tel; // 번호 표시
-    document.getElementById('d-addr-display').innerText = addr;
+    document.getElementById('d-name-display').value = name;
+    document.getElementById('d-tel-display').value = tel;
+    document.getElementById('d-addr-display').value = addr;
     document.getElementById('d-total').innerText = formatKRW(dTotal) + " 원";
     
     document.getElementById('view-general').classList.remove('active-view');
     document.getElementById('view-detailed').classList.add('active-view');
 
-    // [기능추가] 하단 액션바 숨김
+    // ★★★ 하단 메뉴바 숨김 ★★★
     const actionBar = document.querySelector('.bottom-action-bar');
     if(actionBar) actionBar.style.display = 'none';
 
@@ -233,9 +243,9 @@ function backToGeneral() {
     document.getElementById('view-detailed').classList.remove('active-view');
     document.getElementById('view-general').classList.add('active-view');
     
-    // [기능추가] 하단 액션바 다시 표시
+    // ★★★ 하단 메뉴바 복구 ★★★
     const actionBar = document.querySelector('.bottom-action-bar');
-    if(actionBar) actionBar.style.display = ''; // 기존 CSS(flex) 복구
+    if(actionBar) actionBar.style.display = 'flex';
 
     window.scrollTo(0,0);
 }
@@ -260,7 +270,7 @@ function saveToLocal() {
 function loadFromLocal() {
     const saved = localStorage.getItem('daham_estimate_draft');
     if(!saved) return;
-    if(!confirm("이전에 작성하던 내용이 있습니다. 불러오시겠습니까?")) {
+    if(!confirm("작성 중인 내용이 있습니다. 불러오시겠습니까?")) {
         localStorage.removeItem('daham_estimate_draft'); return;
     }
     const data = JSON.parse(saved);
@@ -283,7 +293,7 @@ function loadFromLocal() {
 }
 
 function resetForm() {
-    if(confirm("초기화 하시겠습니까?")) {
+    if(confirm("모든 내용을 초기화 하시겠습니까?")) {
         localStorage.removeItem('daham_estimate_draft');
         location.reload();
     }
