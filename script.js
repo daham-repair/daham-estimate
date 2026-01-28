@@ -1,15 +1,23 @@
 /* =========================================
-   [1] 수파베이스 연결 설정 (변수명 충돌 해결)
+   [1] 수파베이스 연결 (에러나도 멈추지 않게 안전장치 추가)
    ========================================= */
-const supabaseUrl = '여기에_Project_URL_붙여넣기'; // 따옴표 안의 내용을 본인 것으로 꼭 바꾸세요!
-const supabaseKey = '여기에_API_Key_anon_public_붙여넣기'; // 따옴표 안의 내용을 본인 것으로 꼭 바꾸세요!
+// ▼▼▼ 여기에 본인 주소와 키를 넣어주세요 ▼▼▼
+const supabaseUrl = '여기에_Project_URL_붙여넣기';
+const supabaseKey = '여기에_API_Key_anon_public_붙여넣기';
+// ▲▲▲----------------------------------▲▲▲
 
-// [수정] 변수 이름을 'supabase' -> 'dbClient'로 변경하여 충돌 방지
 let dbClient = null;
-if (typeof supabase !== 'undefined') {
-    dbClient = supabase.createClient(supabaseUrl, supabaseKey);
-} else {
-    console.log("수파베이스 라이브러리가 로드되지 않았습니다. (HTML 헤더 확인 필요)");
+
+// 안전 장치: DB 연결하다가 실패해도 목록은 보여주도록 설정
+try {
+    if (typeof supabase !== 'undefined' && supabaseUrl.startsWith('http')) {
+        dbClient = supabase.createClient(supabaseUrl, supabaseKey);
+        console.log("DB 연결 성공");
+    } else {
+        console.log("DB 연결 건너뜀 (설정값 확인 필요)");
+    }
+} catch (error) {
+    console.error("DB 연결 중 오류 발생(무시하고 진행):", error);
 }
 
 /* =========================================
@@ -49,33 +57,37 @@ const data = [
 const paintMap = { water: 12, elastic: 22, ceramic: 30 };
 const body = document.getElementById('estimate-body');
 
-// 초기 렌더링
-data.forEach((sec, idx) => {
-    const cont = document.createElement('div'); cont.className = 'section-container'; cont.id = 'cont-'+idx;
-    const h = document.createElement('div'); h.className = 'section-header'; 
-    h.innerHTML = `<span><div class="section-icon">${icons[sec.key]}</div> ${sec.category}<span id="pv-${idx}" class="paint-print-val"></span></span><span class="no-print">▼</span>`;
-    h.onclick = () => document.getElementById('c-'+idx).classList.toggle('show');
-    cont.appendChild(h);
-    
-    const c = document.createElement('div'); c.className = 'section-content'; c.id = 'c-'+idx;
-    let rows = `<div class="grid-row master-grid no-print bulk-row">
-        <div style="text-align:left;"><label class="item-label bulk-text"><input type="checkbox" onchange="toggleSec(${idx}, this)"><span class="checkmark"></span><span>전체선택</span></label></div>
-        <div style="grid-column: span 3; text-align:right;">
-            ${sec.isPaint ? `<select id="p-sel" class="paint-select" onchange="changeP(${idx}, this.value)">
-                <option value="water">수성 페인트</option><option value="elastic">탄성 코트</option><option value="ceramic">세라믹 코트</option>
-            </select>` : ''}
-        </div>
-    </div>`;
-    sec.items.forEach((item, iIdx) => {
-        rows += `<div class="grid-row master-grid row-${idx} item-line">
-            <div style="text-align:left;"><label class="item-label"><input type="checkbox" class="chk" data-name="${item.n}" onchange="update()"><span class="checkmark"></span><span>${item.n}</span></label></div>
-            <div><input type="number" class="in-num qty" value="1" oninput="update()"></div>
-            <div><input type="number" class="in-num price" value="${item.p}" oninput="update()" id="p-${idx}-${iIdx}"></div>
-            <div class="row-total" style="text-align:right; padding-right:20px;">0</div>
+// 초기 렌더링 (목록 만들기)
+if(body) {
+    data.forEach((sec, idx) => {
+        const cont = document.createElement('div'); cont.className = 'section-container'; cont.id = 'cont-'+idx;
+        const h = document.createElement('div'); h.className = 'section-header'; 
+        h.innerHTML = `<span><div class="section-icon">${icons[sec.key]}</div> ${sec.category}<span id="pv-${idx}" class="paint-print-val"></span></span><span class="no-print">▼</span>`;
+        h.onclick = () => document.getElementById('c-'+idx).classList.toggle('show');
+        cont.appendChild(h);
+        
+        const c = document.createElement('div'); c.className = 'section-content'; c.id = 'c-'+idx;
+        let rows = `<div class="grid-row master-grid no-print bulk-row">
+            <div style="text-align:left;"><label class="item-label bulk-text"><input type="checkbox" onchange="toggleSec(${idx}, this)"><span class="checkmark"></span><span>전체선택</span></label></div>
+            <div style="grid-column: span 3; text-align:right;">
+                ${sec.isPaint ? `<select id="p-sel" class="paint-select" onchange="changeP(${idx}, this.value)">
+                    <option value="water">수성 페인트</option><option value="elastic">탄성 코트</option><option value="ceramic">세라믹 코트</option>
+                </select>` : ''}
+            </div>
         </div>`;
+        sec.items.forEach((item, iIdx) => {
+            rows += `<div class="grid-row master-grid row-${idx} item-line">
+                <div style="text-align:left;"><label class="item-label"><input type="checkbox" class="chk" data-name="${item.n}" onchange="update()"><span class="checkmark"></span><span>${item.n}</span></label></div>
+                <div><input type="number" class="in-num qty" value="1" oninput="update()"></div>
+                <div><input type="number" class="in-num price" value="${item.p}" oninput="update()" id="p-${idx}-${iIdx}"></div>
+                <div class="row-total" style="text-align:right; padding-right:20px;">0</div>
+            </div>`;
+        });
+        c.innerHTML = rows; cont.appendChild(c); body.appendChild(cont);
     });
-    c.innerHTML = rows; cont.appendChild(c); body.appendChild(cont);
-});
+} else {
+    console.error("HTML에 id='estimate-body'가 없습니다.");
+}
 
 // 기능 함수들
 function changeP(sIdx, type) {
@@ -100,4 +112,191 @@ function update() {
         const chk = row.querySelector('.chk');
         if(chk.checked) {
             const sum = (parseFloat(row.querySelector('.qty').value)||0)*(parseFloat(row.querySelector('.price').value)||0);
-            total += sum; row.querySelector('.row-total').innerText = format
+            total += sum; row.querySelector('.row-total').innerText = formatKRW(sum);
+        } else if (row.querySelector('.row-total')) row.querySelector('.row-total').innerText = "0";
+    });
+    const sumEl = document.getElementById('final-sum');
+    if(sumEl) sumEl.innerText = formatKRW(total) + " 원";
+}
+
+/* =========================================
+   [3] 스마트 출력 및 저장
+   ========================================= */
+async function smartPrint() {
+    const inputs = document.querySelectorAll('.in-num');
+    const name = document.getElementById('g-name').value;
+    const tel = document.getElementById('g-tel').value;
+    const addr = document.getElementById('g-addr').value;
+
+    if(!name) { alert("고객명을 입력해야 저장이 가능합니다."); return; }
+
+    let selectedData = [];
+    let totalAmt = 0;
+    
+    document.querySelectorAll('#view-general .item-line').forEach(row => {
+        const chk = row.querySelector('.chk');
+        if(chk.checked) {
+            const qty = parseFloat(row.querySelector('.qty').value)||0;
+            const price = parseFloat(row.querySelector('.price').value)||0;
+            selectedData.push({
+                item: chk.dataset.name,
+                qty: qty,
+                price: price,
+                sum: qty * price
+            });
+            totalAmt += (qty * price);
+        }
+    });
+
+    // DB 저장 (안전 모드 적용)
+    if(dbClient) {
+        try {
+            await dbClient.from('estimates').insert([{ 
+                client_name: name, client_phone: tel, client_address: addr,
+                total_price: formatKRW(totalAmt), detail_data: selectedData
+            }]);
+            console.log("DB 저장 완료");
+        } catch (err) { console.error("DB 저장 실패 (인쇄는 진행):", err); }
+    }
+
+    inputs.forEach(input => { if (input.classList.contains('price')) { input.dataset.orig = input.value; input.type = "text"; input.value = formatKRW(parseFloat(input.value)||0); } });
+    const ps = document.getElementById('p-sel');
+    if(ps) { const txt = ps.options[ps.selectedIndex].text; document.getElementById('pv-11').innerText = ` [${txt}]`; }
+    
+    data.forEach((sec, idx) => {
+        const rows = document.querySelectorAll(`.row-${idx}`);
+        let hasChecked = false;
+        rows.forEach(r => { 
+            if(!r.querySelector('.chk').checked) {
+                r.classList.add('hidden-print'); 
+            } else { 
+                r.classList.remove('hidden-print'); 
+                hasChecked = true; 
+            } 
+        });
+
+        if(hasChecked) {
+            document.getElementById('cont-'+idx).classList.remove('hidden-print');
+            document.getElementById('c-'+idx).classList.add('show');
+        } else {
+            document.getElementById('cont-'+idx).classList.add('hidden-print');
+        }
+    });
+
+    window.print();
+
+    setTimeout(() => {
+        inputs.forEach(input => { if (input.classList.contains('price')) { input.type = "number"; input.value = input.dataset.orig; } });
+        document.querySelectorAll('.section-container').forEach(el => el.classList.remove('hidden-print'));
+        update();
+    }, 1000);
+}
+
+function switchToDetailed() {
+    const name = document.getElementById('g-name').value;
+    const addr = document.getElementById('g-addr').value;
+    if(!name || !addr) { alert("고객명과 주소를 입력해주세요."); return; }
+    
+    const ps = document.getElementById('p-sel');
+    const paintLabel = ps ? ` <span class="paint-tag">${ps.options[ps.selectedIndex].text}</span>` : '';
+    const dBody = document.getElementById('detailed-body'); dBody.innerHTML = '';
+    let dTotal = 0;
+    
+    data.forEach((sec, sIdx) => {
+        const sel = [];
+        const allRows = document.querySelectorAll(`.row-${sIdx}`);
+        allRows.forEach(row => {
+            const chk = row.querySelector('.chk');
+            if(chk && chk.checked) {
+                sel.push({ n: chk.dataset.name, q: row.querySelector('.qty').value, p: row.querySelector('.price').value });
+            }
+        });
+
+        if(sel.length > 0) {
+            const h = document.createElement('div'); h.className = 'section-header'; h.innerHTML = sec.isPaint ? `${sec.category}${paintLabel}` : sec.category;
+            dBody.appendChild(h);
+            sel.forEach(item => {
+                const row = document.createElement('div'); row.className = 'grid-row detail-grid';
+                const sum = item.q * item.p; dTotal += sum;
+                row.innerHTML = `<strong>${item.n}</strong><input type="text" class="spec-field" placeholder="사양 입력"><div>${item.q}</div><div>${parseInt(item.p).toLocaleString()}</div><div style="text-align:right;">${formatKRW(sum)}</div>`;
+                dBody.appendChild(row);
+            });
+        }
+    });
+    
+    document.getElementById('d-name-display').innerText = name;
+    document.getElementById('d-tel-display').innerText = document.getElementById('g-tel').value;
+    document.getElementById('d-addr-display').innerText = addr;
+    document.getElementById('d-total').innerText = formatKRW(dTotal) + " 원";
+    document.getElementById('view-general').classList.remove('active-view');
+    document.getElementById('view-detailed').classList.add('active-view');
+    window.scrollTo(0,0);
+}
+
+function backToGeneral() {
+    document.getElementById('view-detailed').classList.remove('active-view');
+    document.getElementById('view-general').classList.add('active-view');
+    window.scrollTo(0,0);
+}
+
+/* =========================================
+   [4] 로컬 저장 및 초기화 기능
+   ========================================= */
+function saveToLocal() {
+    const saveData = {
+        name: document.getElementById('g-name').value,
+        tel: document.getElementById('g-tel').value,
+        addr: document.getElementById('g-addr').value,
+        items: []
+    };
+    document.querySelectorAll('.item-line').forEach((row, idx) => {
+        const chk = row.querySelector('.chk');
+        if(chk.checked) {
+            saveData.items.push({ idx: idx, qty: row.querySelector('.qty').value, price: row.querySelector('.price').value });
+        }
+    });
+    localStorage.setItem('daham_estimate_draft', JSON.stringify(saveData));
+    showToast("현재 작성 내용이 임시 저장되었습니다.");
+}
+
+function loadFromLocal() {
+    const saved = localStorage.getItem('daham_estimate_draft');
+    if(!saved) return;
+    const data = JSON.parse(saved);
+    if(!confirm("이전에 작성하던 견적 내용이 있습니다. 불러오시겠습니까?")) {
+        localStorage.removeItem('daham_estimate_draft'); return;
+    }
+    document.getElementById('g-name').value = data.name || '';
+    document.getElementById('g-tel').value = data.tel || '';
+    document.getElementById('g-addr').value = data.addr || '';
+    document.querySelectorAll('.chk').forEach(chk => chk.checked = false);
+    const rows = document.querySelectorAll('.item-line');
+    data.items.forEach(item => {
+        if(rows[item.idx]) {
+            const row = rows[item.idx];
+            row.querySelector('.chk').checked = true;
+            row.querySelector('.qty').value = item.qty;
+            row.querySelector('.price').value = item.price;
+        }
+    });
+    update();
+    showToast("작성 내용을 불러왔습니다.");
+}
+
+function resetForm() {
+    if(confirm("모든 내용을 지우고 새로 작성하시겠습니까?")) {
+        localStorage.removeItem('daham_estimate_draft');
+        location.reload();
+    }
+}
+
+function showToast(message) {
+    const x = document.getElementById("toast-msg");
+    if(x) {
+        x.innerText = message;
+        x.className = "toast show";
+        setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+    }
+}
+
+window.onload = function() { loadFromLocal(); }
