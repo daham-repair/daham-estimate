@@ -1,5 +1,5 @@
 /* =========================================
-   다함 인테리어 견적 시스템 (최종 완성본)
+   다함 인테리어 견적 시스템 (로직 전용)
    ========================================= */
 
 // ▼▼▼ [1] 수파베이스 키 설정 (여기를 꼭 수정하세요) ▼▼▼
@@ -12,51 +12,17 @@ let dbClient = null;
 document.addEventListener('DOMContentLoaded', function() {
     console.log("화면 로딩 완료");
 
+    // DB 연결 시도
     try {
         if (typeof supabase !== 'undefined' && supabaseUrl.startsWith('http')) {
             dbClient = supabase.createClient(supabaseUrl, supabaseKey);
             console.log("DB 연결 성공");
-        } else {
-            console.log("DB 설정 없음 (저장 기능 OFF)");
         }
-    } catch (e) {
-        console.error("DB 연결 에러(무시):", e);
-    }
+    } catch (e) { console.error("DB 연결 실패(무시):", e); }
 
-    const icons = {
-        demolition: `<svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`,
-        carpentry: `<svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM7 19V5h10v14H7z"/></svg>`,
-        film: `<svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>`,
-        plumbing: `<svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71L12 2z"/></svg>`,
-        electrical: `<svg viewBox="0 0 24 24"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg>`,
-        wallpaper: `<svg viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9z"/></svg>`,
-        flooring: `<svg viewBox="0 0 24 24"><path d="M3 5h18v2H3zm0 6h18v2H3zm0 6h18v2H3z"/></svg>`,
-        furniture: `<svg viewBox="0 0 24 24"><path d="M4 18v3h3v-3h10v3h3v-3h1V3H3v15h1z"/></svg>`,
-        door: `<svg viewBox="0 0 24 24"><path d="M6 3v18h12V3H6z"/></svg>`,
-        sash: `<svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>`,
-        paint: `<svg viewBox="0 0 24 24"><path d="M7 14c-1.66 0-3 1.34-3 3 0 1.31-1.16 2-2 2 .92 1.22 2.49 2 4 2 2.21 0 4-1.79 4-4 0-1.66-1.34-3-3-3zm13.71-9.37l-1.34-1.34a.996.996 0 0 0-1.41 0L9 13.59V18h4.41l10.3-10.3c.39-.39.39-1.02 0-1.41z"/></svg>`,
-        plus: `<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>`
-    };
-
-    const data = [
-        { category: "철거", key: "demolition", items: [{n:"샤시", p:35},{n:"문", p:5},{n:"문틀", p:5},{n:"몰딩", p:1.5},{n:"우물박스", p:5},{n:"걸레받이", p:1},{n:"싱크대", p:20},{n:"신발장", p:10},{n:"붙박이장", p:15},{n:"화장실 타일", p:25},{n:"화장실 도기", p:20},{n:"화장실 천장", p:10},{n:"화장실 바닥", p:15},{n:"현관 타일", p:15},{n:"현관 디딤석", p:5},{n:"베란다 타일", p:20},{n:"스위치 철거", p:0.5},{n:"콘센트 철거", p:0.5},{n:"등 철거", p:1},{n:"강마루 철거(평)", p:1.8},{n:"철거인건비", p:0}] },
-        { category: "목공", key: "carpentry", items: [{n:"천장시공", p:25},{n:"천장몰딩", p:2},{n:"걸레받이 시공", p:2},{n:"문선몰딩", p:5},{n:"문틀시공", p:35},{n:"가벽시공", p:20},{n:"실링팬 보강", p:10},{n:"단열작업", p:18},{n:"기타", p:0},{n:"목공인건비", p:0}] },
-        { category: "필름", key: "film", items: [{n:"샤시", p:25},{n:"문틀", p:10},{n:"문", p:12},{n:"싱크대", p:30},{n:"신발장", p:15},{n:"붙박이장", p:30},{n:"기타", p:0},{n:"필름인건비", p:0}] },
-        { category: "설비", key: "plumbing", items: [{n:"화장실 방수", p:45},{n:"화장실 수도 배관 교체", p:20},{n:"주방 수도 배관 교체", p:20},{n:"주방 수도 내림", p:15},{n:"도기 셋팅", p:25},{n:"배란다 수도 연장", p:15},{n:"설비인건비", p:0}] },
-        { category: "타일", key: "plus", items: [{n:"화장실 벽", p:120},{n:"화장실 바닥", p:30},{n:"주방 타일", p:40},{n:"베란다 타일", p:60},{n:"현관 타일", p:25},{n:"타일인건비", p:0}] },
-        { category: "전기", key: "electrical", items: [{n:"스위치 교체", p:2},{n:"콘센트 교체", p:2},{n:"전기증설 인입", p:35},{n:"방등", p:3.5},{n:"다운라이트", p:2.5},{n:"실링팬 설치", p:15},{n:"차단기 교체", p:10},{n:"차단기 증설", p:15},{n:"전기인건비", p:0}] },
-        { category: "도배", key: "wallpaper", items: [{n:"합지", p:3.5},{n:"실크", p:5.5},{n:"도배인건비", p:0}] },
-        { category: "바닥", key: "flooring", items: [{n:"장판", p:6.5},{n:"강화마루", p:12},{n:"강마루", p:15},{n:"데코타일", p:6},{n:"바닥인건비", p:0}] },
-        { category: "가구", key: "furniture", items: [{n:"싱크대", p:120},{n:"신발장", p:45},{n:"큰방 붙박이", p:22},{n:"작은장 붙박이", p:55},{n:"베란다 창고장", p:25},{n:"가구인건비", p:0}] },
-        { category: "중문", key: "door", items: [{n:"슬라이딩", p:110},{n:"3연동", p:100},{n:"미닫이", p:120},{n:"중문인건비", p:0}] },
-        { category: "샤시", key: "sash", items: [{n:"샤시 교체/수리", p:0},{n:"샤시인건비", p:0}] },
-        { category: "페인트", key: "paint", isPaint: true, items: [{n:"거실베란다", p:12},{n:"큰방베란다", p:12},{n:"작은베란다", p:12},{n:"주방베란다", p:12},{n:"페인트인건비", p:0}] },
-        { category: "기타", key: "plus", items: [{n:"화장실 돔천장", p:20},{n:"입주 청소", p:30},{n:"폐기물 처리", p:0},{n:"기타인건비", p:0}] }
-    ];
-
+    // 목록 생성 (data.js에서 데이터를 가져옵니다)
     const body = document.getElementById('estimate-body');
-
-    if(body) {
+    if(body && typeof data !== 'undefined') {
         data.forEach((sec, idx) => {
             const cont = document.createElement('div'); cont.className = 'section-container'; cont.id = 'cont-'+idx;
             const h = document.createElement('div'); h.className = 'section-header'; 
@@ -134,9 +100,7 @@ async function smartPrint() {
         if(chk.checked) {
             const qty = parseFloat(row.querySelector('.qty').value)||0;
             const price = parseFloat(row.querySelector('.price').value)||0;
-            selectedData.push({
-                item: chk.dataset.name, qty: qty, price: price, sum: qty * price
-            });
+            selectedData.push({ item: chk.dataset.name, qty: qty, price: price, sum: qty * price });
             totalAmt += (qty * price);
         }
     });
@@ -147,7 +111,6 @@ async function smartPrint() {
                 client_name: name, client_phone: tel, client_address: addr,
                 total_price: formatKRW(totalAmt), detail_data: selectedData
             }]);
-            console.log("DB 저장 완료");
         } catch (err) { console.error("DB 저장 실패:", err); }
     }
 
@@ -155,6 +118,7 @@ async function smartPrint() {
     const ps = document.getElementById('p-sel');
     if(ps) { const txt = ps.options[ps.selectedIndex].text; document.getElementById('pv-11').innerText = ` [${txt}]`; }
     
+    // 인쇄 모드 전환
     for(let idx=0; idx<13; idx++) {
         const rows = document.querySelectorAll(`.row-${idx}`);
         let hasChecked = false;
@@ -189,8 +153,6 @@ function switchToDetailed() {
     const addr = document.getElementById('g-addr').value;
     if(!name || !addr) { alert("고객명과 주소를 입력해주세요."); return; }
     
-    const ps = document.getElementById('p-sel');
-    const paintLabel = ps ? ` <span class="paint-tag">${ps.options[ps.selectedIndex].text}</span>` : '';
     const dBody = document.getElementById('detailed-body'); dBody.innerHTML = '';
     let dTotal = 0;
     
@@ -200,9 +162,7 @@ function switchToDetailed() {
             const n = chk.dataset.name;
             const q = row.querySelector('.qty').value;
             const p = row.querySelector('.price').value;
-            const sum = q * p; 
-            dTotal += sum;
-
+            const sum = q * p; dTotal += sum;
             const div = document.createElement('div');
             div.className = 'grid-row detail-grid';
             div.innerHTML = `<strong>${n}</strong><input type="text" class="spec-field" placeholder="사양 입력"><div>${q}</div><div>${parseInt(p).toLocaleString()}</div><div style="text-align:right;">${formatKRW(sum)}</div>`;
@@ -276,9 +236,5 @@ function resetForm() {
 
 function showToast(message) {
     const x = document.getElementById("toast-msg");
-    if(x) {
-        x.innerText = message;
-        x.className = "toast show";
-        setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
-    }
+    if(x) { x.innerText = message; x.className = "toast show"; setTimeout(() => x.className = x.className.replace("show", ""), 3000); }
 }
