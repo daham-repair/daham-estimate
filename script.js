@@ -54,6 +54,46 @@ document.addEventListener('DOMContentLoaded', function() {
     loadFromLocal();
 });
 
+// [기능추가] 전화번호 자동 포맷팅 (010.1234.5678)
+function autoFormatTel(target) {
+    let raw = target.value.replace(/[^0-9]/g, '');
+    let fmt = '';
+    if(raw.length < 4) {
+        fmt = raw;
+    } else if(raw.length < 7) {
+        fmt = raw.substr(0,3)+'.'+raw.substr(3);
+    } else if(raw.length < 11) {
+        fmt = raw.substr(0,3)+'.'+raw.substr(3,3)+'.'+raw.substr(6);
+    } else {
+        fmt = raw.substr(0,3)+'.'+raw.substr(3,4)+'.'+raw.substr(7);
+    }
+    target.value = fmt;
+}
+
+// [기능추가] 입력값 검증 및 커서 이동 공통 함수
+function validateInputs() {
+    const elName = document.getElementById('g-name');
+    const elTel = document.getElementById('g-tel');
+    const elAddr = document.getElementById('g-addr');
+
+    if(!elName.value.trim()) {
+        alert("고객명을 입력해주세요.");
+        elName.focus();
+        return false;
+    }
+    if(!elTel.value.trim()) {
+        alert("연락처를 입력해주세요.");
+        elTel.focus();
+        return false;
+    }
+    if(!elAddr.value.trim()) {
+        alert("현장 주소를 입력해주세요.");
+        elAddr.focus();
+        return false;
+    }
+    return true;
+}
+
 const paintMap = { water: 12, elastic: 22, ceramic: 30 };
 
 function changeP(sIdx, type) {
@@ -86,12 +126,13 @@ function update() {
 }
 
 async function smartPrint() {
+    // [수정] 유효성 검사 (실패시 함수 종료 및 커서이동)
+    if(!validateInputs()) return;
+
     const inputs = document.querySelectorAll('.in-num');
     const name = document.getElementById('g-name').value;
     const tel = document.getElementById('g-tel').value;
     const addr = document.getElementById('g-addr').value;
-
-    if(!name) { alert("고객명을 입력해야 저장이 가능합니다."); return; }
 
     let selectedData = [];
     let totalAmt = 0;
@@ -149,9 +190,12 @@ async function smartPrint() {
 }
 
 function switchToDetailed() {
+    // [수정] 유효성 검사 (이름/번호/주소 체크 + 커서이동)
+    if(!validateInputs()) return;
+    
     const name = document.getElementById('g-name').value;
+    const tel = document.getElementById('g-tel').value;
     const addr = document.getElementById('g-addr').value;
-    if(!name || !addr) { alert("고객명과 주소를 입력해주세요."); return; }
     
     const dBody = document.getElementById('detailed-body'); dBody.innerHTML = '';
     let dTotal = 0;
@@ -171,17 +215,28 @@ function switchToDetailed() {
     });
     
     document.getElementById('d-name-display').innerText = name;
-    document.getElementById('d-tel-display').innerText = document.getElementById('g-tel').value;
+    document.getElementById('d-tel-display').innerText = tel; // 번호 표시
     document.getElementById('d-addr-display').innerText = addr;
     document.getElementById('d-total').innerText = formatKRW(dTotal) + " 원";
+    
     document.getElementById('view-general').classList.remove('active-view');
     document.getElementById('view-detailed').classList.add('active-view');
+
+    // [기능추가] 하단 액션바 숨김
+    const actionBar = document.querySelector('.bottom-action-bar');
+    if(actionBar) actionBar.style.display = 'none';
+
     window.scrollTo(0,0);
 }
 
 function backToGeneral() {
     document.getElementById('view-detailed').classList.remove('active-view');
     document.getElementById('view-general').classList.add('active-view');
+    
+    // [기능추가] 하단 액션바 다시 표시
+    const actionBar = document.querySelector('.bottom-action-bar');
+    if(actionBar) actionBar.style.display = ''; // 기존 CSS(flex) 복구
+
     window.scrollTo(0,0);
 }
 
