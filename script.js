@@ -9,23 +9,20 @@ const supabaseKey = '여기에_API_Key_anon_public_붙여넣기';
 
 let dbClient = null;
 
-// [안전장치 1] 화면(HTML)이 다 준비된 뒤에만 스크립트를 실행한다.
 document.addEventListener('DOMContentLoaded', function() {
     console.log("화면 로딩 완료");
 
-    // [안전장치 2] DB 연결 시도 (오류 나도 무시하고 진행)
     try {
         if (typeof supabase !== 'undefined' && supabaseUrl.startsWith('http')) {
             dbClient = supabase.createClient(supabaseUrl, supabaseKey);
             console.log("DB 연결 성공");
         } else {
-            console.log("DB 설정이 없거나 라이브러리 로드 실패 (저장 기능만 꺼짐)");
+            console.log("DB 설정 없음 (저장 기능 OFF)");
         }
     } catch (e) {
-        console.error("DB 연결 중 에러(무시):", e);
+        console.error("DB 연결 에러(무시):", e);
     }
 
-    // [2] 데이터 및 아이콘 설정
     const icons = {
         demolition: `<svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`,
         carpentry: `<svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM7 19V5h10v14H7z"/></svg>`,
@@ -42,24 +39,23 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     const data = [
-        { category: "철거 (Demolition)", key: "demolition", items: [{n:"샤시", p:35},{n:"문", p:5},{n:"문틀", p:5},{n:"몰딩", p:1.5},{n:"우물박스", p:5},{n:"걸레받이", p:1},{n:"싱크대", p:20},{n:"신발장", p:10},{n:"붙박이장", p:15},{n:"화장실 타일", p:25},{n:"화장실 도기", p:20},{n:"화장실 천장", p:10},{n:"화장실 바닥", p:15},{n:"현관 타일", p:15},{n:"현관 디딤석", p:5},{n:"베란다 타일", p:20},{n:"스위치 철거", p:0.5},{n:"콘센트 철거", p:0.5},{n:"등 철거", p:1},{n:"강마루 철거(평)", p:1.8},{n:"철거인건비", p:0}] },
-        { category: "목공 (Carpentry)", key: "carpentry", items: [{n:"천장시공", p:25},{n:"천장몰딩", p:2},{n:"걸레받이 시공", p:2},{n:"문선몰딩", p:5},{n:"문틀시공", p:35},{n:"가벽시공", p:20},{n:"실링팬 보강", p:10},{n:"단열작업", p:18},{n:"기타", p:0},{n:"목공인건비", p:0}] },
-        { category: "필름 (Film)", key: "film", items: [{n:"샤시", p:25},{n:"문틀", p:10},{n:"문", p:12},{n:"싱크대", p:30},{n:"신발장", p:15},{n:"붙박이장", p:30},{n:"기타", p:0},{n:"필름인건비", p:0}] },
-        { category: "설비 (Plumbing)", key: "plumbing", items: [{n:"화장실 방수", p:45},{n:"화장실 수도 배관 교체", p:20},{n:"주방 수도 배관 교체", p:20},{n:"주방 수도 내림", p:15},{n:"도기 셋팅", p:25},{n:"배란다 수도 연장", p:15},{n:"설비인건비", p:0}] },
-        { category: "타일 (Tile)", key: "plus", items: [{n:"화장실 벽", p:120},{n:"화장실 바닥", p:30},{n:"주방 타일", p:40},{n:"베란다 타일", p:60},{n:"현관 타일", p:25},{n:"타일인건비", p:0}] },
-        { category: "전기 (Electrical)", key: "electrical", items: [{n:"스위치 교체", p:2},{n:"콘센트 교체", p:2},{n:"전기증설 인입", p:35},{n:"방등", p:3.5},{n:"다운라이트", p:2.5},{n:"실링팬 설치", p:15},{n:"차단기 교체", p:10},{n:"차단기 증설", p:15},{n:"전기인건비", p:0}] },
-        { category: "도배 (Wallpaper)", key: "wallpaper", items: [{n:"합지", p:3.5},{n:"실크", p:5.5},{n:"도배인건비", p:0}] },
-        { category: "바닥마감재 (Flooring)", key: "flooring", items: [{n:"장판", p:6.5},{n:"강화마루", p:12},{n:"강마루", p:15},{n:"데코타일", p:6},{n:"바닥인건비", p:0}] },
-        { category: "싱크대/가구 (Furniture)", key: "furniture", items: [{n:"싱크대", p:120},{n:"신발장", p:45},{n:"큰방 붙박이", p:22},{n:"작은장 붙박이", p:55},{n:"베란다 창고장", p:25},{n:"가구인건비", p:0}] },
-        { category: "중문 (Middle Door)", key: "door", items: [{n:"슬라이딩", p:110},{n:"3연동", p:100},{n:"미닫이", p:120},{n:"중문인건비", p:0}] },
-        { category: "샤시 (Sash)", key: "sash", items: [{n:"샤시 교체/수리", p:0},{n:"샤시인건비", p:0}] },
-        { category: "페인트 (Paint)", key: "paint", isPaint: true, items: [{n:"거실베란다", p:12},{n:"큰방베란다", p:12},{n:"작은베란다", p:12},{n:"주방베란다", p:12},{n:"페인트인건비", p:0}] },
-        { category: "기타 (Others)", key: "plus", items: [{n:"화장실 돔천장", p:20},{n:"입주 청소", p:30},{n:"폐기물 처리", p:0},{n:"기타인건비", p:0}] }
+        { category: "철거", key: "demolition", items: [{n:"샤시", p:35},{n:"문", p:5},{n:"문틀", p:5},{n:"몰딩", p:1.5},{n:"우물박스", p:5},{n:"걸레받이", p:1},{n:"싱크대", p:20},{n:"신발장", p:10},{n:"붙박이장", p:15},{n:"화장실 타일", p:25},{n:"화장실 도기", p:20},{n:"화장실 천장", p:10},{n:"화장실 바닥", p:15},{n:"현관 타일", p:15},{n:"현관 디딤석", p:5},{n:"베란다 타일", p:20},{n:"스위치 철거", p:0.5},{n:"콘센트 철거", p:0.5},{n:"등 철거", p:1},{n:"강마루 철거(평)", p:1.8},{n:"철거인건비", p:0}] },
+        { category: "목공", key: "carpentry", items: [{n:"천장시공", p:25},{n:"천장몰딩", p:2},{n:"걸레받이 시공", p:2},{n:"문선몰딩", p:5},{n:"문틀시공", p:35},{n:"가벽시공", p:20},{n:"실링팬 보강", p:10},{n:"단열작업", p:18},{n:"기타", p:0},{n:"목공인건비", p:0}] },
+        { category: "필름", key: "film", items: [{n:"샤시", p:25},{n:"문틀", p:10},{n:"문", p:12},{n:"싱크대", p:30},{n:"신발장", p:15},{n:"붙박이장", p:30},{n:"기타", p:0},{n:"필름인건비", p:0}] },
+        { category: "설비", key: "plumbing", items: [{n:"화장실 방수", p:45},{n:"화장실 수도 배관 교체", p:20},{n:"주방 수도 배관 교체", p:20},{n:"주방 수도 내림", p:15},{n:"도기 셋팅", p:25},{n:"배란다 수도 연장", p:15},{n:"설비인건비", p:0}] },
+        { category: "타일", key: "plus", items: [{n:"화장실 벽", p:120},{n:"화장실 바닥", p:30},{n:"주방 타일", p:40},{n:"베란다 타일", p:60},{n:"현관 타일", p:25},{n:"타일인건비", p:0}] },
+        { category: "전기", key: "electrical", items: [{n:"스위치 교체", p:2},{n:"콘센트 교체", p:2},{n:"전기증설 인입", p:35},{n:"방등", p:3.5},{n:"다운라이트", p:2.5},{n:"실링팬 설치", p:15},{n:"차단기 교체", p:10},{n:"차단기 증설", p:15},{n:"전기인건비", p:0}] },
+        { category: "도배", key: "wallpaper", items: [{n:"합지", p:3.5},{n:"실크", p:5.5},{n:"도배인건비", p:0}] },
+        { category: "바닥", key: "flooring", items: [{n:"장판", p:6.5},{n:"강화마루", p:12},{n:"강마루", p:15},{n:"데코타일", p:6},{n:"바닥인건비", p:0}] },
+        { category: "가구", key: "furniture", items: [{n:"싱크대", p:120},{n:"신발장", p:45},{n:"큰방 붙박이", p:22},{n:"작은장 붙박이", p:55},{n:"베란다 창고장", p:25},{n:"가구인건비", p:0}] },
+        { category: "중문", key: "door", items: [{n:"슬라이딩", p:110},{n:"3연동", p:100},{n:"미닫이", p:120},{n:"중문인건비", p:0}] },
+        { category: "샤시", key: "sash", items: [{n:"샤시 교체/수리", p:0},{n:"샤시인건비", p:0}] },
+        { category: "페인트", key: "paint", isPaint: true, items: [{n:"거실베란다", p:12},{n:"큰방베란다", p:12},{n:"작은베란다", p:12},{n:"주방베란다", p:12},{n:"페인트인건비", p:0}] },
+        { category: "기타", key: "plus", items: [{n:"화장실 돔천장", p:20},{n:"입주 청소", p:30},{n:"폐기물 처리", p:0},{n:"기타인건비", p:0}] }
     ];
 
     const body = document.getElementById('estimate-body');
 
-    // [핵심] 목록 생성
     if(body) {
         data.forEach((sec, idx) => {
             const cont = document.createElement('div'); cont.className = 'section-container'; cont.id = 'cont-'+idx;
@@ -82,21 +78,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div style="text-align:left;"><label class="item-label"><input type="checkbox" class="chk" data-name="${item.n}" onchange="update()"><span class="checkmark"></span><span>${item.n}</span></label></div>
                     <div><input type="number" class="in-num qty" value="1" oninput="update()"></div>
                     <div><input type="number" class="in-num price" value="${item.p}" oninput="update()" id="p-${idx}-${iIdx}"></div>
-                    <div class="row-total" style="text-align:right; padding-right:20px;">0</div>
+                    <div class="row-total" style="text-align:right;">0</div>
                 </div>`;
             });
             c.innerHTML = rows; cont.appendChild(c); body.appendChild(cont);
         });
     }
 
-    // 로컬 저장된 내용 불러오기
     loadFromLocal();
 });
 
-
-/* =========================================
-   [전역 함수] 버튼 클릭시 실행되는 기능들
-   ========================================= */
 const paintMap = { water: 12, elastic: 22, ceramic: 30 };
 
 function changeP(sIdx, type) {
@@ -128,7 +119,6 @@ function update() {
     if(sumEl) sumEl.innerText = formatKRW(total) + " 원";
 }
 
-// [핵심 기능] 견적 발행 및 DB 저장
 async function smartPrint() {
     const inputs = document.querySelectorAll('.in-num');
     const name = document.getElementById('g-name').value;
@@ -137,7 +127,6 @@ async function smartPrint() {
 
     if(!name) { alert("고객명을 입력해야 저장이 가능합니다."); return; }
 
-    // (1) 데이터 수집
     let selectedData = [];
     let totalAmt = 0;
     document.querySelectorAll('#view-general .item-line').forEach(row => {
@@ -146,16 +135,12 @@ async function smartPrint() {
             const qty = parseFloat(row.querySelector('.qty').value)||0;
             const price = parseFloat(row.querySelector('.price').value)||0;
             selectedData.push({
-                item: chk.dataset.name,
-                qty: qty,
-                price: price,
-                sum: qty * price
+                item: chk.dataset.name, qty: qty, price: price, sum: qty * price
             });
             totalAmt += (qty * price);
         }
     });
 
-    // (2) DB 저장 (안전 모드)
     if(dbClient) {
         try {
             await dbClient.from('estimates').insert([{ 
@@ -163,15 +148,13 @@ async function smartPrint() {
                 total_price: formatKRW(totalAmt), detail_data: selectedData
             }]);
             console.log("DB 저장 완료");
-        } catch (err) { console.error("DB 저장 실패 (인쇄는 진행):", err); }
+        } catch (err) { console.error("DB 저장 실패:", err); }
     }
 
-    // (3) 인쇄 화면 준비
     inputs.forEach(input => { if (input.classList.contains('price')) { input.dataset.orig = input.value; input.type = "text"; input.value = formatKRW(parseFloat(input.value)||0); } });
     const ps = document.getElementById('p-sel');
     if(ps) { const txt = ps.options[ps.selectedIndex].text; document.getElementById('pv-11').innerText = ` [${txt}]`; }
     
-    // 섹션 처리
     for(let idx=0; idx<13; idx++) {
         const rows = document.querySelectorAll(`.row-${idx}`);
         let hasChecked = false;
@@ -194,7 +177,6 @@ async function smartPrint() {
 
     window.print();
 
-    // 복구
     setTimeout(() => {
         inputs.forEach(input => { if (input.classList.contains('price')) { input.type = "number"; input.value = input.dataset.orig; } });
         document.querySelectorAll('.section-container').forEach(el => el.classList.remove('hidden-print'));
