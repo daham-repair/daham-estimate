@@ -34,8 +34,20 @@ body { font-family: 'Pretendard', sans-serif; background-color: var(--bg-light);
 
 /* [공통 스타일] */
 .header-top { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid var(--border-color); padding-bottom: 12px; margin-bottom: 12px; }
+/*
 .logo-box h1 { margin: 0; color: var(--primary-navy); font-size: 32px; font-weight: 900; line-height: 1; }
 .logo-box span { color: var(--accent-gold); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 2.5px; display: block; margin-top: 8px; }
+*/
+.img-logo {
+    height: 60px; /* 로고 높이 (원하시는 크기로 숫자 조절 가능) */
+    width: auto;  /* 비율 자동 유지 */
+    display: block;
+}
+
+/* 모바일에서는 로고 크기 살짝 줄임 */
+@media (max-width: 480px) {
+    .img-logo { height: 45px; }
+}
 .rep-info strong { color: var(--primary-navy); font-size: 18px; display: block; margin-bottom: 5px; }
 .contact-highlight { color: var(--danger-red); font-weight: 900; font-size: 18px; }
 .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
@@ -87,4 +99,5 @@ body { font-family: 'Pretendard', sans-serif; background-color: var(--bg-light);
         min-width: 100px; white-space: nowrap; overflow: visible;
     }
      #view-detailed .detail-grid { gap: 5px !important; }
+
 }
