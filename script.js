@@ -1,5 +1,5 @@
 /* =========================================
-   다함 인테리어 견적 시스템 (버그 수정 버전)
+   다함 인테리어 견적 시스템 (전화번호 포맷팅 추가)
    ========================================= */
 
 const supabaseUrl = 'YOUR_SUPABASE_URL';
@@ -42,6 +42,29 @@ document.addEventListener('DOMContentLoaded', function() {
             c.innerHTML = rows; cont.appendChild(c); body.appendChild(cont);
         });
     }
+
+    // [추가됨] 전화번호 자동 서식 (숫자만 입력 -> 점(.) 포함 형식)
+    const telInput = document.getElementById('g-tel');
+    if(telInput) {
+        telInput.addEventListener('input', function(e) {
+            let v = e.target.value.replace(/[^0-9]/g, ''); // 숫자만 남김
+            if (v.length > 11) v = v.substr(0, 11); // 최대 11자리 제한
+
+            if (v.length > 3 && v.length <= 7) {
+                e.target.value = v.replace(/(\d{3})(\d{1,4})/, '$1.$2');
+            } else if (v.length > 7) {
+                // 02(서울)인 경우와 그 외(010, 031 등) 구분
+                if(v.startsWith('02') && v.length <= 10) { 
+                    e.target.value = v.replace(/(\d{2})(\d{3,4})(\d{4})/, '$1.$2.$3');
+                } else {
+                    e.target.value = v.replace(/(\d{3})(\d{3,4})(\d{4})/, '$1.$2.$3');
+                }
+            } else {
+                e.target.value = v;
+            }
+        });
+    }
+
     loadFromLocal();
 });
 
@@ -104,7 +127,6 @@ async function smartPrint() {
     const ps = document.getElementById('p-sel');
     if(ps) { 
         const txt = ps.options[ps.selectedIndex].text;
-        // [수정된 부분] 모든 페인트 val을 찾는게 아니라, isPaint 속성이 true인 데이터의 인덱스만 찾아서 수정
         data.forEach((sec, idx) => {
             if (sec.isPaint) {
                 const el = document.getElementById(`pv-${idx}`);
