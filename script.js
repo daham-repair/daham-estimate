@@ -1,5 +1,5 @@
 /* =========================================
-   다함 인테리어 견적 시스템 (커서 이동 기능 추가)
+   다함 인테리어 견적 시스템 (버그 수정 버전)
    ========================================= */
 
 const supabaseUrl = 'YOUR_SUPABASE_URL';
@@ -83,7 +83,6 @@ function update() {
     if(sumEl) sumEl.innerText = formatKRW(total) + " 원";
 }
 
-/* [핵심 수정] 필수 입력값 확인 및 커서 이동 */
 async function smartPrint() {
     const nameEl = document.getElementById('g-name');
     const telEl = document.getElementById('g-tel');
@@ -105,8 +104,13 @@ async function smartPrint() {
     const ps = document.getElementById('p-sel');
     if(ps) { 
         const txt = ps.options[ps.selectedIndex].text;
-        const pValEls = document.querySelectorAll('.paint-print-val');
-        pValEls.forEach(el => { if(el.offsetParent !== null) el.innerText = ` [${txt}]`; });
+        // [수정된 부분] 모든 페인트 val을 찾는게 아니라, isPaint 속성이 true인 데이터의 인덱스만 찾아서 수정
+        data.forEach((sec, idx) => {
+            if (sec.isPaint) {
+                const el = document.getElementById(`pv-${idx}`);
+                if(el) el.innerText = ` [${txt}]`;
+            }
+        });
     }
     
     data.forEach((_, idx) => {
@@ -134,7 +138,6 @@ async function smartPrint() {
     }, 1000);
 }
 
-/* [핵심 수정] 계약서 전환 시에도 필수값 확인 */
 function switchToDetailed() {
     const nameEl = document.getElementById('g-name');
     const telEl = document.getElementById('g-tel');
