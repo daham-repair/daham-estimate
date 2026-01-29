@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>다함 인테리어 | 통합 견적 시스템</title>
-    <link rel="stylesheet" href="style.css?v=15">
+    <link rel="stylesheet" href="style.css?v=16">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="icon" href="logo.png" type="image/png">
 </head>
@@ -13,7 +13,7 @@
     <div id="view-general" class="active-view">
         <div class="notice-banner no-print">
             <span>⚠️ 실측 전 참고용 '공식 가견적서'입니다</span>
-            <span class="version-badge">Ver 1.5</span>
+            <span class="version-badge">Ver 1.6</span>
         </div>
 
         <div class="header-card">
@@ -85,20 +85,22 @@
             <div id="detailed-body"></div>
         </div>
         <div class="total-card"><div>최종 시공 합계</div><div id="d-total" class="total-val">0 원</div></div>
-        <div class="no-print" style="margin: 40px 0; text-align: center;">
-            <button class="action-btn btn-reset" onclick="backToGeneral()" style="width:100%; max-width:200px; background:#fff; color:#555; border:1px solid #ddd; height:50px; display:inline-flex; flex-direction:row; justify-content:center; align-items:center;">목록으로 돌아가기</button>
-        </div>
+        
+        <div style="height: 60px;"></div> 
     </div>
 
     <div class="bottom-action-bar no-print">
-        <button class="action-btn btn-reset" onclick="resetForm()">초기화</button>
-        <button class="action-btn btn-save" onclick="saveToLocal()">임시저장</button>
-        <button class="action-btn btn-print" onclick="smartPrint()">견적발행</button>
-        <button class="action-btn btn-next" onclick="switchToDetailed()">계약서</button>
+        <button id="btn-reset" class="action-btn btn-reset" onclick="resetForm()">초기화</button>
+        <button id="btn-save" class="action-btn btn-save" onclick="saveToLocal()">임시저장</button>
+        <button id="btn-print-est" class="action-btn btn-print" onclick="smartPrint()">견적발행</button>
+        <button id="btn-go-contract" class="action-btn btn-next" onclick="switchToDetailed()">계약서</button>
+
+        <button id="btn-back" class="action-btn btn-reset" onclick="backToGeneral()" style="display:none;">목록으로</button>
+        <button id="btn-print-cont" class="action-btn btn-print" onclick="printContract()" style="display:none; flex: 2; background:var(--primary-navy);">계약서 출력</button>
     </div>
     <div id="toast-msg" class="toast">저장되었습니다!</div>
 </div>
-<script src="data.js?v=15"></script>
-<script src="script.js?v=15"></script>
+<script src="data.js?v=16"></script>
+<script src="script.js?v=16"></script>
 </body>
 </html>
