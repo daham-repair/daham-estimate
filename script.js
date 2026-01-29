@@ -1,10 +1,16 @@
 /* =========================================
-   다함 인테리어 견적 시스템 (기타 항목 추가입력 기능)
+   다함 인테리어 견적 시스템 (동적 행 추가 기능 Ver 1.13)
    ========================================= */
 
 const supabaseUrl = 'YOUR_SUPABASE_URL';
 const supabaseKey = 'YOUR_SUPABASE_KEY';
 let dbClient = null;
+
+window.onbeforeunload = function() {
+    if(document.getElementById('final-sum').innerText !== "0 원") {
+        return "작성 중인 내용이 사라질 수 있습니다.";
+    }
+};
 
 document.addEventListener('DOMContentLoaded', function() {
     try {
@@ -23,42 +29,43 @@ document.addEventListener('DOMContentLoaded', function() {
             cont.appendChild(h);
             
             const c = document.createElement('div'); c.className = 'section-content'; c.id = 'c-'+idx;
-            let rows = `<div class="grid-row master-grid no-print bulk-row">
-                <div style="text-align:left;"><label class="item-label bulk-text"><input type="checkbox" onchange="toggleSec(${idx}, this)"><span class="checkmark"></span><span>전체선택</span></label></div>
-                <div style="grid-column: span 3; text-align:right;">
-                    ${sec.isPaint ? `<select id="p-sel" class="paint-select" onchange="changeP(${idx}, this.value)">
-                        <option value="water">수성 페인트</option><option value="elastic">탄성 코트</option><option value="ceramic">세라믹 코트</option>
-                    </select>` : ''}
-                </div>
-            </div>`;
             
-            // 기존 아이템 렌더링
-            sec.items.forEach((item, iIdx) => {
-                rows += `<div class="grid-row master-grid row-${idx} item-line">
-                    <div style="text-align:left;"><label class="item-label"><input type="checkbox" class="chk" data-name="${item.n}" onchange="update()"><span class="checkmark"></span><span>${item.n}</span></label></div>
-                    <div><input type="number" class="in-num qty" value="1" oninput="update()"></div>
-                    <div><input type="number" class="in-num price" value="${item.p}" oninput="update()"></div>
-                    <div class="row-total" style="text-align:right;">0</div>
-                </div>`;
-            });
-
-            // [추가] '기타' 카테고리일 경우 직접 입력 칸 추가
-            if (sec.category === '기타') {
-                rows += `<div class="grid-row master-grid row-${idx} item-line custom-row">
-                    <div style="text-align:left; display:flex; align-items:center;">
-                        <label class="item-label" style="width:auto; margin-right:10px;">
-                            <input type="checkbox" class="chk" data-name="기타 추가" onchange="update()">
-                            <span class="checkmark" style="margin-right:0;"></span>
-                        </label>
-                        <input type="text" class="custom-name" placeholder="항목 직접 입력" oninput="this.closest('.grid-row').querySelector('.chk').dataset.name = this.value">
+            // [수정] 직접 입력 섹션은 '+ 추가' 버튼 표시
+            if (sec.key === 'custom') {
+                // 직접 입력 섹션: 헤더 + 동적 컨테이너 + 추가 버튼
+                c.innerHTML = `
+                    <div id="custom-rows-container-${idx}"></div>
+                    <div class="no-print" style="padding: 0 10px;">
+                        <button class="btn-add-row" onclick="addCustomRow(${idx})">+ 항목 추가하기</button>
                     </div>
-                    <div><input type="number" class="in-num qty" value="1" oninput="update()"></div>
-                    <div><input type="number" class="in-num price" value="0" oninput="update()"></div>
-                    <div class="row-total" style="text-align:right;">0</div>
+                `;
+            } else {
+                // 일반 섹션
+                let rows = `<div class="grid-row master-grid no-print bulk-row">
+                    <div style="text-align:left;"><label class="item-label bulk-text"><input type="checkbox" onchange="toggleSec(${idx}, this)"><span class="checkmark"></span><span>전체선택</span></label></div>
+                    <div style="grid-column: span 3; text-align:right;">
+                        ${sec.isPaint ? `<select id="p-sel" class="paint-select" onchange="changeP(${idx}, this.value)">
+                            <option value="water">수성 페인트</option><option value="elastic">탄성 코트</option><option value="ceramic">세라믹 코트</option>
+                        </select>` : ''}
+                    </div>
                 </div>`;
+                sec.items.forEach((item, iIdx) => {
+                    // [기존 로직 유지]
+                    let isCustomLine = (sec.category === '기타' && iIdx === sec.items.length - 1) ? true : false; 
+                    // (기존 '기타'의 마지막 항목 로직은 이제 사용하지 않거나 유지해도 무방하나, 
+                    // 이번 요청은 '직접 입력' 대메뉴를 쓰는 것이므로 일반 항목으로 처리)
+                    
+                    rows += `<div class="grid-row master-grid row-${idx} item-line">
+                        <div style="text-align:left;"><label class="item-label"><input type="checkbox" class="chk" data-name="${item.n}" onchange="update()"><span class="checkmark"></span><span>${item.n}</span></label></div>
+                        <div><input type="number" class="in-num qty" value="1" oninput="update()"></div>
+                        <div><input type="number" class="in-num price" value="${item.p}" oninput="update()"></div>
+                        <div class="row-total" style="text-align:right;">0</div>
+                    </div>`;
+                });
+                c.innerHTML = rows;
             }
 
-            c.innerHTML = rows; cont.appendChild(c); body.appendChild(cont);
+            cont.appendChild(c); body.appendChild(cont);
         });
     }
 
@@ -67,7 +74,6 @@ document.addEventListener('DOMContentLoaded', function() {
         telInput.addEventListener('input', function(e) {
             let v = e.target.value.replace(/[^0-9]/g, ''); 
             if (v.length > 11) v = v.substr(0, 11); 
-
             if (v.length > 3 && v.length <= 7) {
                 e.target.value = v.replace(/(\d{3})(\d{1,4})/, '$1.$2');
             } else if (v.length > 7) {
@@ -76,15 +82,55 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     e.target.value = v.replace(/(\d{3})(\d{3,4})(\d{4})/, '$1.$2.$3');
                 }
-            } else {
-                e.target.value = v;
-            }
+            } else { e.target.value = v; }
         });
     }
     loadFromLocal();
 });
 
+// [추가] 직접 입력 행 추가 함수
+function addCustomRow(secIdx, savedData = null) {
+    const container = document.getElementById(`custom-rows-container-${secIdx}`);
+    const div = document.createElement('div');
+    div.className = `grid-row master-grid row-${secIdx} item-line custom-dynamic-row`;
+    
+    // 저장된 데이터가 있으면 사용, 없으면 기본값
+    const nameVal = savedData ? savedData.name : "";
+    const qtyVal = savedData ? savedData.qty : 1;
+    const priceVal = savedData ? savedData.price : 0;
+    
+    div.innerHTML = `
+        <div style="text-align:left; display:flex; align-items:center;">
+            <label class="item-label" style="width:auto; margin-right:10px;">
+                <input type="checkbox" class="chk" data-name="${nameVal || '직접 입력'}" checked onchange="update()">
+                <span class="checkmark" style="margin-right:0;"></span>
+            </label>
+            <input type="text" class="custom-name" placeholder="항목 입력" value="${nameVal}" oninput="syncCustomName(this)">
+        </div>
+        <div><input type="number" class="in-num qty" value="${qtyVal}" oninput="update()"></div>
+        <div><input type="number" class="in-num price" value="${priceVal}" oninput="update()"></div>
+        <div style="text-align:right; display:flex; justify-content:flex-end; align-items:center;">
+            <span class="row-total">0</span>
+            <button class="btn-del-row no-print" onclick="deleteRow(this)">-</button>
+        </div>
+    `;
+    container.appendChild(div);
+    update();
+}
+
+// [추가] 행 삭제 함수
+function deleteRow(btn) {
+    btn.closest('.grid-row').remove();
+    update();
+}
+
 const paintMap = { water: 12, elastic: 22, ceramic: 30 };
+
+function syncCustomName(el) {
+    const row = el.closest('.grid-row');
+    const chk = row.querySelector('.chk');
+    chk.dataset.name = el.value.trim() === "" ? "직접 입력" : el.value;
+}
 
 function changeP(sIdx, type) {
     const np = paintMap[type];
@@ -123,6 +169,7 @@ function update() {
 }
 
 async function smartPrint() {
+    update(); 
     const nameEl = document.getElementById('g-name');
     const telEl = document.getElementById('g-tel');
     const addrEl = document.getElementById('g-addr');
@@ -181,6 +228,8 @@ function printContract() {
 }
 
 function switchToDetailed() {
+    update();
+
     const nameEl = document.getElementById('g-name');
     const telEl = document.getElementById('g-tel');
     const addrEl = document.getElementById('g-addr');
@@ -198,7 +247,6 @@ function switchToDetailed() {
         rows.forEach(row => {
             const chk = row.querySelector('.chk');
             if (chk && chk.checked) {
-                // [수정] 직접 입력한 텍스트가 있으면 그것을 이름으로 사용
                 let itemName = chk.dataset.name;
                 const customInput = row.querySelector('.custom-name');
                 if(customInput && customInput.value.trim() !== "") {
@@ -245,7 +293,6 @@ function switchToDetailed() {
     document.getElementById('view-detailed').classList.add('active-view');
 
     toggleButtons(true);
-    
     window.scrollTo(0,0);
 }
 
@@ -263,58 +310,90 @@ function toggleButtons(isContractMode) {
     contBtns.forEach(id => document.getElementById(id).style.display = isContractMode ? 'flex' : 'none');
 }
 
+// [수정] 저장 로직 (동적 행까지 저장)
 function saveToLocal() {
     const saveData = {
         name: document.getElementById('g-name').value,
         tel: document.getElementById('g-tel').value,
         addr: document.getElementById('g-addr').value,
-        items: []
+        paintType: document.getElementById('p-sel') ? document.getElementById('p-sel').value : null,
+        items: [],
+        customItems: [] // [추가] 직접 입력 항목 별도 저장
     };
-    document.querySelectorAll('.item-line').forEach((row, idx) => {
+    
+    // 일반 항목 저장
+    document.querySelectorAll('.item-line:not(.custom-dynamic-row)').forEach((row, idx) => {
         const chk = row.querySelector('.chk');
         if(chk.checked) {
-            const itemData = { idx: idx, qty: row.querySelector('.qty').value, price: row.querySelector('.price').value };
-            // [추가] 직접 입력 텍스트 저장
-            const customInput = row.querySelector('.custom-name');
-            if(customInput) {
-                itemData.customName = customInput.value;
-            }
-            saveData.items.push(itemData);
+            saveData.items.push({ 
+                // 주의: 동적행이 아니므로 DOM 순서상 index가 data.js와 일치하는지 확인 필요하나, 
+                // 현재 구조상 '기타'까지는 순차적이므로 row index보다는 data-name 등을 활용하거나 
+                // 기존 방식(전체 row 순회)을 유지하되 동적행만 제외.
+                // data.js 순서와 DOM 순서가 일치한다고 가정 (동적행은 마지막 섹션이므로)
+                idx: idx, 
+                qty: row.querySelector('.qty').value, 
+                price: row.querySelector('.price').value 
+            });
         }
     });
+
+    // 직접 입력 항목 저장
+    document.querySelectorAll('.custom-dynamic-row').forEach(row => {
+        const customInput = row.querySelector('.custom-name');
+        if(customInput) {
+            saveData.customItems.push({
+                name: customInput.value,
+                qty: row.querySelector('.qty').value,
+                price: row.querySelector('.price').value
+            });
+        }
+    });
+
     localStorage.setItem('daham_estimate_draft', JSON.stringify(saveData));
     showToast("임시 저장되었습니다.");
 }
 
+// [수정] 불러오기 로직 (동적 행 복구)
 function loadFromLocal() {
     const saved = localStorage.getItem('daham_estimate_draft');
     if(!saved) return;
-    if(!confirm("이전에 작성하던 내용이 있습니다. 불러오시겠습니까?")) return;
-    const data = JSON.parse(saved);
-    document.getElementById('g-name').value = data.name || '';
-    document.getElementById('g-tel').value = data.tel || '';
-    document.getElementById('g-addr').value = data.addr || '';
+    if(!confirm("저장된 내용을 불러오시겠습니까?")) return;
+
+    const savedData = JSON.parse(saved);
+    document.getElementById('g-name').value = savedData.name || '';
+    document.getElementById('g-tel').value = savedData.tel || '';
+    document.getElementById('g-addr').value = savedData.addr || '';
+    
+    if(savedData.paintType && document.getElementById('p-sel')) {
+        document.getElementById('p-sel').value = savedData.paintType;
+    }
     
     setTimeout(() => {
-        const rows = document.querySelectorAll('.item-line');
-        data.items.forEach(item => {
+        // 일반 항목 복구
+        const rows = document.querySelectorAll('.item-line:not(.custom-dynamic-row)');
+        savedData.items.forEach(item => {
             if(rows[item.idx]) {
                 const row = rows[item.idx];
                 const chk = row.querySelector('.chk');
                 chk.checked = true;
                 row.querySelector('.qty').value = item.qty;
                 row.querySelector('.price').value = item.price;
-                
-                // [추가] 직접 입력 텍스트 복구
-                if(item.customName) {
-                    const customInput = row.querySelector('.custom-name');
-                    if(customInput) {
-                        customInput.value = item.customName;
-                        chk.dataset.name = item.customName;
-                    }
-                }
             }
         });
+
+        // 직접 입력 항목 복구
+        if(savedData.customItems && savedData.customItems.length > 0) {
+            // 'custom' 섹션의 index 찾기 (마지막 섹션)
+            const customSecIdx = data.length - 1; 
+            const container = document.getElementById(`custom-rows-container-${customSecIdx}`);
+            if(container) {
+                container.innerHTML = ''; // 기존 내용 초기화
+                savedData.customItems.forEach(cItem => {
+                    addCustomRow(customSecIdx, cItem);
+                });
+            }
+        }
+        
         update();
     }, 200);
 }
@@ -322,6 +401,7 @@ function loadFromLocal() {
 function resetForm() {
     if(confirm("모든 내용을 초기화 하시겠습니까?")) {
         localStorage.removeItem('daham_estimate_draft');
+        window.onbeforeunload = null; 
         location.reload();
     }
 }
