@@ -1,5 +1,5 @@
 /* =========================================
-   다함 인테리어 견적 시스템 (전화번호 포맷팅 추가)
+   다함 인테리어 견적 시스템 (계약서 고도화)
    ========================================= */
 
 const supabaseUrl = 'YOUR_SUPABASE_URL';
@@ -43,17 +43,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // [추가됨] 전화번호 자동 서식 (숫자만 입력 -> 점(.) 포함 형식)
     const telInput = document.getElementById('g-tel');
     if(telInput) {
         telInput.addEventListener('input', function(e) {
-            let v = e.target.value.replace(/[^0-9]/g, ''); // 숫자만 남김
-            if (v.length > 11) v = v.substr(0, 11); // 최대 11자리 제한
+            let v = e.target.value.replace(/[^0-9]/g, ''); 
+            if (v.length > 11) v = v.substr(0, 11); 
 
             if (v.length > 3 && v.length <= 7) {
                 e.target.value = v.replace(/(\d{3})(\d{1,4})/, '$1.$2');
             } else if (v.length > 7) {
-                // 02(서울)인 경우와 그 외(010, 031 등) 구분
                 if(v.startsWith('02') && v.length <= 10) { 
                     e.target.value = v.replace(/(\d{2})(\d{3,4})(\d{4})/, '$1.$2.$3');
                 } else {
@@ -64,7 +62,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-
     loadFromLocal();
 });
 
@@ -160,6 +157,12 @@ async function smartPrint() {
     }, 1000);
 }
 
+// [수정] 계약서 전용 출력 함수
+function printContract() {
+    window.print();
+}
+
+// [수정] 계약서 화면 전환 (그룹화 및 버튼 교체)
 function switchToDetailed() {
     const nameEl = document.getElementById('g-name');
     const telEl = document.getElementById('g-tel');
@@ -172,17 +175,46 @@ function switchToDetailed() {
     const dBody = document.getElementById('detailed-body'); dBody.innerHTML = '';
     let dTotal = 0;
     
-    document.querySelectorAll('#view-general .item-line').forEach(row => {
-        const chk = row.querySelector('.chk');
-        if(chk && chk.checked) {
-            const n = chk.dataset.name;
-            const q = row.querySelector('.qty').value;
-            const p = row.querySelector('.price').value;
-            const sum = q * p; dTotal += sum;
-            const div = document.createElement('div');
-            div.className = 'grid-row detail-grid';
-            div.innerHTML = `<strong>${n}</strong><input type="text" class="spec-field" placeholder="사양 입력"><div>${q}</div><div>${parseInt(p).toLocaleString()}</div><div style="text-align:right;">${formatKRW(sum)}</div>`;
-            dBody.appendChild(div);
+    // [핵심] 섹션별 그룹화 로직
+    data.forEach((sec, idx) => {
+        // 해당 섹션에 체크된 항목이 있는지 확인
+        const checkedItems = [];
+        const rows = document.querySelectorAll(`.row-${idx}`);
+        rows.forEach(row => {
+            const chk = row.querySelector('.chk');
+            if (chk && chk.checked) {
+                checkedItems.push({
+                    name: chk.dataset.name,
+                    qty: row.querySelector('.qty').value,
+                    price: row.querySelector('.price').value
+                });
+            }
+        });
+
+        // 체크된 항목이 있다면 섹션 헤더 생성 후 아이템 추가
+        if (checkedItems.length > 0) {
+            // 섹션 헤더
+            const secHeader = document.createElement('div');
+            secHeader.className = 'contract-section-header';
+            secHeader.innerHTML = `<div class="section-icon">${icons[sec.key]}</div> ${sec.category}`;
+            dBody.appendChild(secHeader);
+
+            // 아이템 리스트
+            checkedItems.forEach(item => {
+                const sum = item.qty * item.price;
+                dTotal += sum;
+                const div = document.createElement('div');
+                div.className = 'grid-row detail-grid';
+                // [수정] 자재사양 입력란을 textarea로 변경
+                div.innerHTML = `
+                    <strong>${item.name}</strong>
+                    <textarea class="spec-field" placeholder="사양 입력" rows="1"></textarea>
+                    <div>${item.qty}</div>
+                    <div>${parseInt(item.price).toLocaleString()}</div>
+                    <div style="text-align:right;">${formatKRW(sum)}</div>
+                `;
+                dBody.appendChild(div);
+            });
         }
     });
     
@@ -190,14 +222,32 @@ function switchToDetailed() {
     document.getElementById('d-tel-display').innerText = telEl.value;
     document.getElementById('d-addr-display').innerText = addrEl.value;
     document.getElementById('d-total').innerText = formatKRW(dTotal) + " 원";
+
+    // 뷰 전환
     document.getElementById('view-general').classList.remove('active-view');
     document.getElementById('view-detailed').classList.add('active-view');
+
+    // [버튼 교체] 견적 모드 버튼 숨김, 계약 모드 버튼 표시
+    toggleButtons(true);
+    
     window.scrollTo(0,0);
 }
 
 function backToGeneral() {
     document.getElementById('view-detailed').classList.remove('active-view');
     document.getElementById('view-general').classList.add('active-view');
+    
+    // [버튼 교체] 견적 모드 버튼 표시, 계약 모드 버튼 숨김
+    toggleButtons(false);
+}
+
+// [추가] 하단 버튼 토글 함수
+function toggleButtons(isContractMode) {
+    const estBtns = ['btn-reset', 'btn-save', 'btn-print-est', 'btn-go-contract'];
+    const contBtns = ['btn-back', 'btn-print-cont'];
+
+    estBtns.forEach(id => document.getElementById(id).style.display = isContractMode ? 'none' : 'flex');
+    contBtns.forEach(id => document.getElementById(id).style.display = isContractMode ? 'flex' : 'none');
 }
 
 function saveToLocal() {
