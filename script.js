@@ -1,5 +1,5 @@
 /* =========================================
-   다함 인테리어 견적 시스템 (계약서 아이콘 제거)
+   다함 인테리어 견적 시스템 (기타 항목 추가입력 기능)
    ========================================= */
 
 const supabaseUrl = 'YOUR_SUPABASE_URL';
@@ -18,7 +18,6 @@ document.addEventListener('DOMContentLoaded', function() {
         data.forEach((sec, idx) => {
             const cont = document.createElement('div'); cont.className = 'section-container'; cont.id = 'cont-'+idx;
             const h = document.createElement('div'); h.className = 'section-header'; 
-            // [참고] 견적 입력창(General View)에는 여전히 아이콘이 표시됨
             h.innerHTML = `<span><div class="section-icon">${icons[sec.key]}</div> ${sec.category}<span id="pv-${idx}" class="paint-print-val"></span></span><span class="no-print">▼</span>`;
             h.onclick = () => document.getElementById('c-'+idx).classList.toggle('show');
             cont.appendChild(h);
@@ -32,6 +31,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     </select>` : ''}
                 </div>
             </div>`;
+            
+            // 기존 아이템 렌더링
             sec.items.forEach((item, iIdx) => {
                 rows += `<div class="grid-row master-grid row-${idx} item-line">
                     <div style="text-align:left;"><label class="item-label"><input type="checkbox" class="chk" data-name="${item.n}" onchange="update()"><span class="checkmark"></span><span>${item.n}</span></label></div>
@@ -40,6 +41,23 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="row-total" style="text-align:right;">0</div>
                 </div>`;
             });
+
+            // [추가] '기타' 카테고리일 경우 직접 입력 칸 추가
+            if (sec.category === '기타') {
+                rows += `<div class="grid-row master-grid row-${idx} item-line custom-row">
+                    <div style="text-align:left; display:flex; align-items:center;">
+                        <label class="item-label" style="width:auto; margin-right:10px;">
+                            <input type="checkbox" class="chk" data-name="기타 추가" onchange="update()">
+                            <span class="checkmark" style="margin-right:0;"></span>
+                        </label>
+                        <input type="text" class="custom-name" placeholder="항목 직접 입력" oninput="this.closest('.grid-row').querySelector('.chk').dataset.name = this.value">
+                    </div>
+                    <div><input type="number" class="in-num qty" value="1" oninput="update()"></div>
+                    <div><input type="number" class="in-num price" value="0" oninput="update()"></div>
+                    <div class="row-total" style="text-align:right;">0</div>
+                </div>`;
+            }
+
             c.innerHTML = rows; cont.appendChild(c); body.appendChild(cont);
         });
     }
@@ -180,8 +198,15 @@ function switchToDetailed() {
         rows.forEach(row => {
             const chk = row.querySelector('.chk');
             if (chk && chk.checked) {
+                // [수정] 직접 입력한 텍스트가 있으면 그것을 이름으로 사용
+                let itemName = chk.dataset.name;
+                const customInput = row.querySelector('.custom-name');
+                if(customInput && customInput.value.trim() !== "") {
+                    itemName = customInput.value;
+                }
+
                 checkedItems.push({
-                    name: chk.dataset.name,
+                    name: itemName,
                     qty: row.querySelector('.qty').value,
                     price: row.querySelector('.price').value
                 });
@@ -191,7 +216,6 @@ function switchToDetailed() {
         if (checkedItems.length > 0) {
             const secHeader = document.createElement('div');
             secHeader.className = 'contract-section-header';
-            // [수정] 아이콘 태그 제거 (텍스트만 표시)
             secHeader.innerHTML = `${sec.category}`;
             dBody.appendChild(secHeader);
 
@@ -249,7 +273,13 @@ function saveToLocal() {
     document.querySelectorAll('.item-line').forEach((row, idx) => {
         const chk = row.querySelector('.chk');
         if(chk.checked) {
-            saveData.items.push({ idx: idx, qty: row.querySelector('.qty').value, price: row.querySelector('.price').value });
+            const itemData = { idx: idx, qty: row.querySelector('.qty').value, price: row.querySelector('.price').value };
+            // [추가] 직접 입력 텍스트 저장
+            const customInput = row.querySelector('.custom-name');
+            if(customInput) {
+                itemData.customName = customInput.value;
+            }
+            saveData.items.push(itemData);
         }
     });
     localStorage.setItem('daham_estimate_draft', JSON.stringify(saveData));
@@ -269,9 +299,20 @@ function loadFromLocal() {
         const rows = document.querySelectorAll('.item-line');
         data.items.forEach(item => {
             if(rows[item.idx]) {
-                rows[item.idx].querySelector('.chk').checked = true;
-                rows[item.idx].querySelector('.qty').value = item.qty;
-                rows[item.idx].querySelector('.price').value = item.price;
+                const row = rows[item.idx];
+                const chk = row.querySelector('.chk');
+                chk.checked = true;
+                row.querySelector('.qty').value = item.qty;
+                row.querySelector('.price').value = item.price;
+                
+                // [추가] 직접 입력 텍스트 복구
+                if(item.customName) {
+                    const customInput = row.querySelector('.custom-name');
+                    if(customInput) {
+                        customInput.value = item.customName;
+                        chk.dataset.name = item.customName;
+                    }
+                }
             }
         });
         update();
