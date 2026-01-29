@@ -1,5 +1,5 @@
 /* =========================================
-   다함 인테리어 견적 시스템 (동적 행 추가 기능 Ver 1.13)
+   다함 인테리어 견적 시스템 (단위 로직 수정 Ver 1.14)
    ========================================= */
 
 const supabaseUrl = 'YOUR_SUPABASE_URL';
@@ -30,9 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const c = document.createElement('div'); c.className = 'section-content'; c.id = 'c-'+idx;
             
-            // [수정] 직접 입력 섹션은 '+ 추가' 버튼 표시
             if (sec.key === 'custom') {
-                // 직접 입력 섹션: 헤더 + 동적 컨테이너 + 추가 버튼
                 c.innerHTML = `
                     <div id="custom-rows-container-${idx}"></div>
                     <div class="no-print" style="padding: 0 10px;">
@@ -40,7 +38,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 `;
             } else {
-                // 일반 섹션
                 let rows = `<div class="grid-row master-grid no-print bulk-row">
                     <div style="text-align:left;"><label class="item-label bulk-text"><input type="checkbox" onchange="toggleSec(${idx}, this)"><span class="checkmark"></span><span>전체선택</span></label></div>
                     <div style="grid-column: span 3; text-align:right;">
@@ -50,15 +47,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>`;
                 sec.items.forEach((item, iIdx) => {
-                    // [기존 로직 유지]
-                    let isCustomLine = (sec.category === '기타' && iIdx === sec.items.length - 1) ? true : false; 
-                    // (기존 '기타'의 마지막 항목 로직은 이제 사용하지 않거나 유지해도 무방하나, 
-                    // 이번 요청은 '직접 입력' 대메뉴를 쓰는 것이므로 일반 항목으로 처리)
-                    
                     rows += `<div class="grid-row master-grid row-${idx} item-line">
                         <div style="text-align:left;"><label class="item-label"><input type="checkbox" class="chk" data-name="${item.n}" onchange="update()"><span class="checkmark"></span><span>${item.n}</span></label></div>
                         <div><input type="number" class="in-num qty" value="1" oninput="update()"></div>
-                        <div><input type="number" class="in-num price" value="${item.p}" oninput="update()"></div>
+                        <div><input type="number" class="in-num price" value="${item.p / 10000}" oninput="update()"></div>
                         <div class="row-total" style="text-align:right;">0</div>
                     </div>`;
                 });
@@ -88,16 +80,15 @@ document.addEventListener('DOMContentLoaded', function() {
     loadFromLocal();
 });
 
-// [추가] 직접 입력 행 추가 함수
 function addCustomRow(secIdx, savedData = null) {
     const container = document.getElementById(`custom-rows-container-${secIdx}`);
     const div = document.createElement('div');
     div.className = `grid-row master-grid row-${secIdx} item-line custom-dynamic-row`;
     
-    // 저장된 데이터가 있으면 사용, 없으면 기본값
     const nameVal = savedData ? savedData.name : "";
     const qtyVal = savedData ? savedData.qty : 1;
-    const priceVal = savedData ? savedData.price : 0;
+    // 불러오기 시 저장된 원금액(만원 단위 아님)을 만원 단위로 변환 표시
+    const priceVal = savedData ? (savedData.price / 10000) : 0;
     
     div.innerHTML = `
         <div style="text-align:left; display:flex; align-items:center;">
@@ -118,7 +109,6 @@ function addCustomRow(secIdx, savedData = null) {
     update();
 }
 
-// [추가] 행 삭제 함수
 function deleteRow(btn) {
     btn.closest('.grid-row').remove();
     update();
@@ -146,6 +136,7 @@ function toggleSec(idx, master) {
     update();
 }
 
+// [핵심] 만원 단위 보정 로직
 function formatKRW(num) { 
     if (!num && num !== 0) return "0"; 
     return Math.floor(num * 10000).toLocaleString(); 
@@ -158,8 +149,10 @@ function update() {
         const qtyVal = parseFloat(row.querySelector('.qty').value) || 0;
         const priceVal = parseFloat(row.querySelector('.price').value) || 0;
         if(chk.checked) {
+            // 만원 단위 곱셈 적용
             const sum = qtyVal * priceVal;
-            total += sum; row.querySelector('.row-total').innerText = formatKRW(sum);
+            total += sum; 
+            row.querySelector('.row-total').innerText = formatKRW(sum);
         } else {
             row.querySelector('.row-total').innerText = "0";
         }
@@ -268,7 +261,9 @@ function switchToDetailed() {
             dBody.appendChild(secHeader);
 
             checkedItems.forEach(item => {
-                const sum = item.qty * item.price;
+                // 단가 보정 (만원 단위)
+                const realPrice = parseFloat(item.price) * 10000;
+                const sum = item.qty * realPrice;
                 dTotal += sum;
                 const div = document.createElement('div');
                 div.className = 'grid-row detail-grid';
@@ -276,8 +271,8 @@ function switchToDetailed() {
                     <strong>${item.name}</strong>
                     <textarea class="spec-field" placeholder="사양 입력" rows="1"></textarea>
                     <div>${item.qty}</div>
-                    <div>${parseInt(item.price).toLocaleString()}</div>
-                    <div style="text-align:right;">${formatKRW(sum)}</div>
+                    <div>${realPrice.toLocaleString()}</div>
+                    <div style="text-align:right;">${sum.toLocaleString()}</div>
                 `;
                 dBody.appendChild(div);
             });
@@ -287,7 +282,7 @@ function switchToDetailed() {
     document.getElementById('d-name-display').innerText = nameEl.value;
     document.getElementById('d-tel-display').innerText = telEl.value;
     document.getElementById('d-addr-display').innerText = addrEl.value;
-    document.getElementById('d-total').innerText = formatKRW(dTotal) + " 원";
+    document.getElementById('d-total').innerText = dTotal.toLocaleString() + " 원";
 
     document.getElementById('view-general').classList.remove('active-view');
     document.getElementById('view-detailed').classList.add('active-view');
@@ -310,7 +305,6 @@ function toggleButtons(isContractMode) {
     contBtns.forEach(id => document.getElementById(id).style.display = isContractMode ? 'flex' : 'none');
 }
 
-// [수정] 저장 로직 (동적 행까지 저장)
 function saveToLocal() {
     const saveData = {
         name: document.getElementById('g-name').value,
@@ -318,33 +312,28 @@ function saveToLocal() {
         addr: document.getElementById('g-addr').value,
         paintType: document.getElementById('p-sel') ? document.getElementById('p-sel').value : null,
         items: [],
-        customItems: [] // [추가] 직접 입력 항목 별도 저장
+        customItems: [] 
     };
     
-    // 일반 항목 저장
     document.querySelectorAll('.item-line:not(.custom-dynamic-row)').forEach((row, idx) => {
         const chk = row.querySelector('.chk');
         if(chk.checked) {
             saveData.items.push({ 
-                // 주의: 동적행이 아니므로 DOM 순서상 index가 data.js와 일치하는지 확인 필요하나, 
-                // 현재 구조상 '기타'까지는 순차적이므로 row index보다는 data-name 등을 활용하거나 
-                // 기존 방식(전체 row 순회)을 유지하되 동적행만 제외.
-                // data.js 순서와 DOM 순서가 일치한다고 가정 (동적행은 마지막 섹션이므로)
                 idx: idx, 
                 qty: row.querySelector('.qty').value, 
-                price: row.querySelector('.price').value 
+                // 원금액으로 저장 (나중에 복구 시 만원 단위 보정 위해)
+                price: parseFloat(row.querySelector('.price').value) * 10000 
             });
         }
     });
 
-    // 직접 입력 항목 저장
     document.querySelectorAll('.custom-dynamic-row').forEach(row => {
         const customInput = row.querySelector('.custom-name');
         if(customInput) {
             saveData.customItems.push({
                 name: customInput.value,
                 qty: row.querySelector('.qty').value,
-                price: row.querySelector('.price').value
+                price: parseFloat(row.querySelector('.price').value) * 10000 
             });
         }
     });
@@ -353,7 +342,6 @@ function saveToLocal() {
     showToast("임시 저장되었습니다.");
 }
 
-// [수정] 불러오기 로직 (동적 행 복구)
 function loadFromLocal() {
     const saved = localStorage.getItem('daham_estimate_draft');
     if(!saved) return;
@@ -369,7 +357,6 @@ function loadFromLocal() {
     }
     
     setTimeout(() => {
-        // 일반 항목 복구
         const rows = document.querySelectorAll('.item-line:not(.custom-dynamic-row)');
         savedData.items.forEach(item => {
             if(rows[item.idx]) {
@@ -377,17 +364,16 @@ function loadFromLocal() {
                 const chk = row.querySelector('.chk');
                 chk.checked = true;
                 row.querySelector('.qty').value = item.qty;
-                row.querySelector('.price').value = item.price;
+                // 화면 표시용 만원 단위 보정
+                row.querySelector('.price').value = item.price / 10000;
             }
         });
 
-        // 직접 입력 항목 복구
         if(savedData.customItems && savedData.customItems.length > 0) {
-            // 'custom' 섹션의 index 찾기 (마지막 섹션)
             const customSecIdx = data.length - 1; 
             const container = document.getElementById(`custom-rows-container-${customSecIdx}`);
             if(container) {
-                container.innerHTML = ''; // 기존 내용 초기화
+                container.innerHTML = ''; 
                 savedData.customItems.forEach(cItem => {
                     addCustomRow(customSecIdx, cItem);
                 });
