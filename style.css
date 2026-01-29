@@ -1,4 +1,4 @@
-/* [0. 공통 디자인 시스템 - Clean Ver. 3.5 (인쇄 아이콘 제거)] */
+/* [0. 공통 디자인 시스템 - Clean Ver. 3.6 (대메뉴 슬림화)] */
 :root {
     --primary-navy: #0A2342; --accent-gold: #C5A47E; --accent-gold-dark: #B3936E;
     --text-dark: #111; --text-gray: #666; --bg-light: #F5F7FA; --card-bg: #FFF;
@@ -49,12 +49,18 @@ body {
 /* [견적 리스트] */
 .estimate-section { background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow-soft); overflow: hidden; margin-bottom: 24px; }
 .grid-header { padding: 15px 25px; background: var(--primary-navy); color: white; font-weight: 600; font-size: 14px; }
-.section-header { padding: 20px 25px; border-bottom: 1px solid var(--border-color); cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: white; }
+
+/* [수정] 대메뉴 여백 축소 */
+.section-header { 
+    padding: 12px 20px; /* 기존 20px 25px -> 12px 20px로 축소 */
+    border-bottom: 1px solid var(--border-color); cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: white; 
+}
 .section-header span { font-weight: 800; font-size: 17px; display: flex; align-items: center; }
 
+/* [수정] 아이콘 크기 축소 */
 .section-icon { 
-    width: 32px; height: 32px; 
-    color: var(--accent-gold); margin-right: 12px; 
+    width: 24px; height: 24px; /* 기존 32px -> 24px로 축소 */
+    color: var(--accent-gold); margin-right: 10px; 
     background-color: transparent; border-radius: 0; padding: 0;
 }
 .section-icon svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 2.5; }
@@ -132,7 +138,11 @@ body {
     .row-total { font-size: 12px; }
     .item-label { font-size: 13px; }
     .checkmark { margin-right: 6px; width: 18px; height: 18px; }
-    .section-header { padding: 15px 15px; }
+    
+    /* [수정] 모바일 대메뉴 헤더 축소 */
+    .section-header { padding: 10px 15px; } 
+    /* [수정] 모바일 아이콘 축소 */
+    .section-icon { width: 20px; height: 20px; margin-right: 8px; }
 }
 
 /* [인쇄 설정] */
@@ -158,6 +168,5 @@ body {
         box-shadow: none !important;
     }
     
-    /* [수정] 인쇄 시 아이콘 숨김 */
     .section-icon { display: none !important; }
 }
