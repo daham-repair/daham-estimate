@@ -1,5 +1,5 @@
 /* =========================================
-   다함 인테리어 견적 시스템 (안정화 로직)
+   다함 인테리어 견적 시스템 (커서 이동 기능 추가)
    ========================================= */
 
 const supabaseUrl = 'YOUR_SUPABASE_URL';
@@ -83,9 +83,15 @@ function update() {
     if(sumEl) sumEl.innerText = formatKRW(total) + " 원";
 }
 
+/* [핵심 수정] 필수 입력값 확인 및 커서 이동 */
 async function smartPrint() {
-    const name = document.getElementById('g-name').value;
-    if(!name) { alert("고객명을 입력해야 발행이 가능합니다."); return; }
+    const nameEl = document.getElementById('g-name');
+    const telEl = document.getElementById('g-tel');
+    const addrEl = document.getElementById('g-addr');
+
+    if(!nameEl.value) { alert("고객명을 입력해주세요."); nameEl.focus(); return; }
+    if(!telEl.value) { alert("연락처를 입력해주세요."); telEl.focus(); return; }
+    if(!addrEl.value) { alert("현장 주소를 입력해주세요."); addrEl.focus(); return; }
 
     const inputs = document.querySelectorAll('.in-num');
     inputs.forEach(input => { 
@@ -128,10 +134,15 @@ async function smartPrint() {
     }, 1000);
 }
 
+/* [핵심 수정] 계약서 전환 시에도 필수값 확인 */
 function switchToDetailed() {
-    const name = document.getElementById('g-name').value;
-    const addr = document.getElementById('g-addr').value;
-    if(!name || !addr) { alert("고객명과 주소를 입력해주세요."); return; }
+    const nameEl = document.getElementById('g-name');
+    const telEl = document.getElementById('g-tel');
+    const addrEl = document.getElementById('g-addr');
+
+    if(!nameEl.value) { alert("고객명을 입력해주세요."); nameEl.focus(); return; }
+    if(!telEl.value) { alert("연락처를 입력해주세요."); telEl.focus(); return; }
+    if(!addrEl.value) { alert("현장 주소를 입력해주세요."); addrEl.focus(); return; }
     
     const dBody = document.getElementById('detailed-body'); dBody.innerHTML = '';
     let dTotal = 0;
@@ -150,9 +161,9 @@ function switchToDetailed() {
         }
     });
     
-    document.getElementById('d-name-display').innerText = name;
-    document.getElementById('d-tel-display').innerText = document.getElementById('g-tel').value;
-    document.getElementById('d-addr-display').innerText = addr;
+    document.getElementById('d-name-display').innerText = nameEl.value;
+    document.getElementById('d-tel-display').innerText = telEl.value;
+    document.getElementById('d-addr-display').innerText = addrEl.value;
     document.getElementById('d-total').innerText = formatKRW(dTotal) + " 원";
     document.getElementById('view-general').classList.remove('active-view');
     document.getElementById('view-detailed').classList.add('active-view');
