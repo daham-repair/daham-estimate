@@ -1,4 +1,4 @@
-/* [0. 공통 디자인 시스템 - Clean Ver. 3.4 (버전 표시 추가)] */
+/* [0. 공통 디자인 시스템 - Clean Ver. 3.5 (인쇄 아이콘 제거)] */
 :root {
     --primary-navy: #0A2342; --accent-gold: #C5A47E; --accent-gold-dark: #B3936E;
     --text-dark: #111; --text-gray: #666; --bg-light: #F5F7FA; --card-bg: #FFF;
@@ -88,12 +88,12 @@ body {
 .btn-print { background: var(--primary-navy); }
 .btn-next { background: var(--danger-red); }
 
-/* [배너 및 버전 표시 스타일 수정] */
+/* [배너 및 버전 표시] */
 .notice-banner { 
     background: #FEF2F2; color: #E03E3E; 
     padding: 10px 15px; border-radius: 8px; 
     margin-bottom: 15px; line-height: 1.4; word-break: keep-all; 
-    display: flex; justify-content: space-between; align-items: center; /* 좌우 정렬 */
+    display: flex; justify-content: space-between; align-items: center;
     font-size: 13px; font-weight: 700;
 }
 .version-badge {
@@ -115,10 +115,8 @@ body {
     body { padding: 15px 10px 150px 10px; }
     .img-logo { height: 45px; }
     .rep-info div { font-size: 17px; }
-    
     .notice-banner { font-size: 11px; padding: 8px 12px; margin-bottom: 10px; }
     .version-badge { font-size: 10px; padding: 2px 4px; }
-    
     .header-card { padding: 15px 15px; }
     .info-grid { gap: 8px; }
 
@@ -128,7 +126,6 @@ body {
         padding-left: 8px !important;
         padding-right: 8px !important;
     }
-    
     .grid-header div { white-space: nowrap; font-size: 13px; letter-spacing: -1px; }
     .detail-grid { grid-template-columns: 2.5fr 3.5fr 0.6fr 1.7fr 1.7fr; gap: 5px; }
     .in-num { font-size: 13px; padding: 8px 0 !important; }
@@ -160,4 +157,7 @@ body {
         padding: 0 !important;
         box-shadow: none !important;
     }
+    
+    /* [수정] 인쇄 시 아이콘 숨김 */
+    .section-icon { display: none !important; }
 }
