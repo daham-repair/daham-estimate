@@ -1,5 +1,5 @@
 /* =========================================
-   다함 인테리어 견적 시스템 (계약서 고도화)
+   다함 인테리어 견적 시스템 (계약서 아이콘 제거)
    ========================================= */
 
 const supabaseUrl = 'YOUR_SUPABASE_URL';
@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
         data.forEach((sec, idx) => {
             const cont = document.createElement('div'); cont.className = 'section-container'; cont.id = 'cont-'+idx;
             const h = document.createElement('div'); h.className = 'section-header'; 
+            // [참고] 견적 입력창(General View)에는 여전히 아이콘이 표시됨
             h.innerHTML = `<span><div class="section-icon">${icons[sec.key]}</div> ${sec.category}<span id="pv-${idx}" class="paint-print-val"></span></span><span class="no-print">▼</span>`;
             h.onclick = () => document.getElementById('c-'+idx).classList.toggle('show');
             cont.appendChild(h);
@@ -157,12 +158,10 @@ async function smartPrint() {
     }, 1000);
 }
 
-// [수정] 계약서 전용 출력 함수
 function printContract() {
     window.print();
 }
 
-// [수정] 계약서 화면 전환 (그룹화 및 버튼 교체)
 function switchToDetailed() {
     const nameEl = document.getElementById('g-name');
     const telEl = document.getElementById('g-tel');
@@ -175,9 +174,7 @@ function switchToDetailed() {
     const dBody = document.getElementById('detailed-body'); dBody.innerHTML = '';
     let dTotal = 0;
     
-    // [핵심] 섹션별 그룹화 로직
     data.forEach((sec, idx) => {
-        // 해당 섹션에 체크된 항목이 있는지 확인
         const checkedItems = [];
         const rows = document.querySelectorAll(`.row-${idx}`);
         rows.forEach(row => {
@@ -191,21 +188,18 @@ function switchToDetailed() {
             }
         });
 
-        // 체크된 항목이 있다면 섹션 헤더 생성 후 아이템 추가
         if (checkedItems.length > 0) {
-            // 섹션 헤더
             const secHeader = document.createElement('div');
             secHeader.className = 'contract-section-header';
-            secHeader.innerHTML = `<div class="section-icon">${icons[sec.key]}</div> ${sec.category}`;
+            // [수정] 아이콘 태그 제거 (텍스트만 표시)
+            secHeader.innerHTML = `${sec.category}`;
             dBody.appendChild(secHeader);
 
-            // 아이템 리스트
             checkedItems.forEach(item => {
                 const sum = item.qty * item.price;
                 dTotal += sum;
                 const div = document.createElement('div');
                 div.className = 'grid-row detail-grid';
-                // [수정] 자재사양 입력란을 textarea로 변경
                 div.innerHTML = `
                     <strong>${item.name}</strong>
                     <textarea class="spec-field" placeholder="사양 입력" rows="1"></textarea>
@@ -223,11 +217,9 @@ function switchToDetailed() {
     document.getElementById('d-addr-display').innerText = addrEl.value;
     document.getElementById('d-total').innerText = formatKRW(dTotal) + " 원";
 
-    // 뷰 전환
     document.getElementById('view-general').classList.remove('active-view');
     document.getElementById('view-detailed').classList.add('active-view');
 
-    // [버튼 교체] 견적 모드 버튼 숨김, 계약 모드 버튼 표시
     toggleButtons(true);
     
     window.scrollTo(0,0);
@@ -236,12 +228,9 @@ function switchToDetailed() {
 function backToGeneral() {
     document.getElementById('view-detailed').classList.remove('active-view');
     document.getElementById('view-general').classList.add('active-view');
-    
-    // [버튼 교체] 견적 모드 버튼 표시, 계약 모드 버튼 숨김
     toggleButtons(false);
 }
 
-// [추가] 하단 버튼 토글 함수
 function toggleButtons(isContractMode) {
     const estBtns = ['btn-reset', 'btn-save', 'btn-print-est', 'btn-go-contract'];
     const contBtns = ['btn-back', 'btn-print-cont'];
