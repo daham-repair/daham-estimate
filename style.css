@@ -1,4 +1,4 @@
-/* [0. 공통 디자인 시스템 - Clean Ver. 3.8 (계약서 헤더 디자인 수정)] */
+/* [0. 공통 디자인 시스템 - Clean Ver. 3.9 (문서 제목 추가)] */
 :root {
     --primary-navy: #0A2342; --accent-gold: #C5A47E; --accent-gold-dark: #B3936E;
     --text-dark: #111; --text-gray: #666; --bg-light: #F5F7FA; --card-bg: #FFF;
@@ -28,19 +28,31 @@ body {
     padding-bottom: 15px; border-bottom: 1px solid var(--border-color); 
 }
 .img-logo { height: 70px; width: auto; display: block; }
-.rep-info { text-align: right; }
+
+/* [추가] 문서 제목 스타일 (견적서/계약서) */
+.doc-title {
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--primary-navy);
+    margin: 0;
+    letter-spacing: -1px;
+    text-align: center;
+    flex-grow: 1; /* 중앙 배치 */
+}
+
+.rep-info { text-align: right; min-width: 120px; }
 .rep-info strong { font-size: 16px; display: block; margin-bottom: 4px; }
 .rep-info div { font-size: 20px; font-weight: 800; }
 
 .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .full-row { grid-column: span 2; }
 
-/* [수정] 계약서 화면 텍스트 표시 영역 (박스 제거, 텍스트 라인화) */
+/* 계약서 화면 텍스트 표시 영역 */
 .display-text { 
     background: transparent; 
     padding: 5px 0 5px 0; 
     border-radius: 0; 
-    border-bottom: 1px solid #ddd; /* 밑줄 추가 */
+    border-bottom: 1px solid #ddd; 
     min-height: auto; 
     font-weight: 700; 
     font-size: 16px; 
@@ -158,6 +170,10 @@ body {
     body { padding: 15px 10px 150px 10px; }
     .img-logo { height: 45px; }
     .rep-info div { font-size: 17px; }
+    
+    /* [수정] 모바일 제목 크기 조정 */
+    .doc-title { font-size: 20px; }
+    
     .notice-banner { font-size: 11px; padding: 8px 12px; margin-bottom: 10px; }
     .version-badge { font-size: 10px; padding: 2px 4px; }
     .header-card { padding: 15px 15px; }
@@ -212,7 +228,8 @@ body {
         overflow: visible;
         white-space: pre-wrap; 
     }
-    
-    /* [추가] 인쇄 시 계약서 헤더 텍스트 깔끔하게 */
     .display-text { border-bottom: none !important; padding: 0 !important; }
+    
+    /* 인쇄 시 제목 적당히 조정 */
+    .doc-title { font-size: 24px; color: black; }
 }
