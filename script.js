@@ -1,5 +1,5 @@
 /* =========================================
-   다함 인테리어 견적 시스템 (단위 로직 수정 Ver 1.14)
+   다함 인테리어 견적 시스템 (단가 로직 안정화 Ver 1.15)
    ========================================= */
 
 const supabaseUrl = 'YOUR_SUPABASE_URL';
@@ -47,6 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>`;
                 sec.items.forEach((item, iIdx) => {
+                    // [핵심] 단가는 표시용(만원 단위)으로 초기 렌더링
                     rows += `<div class="grid-row master-grid row-${idx} item-line">
                         <div style="text-align:left;"><label class="item-label"><input type="checkbox" class="chk" data-name="${item.n}" onchange="update()"><span class="checkmark"></span><span>${item.n}</span></label></div>
                         <div><input type="number" class="in-num qty" value="1" oninput="update()"></div>
@@ -87,8 +88,7 @@ function addCustomRow(secIdx, savedData = null) {
     
     const nameVal = savedData ? savedData.name : "";
     const qtyVal = savedData ? savedData.qty : 1;
-    // 불러오기 시 저장된 원금액(만원 단위 아님)을 만원 단위로 변환 표시
-    const priceVal = savedData ? (savedData.price / 10000) : 0;
+    const priceVal = savedData ? (parseFloat(savedData.price) / 10000) : 0;
     
     div.innerHTML = `
         <div style="text-align:left; display:flex; align-items:center;">
@@ -136,20 +136,23 @@ function toggleSec(idx, master) {
     update();
 }
 
-// [핵심] 만원 단위 보정 로직
+// [핵심] 만원 단위를 원 단위로 변환하여 콤마 표시
 function formatKRW(num) { 
     if (!num && num !== 0) return "0"; 
-    return Math.floor(num * 10000).toLocaleString(); 
+    // num은 만원 단위 숫자임
+    return Math.floor(parseFloat(num) * 10000).toLocaleString(); 
 }
 
 function update() {
     let total = 0;
     document.querySelectorAll('#view-general .item-line').forEach(row => {
         const chk = row.querySelector('.chk');
+        // [수정] 입력값이 콤마를 포함하고 있을 경우 대비하여 제거 후 읽기
         const qtyVal = parseFloat(row.querySelector('.qty').value) || 0;
-        const priceVal = parseFloat(row.querySelector('.price').value) || 0;
+        let priceRaw = row.querySelector('.price').value.toString().replace(/,/g, '');
+        const priceVal = parseFloat(priceRaw) || 0;
+
         if(chk.checked) {
-            // 만원 단위 곱셈 적용
             const sum = qtyVal * priceVal;
             total += sum; 
             row.querySelector('.row-total').innerText = formatKRW(sum);
@@ -174,9 +177,11 @@ async function smartPrint() {
     const inputs = document.querySelectorAll('.in-num');
     inputs.forEach(input => { 
         if (input.classList.contains('price')) { 
+            // 현재 만원 단위 숫자를 백업하고 화면만 포맷팅
             input.dataset.orig = input.value; 
+            const formatted = formatKRW(parseFloat(input.value.toString().replace(/,/g, ''))||0);
             input.type = "text"; 
-            input.value = formatKRW(parseFloat(input.value)||0); 
+            input.value = formatted; 
         } 
     });
 
@@ -208,8 +213,14 @@ async function smartPrint() {
 
     window.print();
 
+    // 인쇄 후 복구 시 데이터 변형 방지
     setTimeout(() => {
-        inputs.forEach(input => { if (input.classList.contains('price')) { input.type = "number"; input.value = input.dataset.orig; } });
+        inputs.forEach(input => { 
+            if (input.classList.contains('price')) { 
+                input.type = "number"; 
+                input.value = input.dataset.orig; 
+            } 
+        });
         document.querySelectorAll('.section-container, .grid-row').forEach(el => el.classList.remove('hidden-print'));
         document.querySelectorAll('.paint-print-val').forEach(el => el.innerText = "");
         update();
@@ -221,6 +232,7 @@ function printContract() {
 }
 
 function switchToDetailed() {
+    // 1. 먼저 현재 입력값들을 기준으로 전체 계산(만원 단위)을 확실히 수행
     update();
 
     const nameEl = document.getElementById('g-name');
@@ -246,10 +258,12 @@ function switchToDetailed() {
                     itemName = customInput.value;
                 }
 
+                // [수정] 콤마 제거 후 숫자만 읽어오기
+                let pRaw = row.querySelector('.price').value.toString().replace(/,/g, '');
                 checkedItems.push({
                     name: itemName,
                     qty: row.querySelector('.qty').value,
-                    price: row.querySelector('.price').value
+                    price: pRaw // 만원 단위 숫자
                 });
             }
         });
@@ -261,9 +275,9 @@ function switchToDetailed() {
             dBody.appendChild(secHeader);
 
             checkedItems.forEach(item => {
-                // 단가 보정 (만원 단위)
+                // 실금액 계산 (만원 단위 숫자 * 10,000)
                 const realPrice = parseFloat(item.price) * 10000;
-                const sum = item.qty * realPrice;
+                const sum = parseFloat(item.qty) * realPrice;
                 dTotal += sum;
                 const div = document.createElement('div');
                 div.className = 'grid-row detail-grid';
@@ -295,17 +309,19 @@ function backToGeneral() {
     document.getElementById('view-detailed').classList.remove('active-view');
     document.getElementById('view-general').classList.add('active-view');
     toggleButtons(false);
+    // 복귀 후 다시 계산 업데이트
+    update();
 }
 
 function toggleButtons(isContractMode) {
     const estBtns = ['btn-reset', 'btn-save', 'btn-print-est', 'btn-go-contract'];
     const contBtns = ['btn-back', 'btn-print-cont'];
-
     estBtns.forEach(id => document.getElementById(id).style.display = isContractMode ? 'none' : 'flex');
     contBtns.forEach(id => document.getElementById(id).style.display = isContractMode ? 'flex' : 'none');
 }
 
 function saveToLocal() {
+    update(); // 저장 전 계산 동기화
     const saveData = {
         name: document.getElementById('g-name').value,
         tel: document.getElementById('g-tel').value,
@@ -318,11 +334,11 @@ function saveToLocal() {
     document.querySelectorAll('.item-line:not(.custom-dynamic-row)').forEach((row, idx) => {
         const chk = row.querySelector('.chk');
         if(chk.checked) {
+            let pRaw = row.querySelector('.price').value.toString().replace(/,/g, '');
             saveData.items.push({ 
                 idx: idx, 
                 qty: row.querySelector('.qty').value, 
-                // 원금액으로 저장 (나중에 복구 시 만원 단위 보정 위해)
-                price: parseFloat(row.querySelector('.price').value) * 10000 
+                price: parseFloat(pRaw) * 10000 // 실금액으로 저장
             });
         }
     });
@@ -330,10 +346,11 @@ function saveToLocal() {
     document.querySelectorAll('.custom-dynamic-row').forEach(row => {
         const customInput = row.querySelector('.custom-name');
         if(customInput) {
+            let pRaw = row.querySelector('.price').value.toString().replace(/,/g, '');
             saveData.customItems.push({
                 name: customInput.value,
                 qty: row.querySelector('.qty').value,
-                price: parseFloat(row.querySelector('.price').value) * 10000 
+                price: parseFloat(pRaw) * 10000 
             });
         }
     });
@@ -364,8 +381,8 @@ function loadFromLocal() {
                 const chk = row.querySelector('.chk');
                 chk.checked = true;
                 row.querySelector('.qty').value = item.qty;
-                // 화면 표시용 만원 단위 보정
-                row.querySelector('.price').value = item.price / 10000;
+                // 불러온 실금액을 다시 만원 단위 숫자로 변환
+                row.querySelector('.price').value = parseFloat(item.price) / 10000;
             }
         });
 
@@ -379,7 +396,6 @@ function loadFromLocal() {
                 });
             }
         }
-        
         update();
     }, 200);
 }
