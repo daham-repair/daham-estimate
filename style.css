@@ -1,4 +1,4 @@
-/* [0. 공통 디자인 시스템 - Clean Ver. 3.3 (인쇄 최적화)] */
+/* [0. 공통 디자인 시스템 - Clean Ver. 3.4 (버전 표시 추가)] */
 :root {
     --primary-navy: #0A2342; --accent-gold: #C5A47E; --accent-gold-dark: #B3936E;
     --text-dark: #111; --text-gray: #666; --bg-light: #F5F7FA; --card-bg: #FFF;
@@ -88,7 +88,21 @@ body {
 .btn-print { background: var(--primary-navy); }
 .btn-next { background: var(--danger-red); }
 
-.notice-banner { background: #FEF2F2; color: #E03E3E; padding: 8px; border-radius: 8px; text-align: center; font-size: 13px; font-weight: 700; margin-bottom: 15px; line-height: 1.4; word-break: keep-all; }
+/* [배너 및 버전 표시 스타일 수정] */
+.notice-banner { 
+    background: #FEF2F2; color: #E03E3E; 
+    padding: 10px 15px; border-radius: 8px; 
+    margin-bottom: 15px; line-height: 1.4; word-break: keep-all; 
+    display: flex; justify-content: space-between; align-items: center; /* 좌우 정렬 */
+    font-size: 13px; font-weight: 700;
+}
+.version-badge {
+    background: rgba(255, 255, 255, 0.5);
+    padding: 2px 6px; border-radius: 4px;
+    font-size: 11px; color: #b91c1c; font-weight: 800;
+    margin-left: 10px; white-space: nowrap;
+}
+
 .toast { visibility: hidden; min-width: 250px; background: rgba(0,0,0,0.8); color: white; text-align: center; border-radius: 50px; padding: 14px; position: fixed; z-index: 2000; left: 50%; bottom: 100px; transform: translateX(-50%); opacity: 0; transition: 0.3s; }
 .toast.show { visibility: visible; opacity: 1; bottom: 110px; }
 .paint-select { padding: 5px 10px; border: 1px solid #DDD; border-radius: 6px; font-size: 13px; font-weight: 600; width: 100%; }
@@ -101,7 +115,10 @@ body {
     body { padding: 15px 10px 150px 10px; }
     .img-logo { height: 45px; }
     .rep-info div { font-size: 17px; }
-    .notice-banner { font-size: 11px; padding: 8px; margin-bottom: 10px; }
+    
+    .notice-banner { font-size: 11px; padding: 8px 12px; margin-bottom: 10px; }
+    .version-badge { font-size: 10px; padding: 2px 4px; }
+    
     .header-card { padding: 15px 15px; }
     .info-grid { gap: 8px; }
 
@@ -121,7 +138,7 @@ body {
     .section-header { padding: 15px 15px; }
 }
 
-/* [인쇄 설정 - 수정됨] */
+/* [인쇄 설정] */
 @media print {
     body { padding: 0 !important; margin: 0; }
     .no-print, .bottom-action-bar, .notice-banner, .paint-select { display: none !important; }
@@ -137,7 +154,6 @@ body {
     .hidden-print { display: none !important; }
     .grid-row { padding-left: 5px !important; padding-right: 5px !important; }
 
-    /* [추가] 인쇄 시 입력창 박스 제거 */
     .input-field {
         border: none !important;
         background: transparent !important;
