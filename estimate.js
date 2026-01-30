@@ -1,4 +1,4 @@
-/* [estimate.js Ver 1.68 - 직접입력 발행 데이터 복구 완료] */
+/* [estimate.js Ver 1.69 - 인쇄 최적화 및 유효성 검사 통합] */
 
 document.addEventListener('DOMContentLoaded', function() {
     const body = document.getElementById('estimate-body');
@@ -18,52 +18,24 @@ document.addEventListener('DOMContentLoaded', function() {
             
             let html = '';
             if (sec.key !== 'custom') {
-                html += `
-                <div class="grid-row quote-grid no-print" style="background:#f8f9fa;">
-                    <label class="item-label">
-                        <input type="checkbox" onchange="toggleSec(${idx}, this)">
-                        <span class="checkmark"></span> <b>전체 선택</b>
-                    </label>
-                </div>`;
+                html += `<div class="grid-row quote-grid no-print" style="background:#f8f9fa;"><label class="item-label"><input type="checkbox" onchange="toggleSec(${idx}, this)"><span class="checkmark"></span> <b>전체 선택</b></label></div>`;
             }
 
             if(sec.isPaint) {
-                html += `
-                <div class="grid-row quote-grid no-print" style="background:#fffbe6; border-bottom:2px solid #ffe58f;">
-                    <div style="font-weight:bold; color:var(--primary-navy);">페인트 종류</div>
-                    <div colspan="3" style="grid-column: span 3;">
-                        <select class="info-select paint-opt" onchange="updatePaintPrice(${idx}, this)">
-                            <option value="water">수성 페인트 (12만)</option>
-                            <option value="elastic">탄성 코트 (22만)</option>
-                            <option value="ceramic">세라믹 코트 (30만)</option>
-                        </select>
-                    </div>
-                </div>`;
+                html += `<div class="grid-row quote-grid no-print" style="background:#fffbe6; border-bottom:2px solid #ffe58f;"><div style="font-weight:bold;">페인트 종류</div><div style="grid-column: span 3;"><select class="info-select" onchange="updatePaintPrice(${idx}, this)"><option value="water">수성 페인트 (12만)</option><option value="elastic">탄성 코트 (22만)</option><option value="ceramic">세라믹 코트 (30만)</option></select></div></div>`;
             }
 
             sec.items.forEach(item => {
                 html += `
                 <div class="grid-row quote-grid item-line">
-                    <div class="col-name">
-                        <label class="item-label">
-                            <input type="checkbox" class="chk" data-name="${item.n}" onchange="updateSum()">
-                            <span class="checkmark"></span>
-                            <span class="item-name-text">${item.n}</span>
-                        </label>
-                    </div>
+                    <div class="col-name"><label class="item-label"><input type="checkbox" class="chk" data-name="${item.n}" onchange="updateSum()"><span class="checkmark"></span><span class="item-name-text">${item.n}</span></label></div>
                     <div class="col-center"><input type="number" class="input-num qty" value="1" oninput="updateSum()"></div>
                     <div class="col-center"><input type="number" class="input-num price" value="${item.p/10000}" oninput="updateSum()"></div>
                     <div class="col-right row-sum">0</div>
                 </div>`;
             });
 
-            c.innerHTML = `
-                <div id="fixed-${idx}">${html}</div>
-                <div id="dynamic-${idx}"></div>
-                <div class="no-print" style="text-align:center; padding:10px;">
-                    <button class="fab-btn btn-reset" style="width:100%; border:1px dashed #ccc; height:44px;" onclick="addCustomRow(${idx})">+ 항목 직접 추가</button>
-                </div>`;
-            
+            c.innerHTML = `<div id="fixed-${idx}">${html}</div><div id="dynamic-${idx}"></div><div class="no-print" style="padding:10px;"><button class="fab-btn btn-reset" style="width:100%; border:1px dashed #ccc; height:44px;" onclick="addCustomRow(${idx})">+ 항목 직접 추가</button></div>`;
             cont.appendChild(c);
             body.appendChild(cont);
         });
@@ -72,35 +44,22 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function validateInputs() {
-    const n = document.getElementById('g-name');
-    const t = document.getElementById('g-tel');
-    const a = document.getElementById('g-addr');
+    const n = document.getElementById('g-name'), t = document.getElementById('g-tel'), a = document.getElementById('g-addr');
     if (!n.value.trim()) { alert("고객명을 입력해주세요."); n.focus(); return false; }
     if (!t.value.trim()) { alert("연락처를 입력해주세요."); t.focus(); return false; }
     if (!a.value.trim()) { alert("현장 주소를 입력해주세요."); a.focus(); return false; }
     return true;
 }
 
-// [Ver 1.68] 인쇄용 데이터 동기화 및 발행 로직
 function smartPrint() {
     if(!validateInputs()) return;
-    
-    // 1. 고객 정보 정적 텍스트로 복사
     document.getElementById('t-name').innerText = document.getElementById('g-name').value;
     document.getElementById('t-tel').innerText = document.getElementById('g-tel').value;
     document.getElementById('t-addr').innerText = document.getElementById('g-addr').value;
 
-    // 2. 직접 입력(textarea) 항목의 내용을 인쇄용 span으로 복사
-    document.querySelectorAll('.grid-row.item-line').forEach(row => {
-        const txtArea = row.querySelector('.custom-name-input');
-        const printSpan = row.querySelector('.custom-name-print');
-        if(txtArea && printSpan) {
-            printSpan.innerText = txtArea.value || "(공정명 없음)";
-        }
-    });
-
-    // 3. 필터링 (선택 안 된 항목 숨기기)
     document.querySelectorAll('.item-line').forEach(row => {
+        const txtArea = row.querySelector('.custom-name-input'), printSpan = row.querySelector('.custom-name-print');
+        if(txtArea && printSpan) printSpan.innerText = txtArea.value || "(공정명 없음)";
         if(!row.querySelector('.chk').checked) row.classList.add('hidden-print');
         else row.classList.remove('hidden-print');
     });
@@ -115,30 +74,21 @@ function smartPrint() {
     setTimeout(() => { document.querySelectorAll('.hidden-print').forEach(el => el.classList.remove('hidden-print')); }, 1000);
 }
 
-// [Ver 1.68] 직접 입력 항목 추가 (인쇄용 span 포함)
 function addCustomRow(idx) {
-    const target = document.getElementById(`dynamic-${idx}`);
-    const div = document.createElement('div');
+    const target = document.getElementById(`dynamic-${idx}`), div = document.createElement('div');
     div.className = 'grid-row quote-grid item-line';
     div.innerHTML = `
-        <div style="display:flex; align-items:flex-start;">
-            <label class="item-label" style="width:auto;"><input type="checkbox" class="chk" checked onchange="updateSum()"><span class="checkmark"></span></label>
-            <textarea class="info-input custom-name-input" style="padding:4px; font-size:13px; height:auto; flex:1; min-height:28px; line-height:1.2;" placeholder="항목명" oninput="updateSum()"></textarea>
-            <span class="custom-name-print"></span> </div>
+        <div style="display:flex; align-items:flex-start;"><label class="item-label" style="width:auto;"><input type="checkbox" class="chk" checked onchange="updateSum()"><span class="checkmark"></span></label><textarea class="info-input custom-name-input" style="padding:4px; font-size:13px; height:auto; flex:1; min-height:28px; line-height:1.2;" placeholder="항목명" oninput="updateSum()"></textarea><span class="custom-name-print"></span></div>
         <div class="col-center"><input type="number" class="input-num qty" value="1" oninput="updateSum()"></div>
         <div class="col-center"><input type="number" class="input-num price" value="0" oninput="updateSum()"></div>
-        <div class="col-right" style="display:flex; align-items:center; justify-content:flex-end;"><span class="row-sum" style="margin-right:5px;">0</span><button class="btn-del-row" onclick="this.closest('.grid-row').remove(); updateSum();">×</button></div>
-    `;
+        <div class="col-right" style="display:flex; align-items:center; justify-content:flex-end;"><span class="row-sum" style="margin-right:5px;">0</span><button class="btn-del-row" onclick="this.closest('.grid-row').remove(); updateSum();">×</button></div>`;
     target.appendChild(div);
     updateSum();
 }
 
 function updatePaintPrice(idx, select) {
-    const section = document.getElementById('c-' + idx);
-    const val = select.value;
-    let price = 12;
-    if(val === 'elastic') price = 22;
-    else if(val === 'ceramic') price = 30;
+    const section = document.getElementById('c-' + idx), val = select.value;
+    let price = (val === 'elastic') ? 22 : (val === 'ceramic') ? 30 : 12;
     section.querySelectorAll('.grid-row.item-line').forEach(row => {
         const nameText = row.querySelector('.item-name-text')?.innerText || "";
         if(nameText.includes('베란다')) row.querySelector('.price').value = price;
@@ -156,9 +106,7 @@ function updateSum() {
     document.querySelectorAll('.grid-row.item-line').forEach(row => {
         const chk = row.querySelector('.chk');
         if (chk && chk.checked) {
-            const q = row.querySelector('.qty')?.value || 0;
-            const p = row.querySelector('.price')?.value || 0;
-            const sum = q * p * 10000;
+            const sum = (parseFloat(row.querySelector('.qty')?.value)||0) * (parseFloat(row.querySelector('.price')?.value)||0) * 10000;
             total += sum;
             if(row.querySelector('.row-sum')) row.querySelector('.row-sum').innerText = sum.toLocaleString();
         } else if(row.querySelector('.row-sum')) { row.querySelector('.row-sum').innerText = "0"; }
@@ -177,9 +125,9 @@ function switchToDetailed() {
     const dBody = document.getElementById('detailed-body'); dBody.innerHTML = '';
     data.forEach((sec, idx) => {
         const rows = document.querySelectorAll(`#c-${idx} .item-line`);
-        let groupHasChecked = false;
-        rows.forEach(r => { if(r.querySelector('.chk')?.checked) groupHasChecked = true; });
-        if(groupHasChecked) {
+        let hasChecked = false;
+        rows.forEach(r => { if(r.querySelector('.chk')?.checked) hasChecked = true; });
+        if(hasChecked) {
             const sh = document.createElement('div');
             sh.className = 'grid-row'; sh.style.backgroundColor = '#f8f9fa'; sh.style.fontWeight = 'bold'; sh.style.gridTemplateColumns = '1fr';
             sh.innerText = sec.category; dBody.appendChild(sh);
@@ -187,8 +135,7 @@ function switchToDetailed() {
                 const chk = row.querySelector('.chk');
                 if(chk && chk.checked) {
                     const nameText = chk.dataset.name || row.querySelector('.custom-name-input')?.value || "직접 입력";
-                    const q = row.querySelector('.qty').value;
-                    const sum = q * row.querySelector('.price').value * 10000;
+                    const q = row.querySelector('.qty').value, sum = q * row.querySelector('.price').value * 10000;
                     const div = document.createElement('div');
                     div.className = 'grid-row contract-grid';
                     div.innerHTML = `<div style="white-space:normal;">${nameText}</div><div><textarea class="spec-field" rows="1" placeholder="사양 입력"></textarea></div><div class="col-center">${q}</div><div class="col-right">${sum.toLocaleString()}</div>`;
@@ -215,9 +162,9 @@ function backToGeneral() {
 
 function resetForm() { if(confirm('초기화하시겠습니까?')) location.reload(); }
 function saveToLocal() {
-    const toast = document.getElementById('toast-msg');
-    toast.classList.add('show');
-    setTimeout(() => { toast.classList.remove('show'); }, 2500);
+    const t = document.getElementById('toast-msg');
+    t.classList.add('show');
+    setTimeout(() => { t.classList.remove('show'); }, 2500);
 }
 
 function initTelFormat() {
