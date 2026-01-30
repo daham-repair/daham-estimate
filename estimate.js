@@ -1,4 +1,4 @@
-/* [estimate.js Ver 1.47 - 모바일/PC 통합 픽스] */
+/* [estimate.js Ver 1.48 - 모바일 대응 강화] */
 
 document.addEventListener('DOMContentLoaded', function() {
     const body = document.getElementById('estimate-body');
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="col-sum row-sum">0</div>
                 </div>`;
             });
-            c.innerHTML = `<div id="fixed-${idx}">${html}</div><div id="dynamic-${idx}"></div><div class="no-print" style="text-align:center;"><button class="btn-add-row" style="width:90%; padding:10px; margin:10px; border:1px dashed #ccc; background:#fff;" onclick="addCustomRow(${idx})">+ 항목 추가</button></div>`;
+            c.innerHTML = `<div id="fixed-${idx}">${html}</div><div id="dynamic-${idx}"></div><div class="no-print" style="text-align:center;"><button class="btn-add-row" style="width:90%; padding:12px; margin:10px auto; border:1px dashed #ccc; background:#fff; border-radius:8px; cursor:pointer;" onclick="addCustomRow(${idx})">+ 항목 직접 추가</button></div>`;
             cont.appendChild(c); body.appendChild(cont);
         });
     }
@@ -91,6 +91,7 @@ function switchToDetailed() {
     document.getElementById('d-name-display').innerText = document.getElementById('g-name').value;
     document.getElementById('d-tel-display').innerText = document.getElementById('g-tel').value;
     document.getElementById('d-addr-display').innerText = document.getElementById('g-addr').value;
+    
     const dBody = document.getElementById('detailed-body'); dBody.innerHTML = ''; let dTotal = 0;
     data.forEach((sec, idx) => {
         const checked = document.querySelectorAll(`#c-${idx} .item-line .chk:checked`);
@@ -109,6 +110,8 @@ function switchToDetailed() {
     document.getElementById('d-total').innerText = dTotal.toLocaleString() + " 원";
     document.getElementById('view-general').style.display = 'none';
     document.getElementById('view-detailed').style.display = 'block';
+    
+    // [중요] 버튼 그룹 교체로 중복 노출 방지
     document.getElementById('btn-group-main').style.display = 'none';
     document.getElementById('btn-group-sub').style.display = 'flex';
     window.scrollTo(0,0);
