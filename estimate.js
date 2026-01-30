@@ -1,4 +1,4 @@
-/* [estimate.js Ver 1.29 - 전화번호 제한 및 계약서 복구] */
+/* [estimate.js Ver 1.30 - 인쇄 최적화 및 전화번호 포맷] */
 const supabaseUrl = 'YOUR_SUPABASE_URL';
 const supabaseKey = 'YOUR_SUPABASE_KEY';
 let dbClient = null;
@@ -9,8 +9,9 @@ document.addEventListener('DOMContentLoaded', function() {
         data.forEach((sec, idx) => {
             const cont = document.createElement('div'); cont.id = 'cont-'+idx;
             const h = document.createElement('div'); h.className = 'section-bar';
-            // [Ver 1.29] 아이콘 SVG 복구
-            h.innerHTML = `<span class="section-title"><svg class="section-icon" viewBox="0 0 24 24">${icons[sec.key]}</svg> ${sec.category}</span> <span>▼</span>`;
+            
+            // [Ver 1.30] 화살표에 arrow-icon 클래스 추가 (인쇄 시 숨김)
+            h.innerHTML = `<span class="section-title"><svg class="section-icon" viewBox="0 0 24 24">${icons[sec.key]}</svg> ${sec.category}</span> <span class="arrow-icon">▼</span>`;
             
             h.onclick = () => {
                 const target = document.getElementById('c-' + idx);
@@ -22,7 +23,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const c = document.createElement('div'); c.className = 'section-content'; c.id = 'c-'+idx;
             
-            // 전체선택 행
             let html = `<div class="grid-row no-print" style="background:#f8f9fa;">
                 <label class="item-label"><input type="checkbox" onchange="toggleSec(${idx}, this)"><span class="checkmark"></span> <b>전체 선택</b></label>
             </div>`;
@@ -52,16 +52,12 @@ document.addEventListener('DOMContentLoaded', function() {
     initTelFormat();
 });
 
-// [Ver 1.29] 전화번호 11자 입력 제한 (010-0000-0000)
 function initTelFormat() {
     const telInput = document.getElementById('g-tel');
     if(telInput) {
         telInput.addEventListener('input', function(e) {
             let v = e.target.value.replace(/[^0-9]/g, '');
-            // 최대 11자리까지만 입력 허용
             if (v.length > 11) v = v.substring(0, 11);
-            
-            // 하이픈 포맷팅
             if (v.length > 3 && v.length <= 7) e.target.value = v.replace(/(\d{3})(\d{1,4})/, '$1-$2');
             else if (v.length > 7) e.target.value = v.replace(/(\d{3})(\d{3,4})(\d{4})/, '$1-$2-$3');
             else e.target.value = v;
@@ -123,18 +119,19 @@ function smartPrint() {
     const name = document.getElementById('g-name').value;
     if(!name) return alert('고객명을 입력해주세요.');
     
-    // 체크 안된 것 숨기기
+    // 1. 체크 안된 항목 숨기기
     document.querySelectorAll('.item-line').forEach(row => {
         if(!row.querySelector('.chk').checked) row.classList.add('hidden-print');
         else row.classList.remove('hidden-print');
     });
     
-    // [Ver 1.29] 빈 섹션 숨기기
+    // 2. 빈 섹션 숨기기 & 내용 열기
     data.forEach((_, idx) => {
         const cont = document.getElementById('cont-' + idx);
         const hasChecked = cont.querySelectorAll('.chk:checked').length > 0;
-        if(!hasChecked) cont.classList.add('hidden-print');
-        else {
+        if(!hasChecked) {
+            cont.classList.add('hidden-print');
+        } else {
             cont.classList.remove('hidden-print');
             document.getElementById('c-'+idx).classList.add('show');
         }
@@ -142,13 +139,13 @@ function smartPrint() {
 
     window.print();
     
-    // 복구
+    // 3. 복구
     setTimeout(() => {
         document.querySelectorAll('.hidden-print').forEach(el => el.classList.remove('hidden-print'));
+        document.querySelectorAll('.section-content').forEach(c => c.classList.remove('show'));
     }, 1000);
 }
 
-// [Ver 1.29] 계약서 화면 전환 (복구됨)
 function switchToDetailed() {
     update();
     const name = document.getElementById('g-name').value;
@@ -167,7 +164,6 @@ function switchToDetailed() {
     data.forEach((sec, idx) => {
         const checked = document.querySelectorAll(`#c-${idx} .item-line .chk:checked`);
         if(checked.length > 0) {
-            // 섹션 헤더
             const sh = document.createElement('div');
             sh.className = 'grid-row';
             sh.style.backgroundColor = '#f1f3f5';
@@ -185,7 +181,6 @@ function switchToDetailed() {
 
                 const div = document.createElement('div');
                 div.className = 'grid-row';
-                // 계약서 그리드 비율 (4 : 1 : 2)
                 div.style.gridTemplateColumns = '2fr 3fr 1fr 2fr';
                 div.innerHTML = `
                     <div style="text-align:left;">${name}</div>
@@ -202,7 +197,6 @@ function switchToDetailed() {
     document.getElementById('view-general').style.display = 'none';
     document.getElementById('view-detailed').style.display = 'block';
     
-    // 버튼 교체
     document.querySelectorAll('.fab-btn').forEach(b => b.style.display = 'none');
     document.getElementById('btn-back').style.display = 'flex';
     document.getElementById('btn-print-cont').style.display = 'flex';
@@ -212,16 +206,14 @@ function switchToDetailed() {
 function backToGeneral() {
     document.getElementById('view-detailed').style.display = 'none';
     document.getElementById('view-general').style.display = 'block';
-    // 버튼 복구
     document.querySelectorAll('.fab-btn').forEach(b => b.style.display = 'flex');
     document.getElementById('btn-back').style.display = 'none';
     document.getElementById('btn-print-cont').style.display = 'none';
 }
 
 function saveToLocal() {
-    // (저장 로직은 Ver 1.28과 동일하여 생략, 실제 적용시엔 이전 버전 코드 사용)
     const t = document.getElementById('toast-msg'); t.className = "toast show"; setTimeout(()=>t.className="toast", 2000);
 }
-function loadFromLocal() { /* 로드 로직 동일 */ }
+function loadFromLocal() {}
 function resetForm() { if(confirm('초기화?')) location.reload(); }
 function printContract() { window.print(); }
