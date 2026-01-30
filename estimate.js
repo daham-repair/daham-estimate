@@ -1,10 +1,11 @@
-/* [estimate.js Ver 1.60 - 버튼 그룹 제어 및 삭제 기능 통합] */
+/* [estimate.js Ver 1.61 - 발행 필터링 및 텍스트 변환 로직] */
 
 document.addEventListener('DOMContentLoaded', function() {
     const body = document.getElementById('estimate-body');
     if(body && typeof data !== 'undefined') {
         data.forEach((sec, idx) => {
             const cont = document.createElement('div');
+            cont.id = 'cont-' + idx; // 섹션 ID 부여
             const h = document.createElement('div');
             h.className = 'section-bar';
             h.innerHTML = `<div><span class="section-icon">${icons[sec.key] || ''}</span>${sec.category}</div> <span>▼</span>`;
@@ -18,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
             let html = '';
             sec.items.forEach(item => {
                 html += `
-                <div class="grid-row quote-grid">
+                <div class="grid-row quote-grid item-line">
                     <div class="col-name">
                         <label class="item-label">
                             <input type="checkbox" class="chk" data-name="${item.n}" onchange="updateSum()">
@@ -46,10 +47,44 @@ document.addEventListener('DOMContentLoaded', function() {
     initTelFormat();
 });
 
+// [Ver 1.61 핵심] 견적 발행용 스마트 인쇄 함수
+function smartPrint() {
+    const name = document.getElementById('g-name').value;
+    const tel = document.getElementById('g-tel').value;
+    const addr = document.getElementById('g-addr').value;
+
+    if(!name.trim()){ alert("고객명을 입력해주세요."); return; }
+
+    // 1. 입력값을 정적 텍스트로 동기화
+    document.getElementById('t-name').innerText = name;
+    document.getElementById('t-tel').innerText = tel;
+    document.getElementById('t-addr').innerText = addr;
+
+    // 2. 미체크 항목 및 빈 섹션 필터링
+    document.querySelectorAll('.item-line').forEach(row => {
+        const isChecked = row.querySelector('.chk').checked;
+        if(!isChecked) row.classList.add('hidden-print');
+        else row.classList.remove('hidden-print');
+    });
+
+    data.forEach((_, idx) => {
+        const cont = document.getElementById('cont-' + idx);
+        const hasChecked = cont.querySelectorAll('.chk:checked').length > 0;
+        if(!hasChecked) cont.classList.add('hidden-print');
+        else cont.classList.remove('hidden-print');
+    });
+
+    // 3. 출력 후 복구
+    window.print();
+    setTimeout(() => {
+        document.querySelectorAll('.hidden-print').forEach(el => el.classList.remove('hidden-print'));
+    }, 1000);
+}
+
 function addCustomRow(idx) {
     const target = document.getElementById(`dynamic-${idx}`);
     const div = document.createElement('div');
-    div.className = 'grid-row quote-grid';
+    div.className = 'grid-row quote-grid item-line';
     div.innerHTML = `
         <div style="display:flex; align-items:flex-start;">
             <label class="item-label" style="width:auto;">
@@ -84,7 +119,7 @@ function initTelFormat() {
 
 function updateSum() {
     let total = 0;
-    document.querySelectorAll('.grid-row').forEach(row => {
+    document.querySelectorAll('.grid-row.item-line').forEach(row => {
         const chk = row.querySelector('.chk');
         if (chk && chk.checked) {
             const q = row.querySelector('.qty')?.value || 0;
@@ -102,38 +137,31 @@ function updateSum() {
     return total;
 }
 
-function validateInputs() {
-    const name = document.getElementById('g-name');
-    if(!name.value.trim()){ alert("고객명을 입력해주세요."); name.focus(); return false; }
-    return true;
-}
-
 function switchToDetailed() {
-    if(!validateInputs()) return;
+    const name = document.getElementById('g-name').value;
+    if(!name.trim()){ alert("고객명을 입력해주세요."); return; }
+    
     const total = updateSum();
     document.getElementById('page-title').innerText = "계약서 작성";
-    document.getElementById('d-name-display').innerText = document.getElementById('g-name').value;
+    document.getElementById('d-name-display').innerText = name;
     document.getElementById('d-tel-display').innerText = document.getElementById('g-tel').value;
     document.getElementById('d-addr-display').innerText = document.getElementById('g-addr').value;
     const dBody = document.getElementById('detailed-body'); dBody.innerHTML = '';
     
     data.forEach((sec, idx) => {
-        const rows = document.querySelectorAll(`#c-${idx} .grid-row`);
-        let groupHasChecked = false;
-        rows.forEach(r => { if(r.querySelector('.chk')?.checked) groupHasChecked = true; });
-        
-        if(groupHasChecked) {
+        const rows = document.querySelectorAll(`#c-${idx} .item-line`);
+        let hasChecked = false;
+        rows.forEach(r => { if(r.querySelector('.chk')?.checked) hasChecked = true; });
+        if(hasChecked) {
             const sh = document.createElement('div');
             sh.className = 'grid-row'; sh.style.backgroundColor = '#f8f9fa'; sh.style.fontWeight = 'bold'; sh.style.gridTemplateColumns = '1fr';
             sh.innerText = sec.category; dBody.appendChild(sh);
-            
             rows.forEach(row => {
                 const chk = row.querySelector('.chk');
                 if(chk && chk.checked) {
                     const nameText = chk.dataset.name || row.querySelector('textarea')?.value || "직접 입력";
                     const q = row.querySelector('.qty').value;
-                    const p = row.querySelector('.price').value;
-                    const sum = q * p * 10000;
+                    const sum = q * row.querySelector('.price').value * 10000;
                     const div = document.createElement('div');
                     div.className = 'grid-row contract-grid';
                     div.innerHTML = `<div style="white-space:normal;">${nameText}</div><div><textarea class="spec-field" rows="1" placeholder="사양 입력"></textarea></div><div class="col-center">${q}</div><div class="col-right">${sum.toLocaleString()}</div>`;
@@ -145,8 +173,6 @@ function switchToDetailed() {
     document.getElementById('d-total').innerText = total.toLocaleString() + " 원";
     document.getElementById('view-general').style.display = 'none';
     document.getElementById('view-detailed').style.display = 'block';
-    
-    // [Ver 1.60] 버튼 그룹 클래스 제어
     document.getElementById('btn-group-main').classList.remove('active');
     document.getElementById('btn-group-sub').classList.add('active');
     window.scrollTo(0,0);
@@ -156,12 +182,9 @@ function backToGeneral() {
     document.getElementById('page-title').innerText = "견적서 작성";
     document.getElementById('view-general').style.display = 'block';
     document.getElementById('view-detailed').style.display = 'none';
-    
-    // [Ver 1.60] 버튼 그룹 클래스 제어
     document.getElementById('btn-group-main').classList.add('active');
     document.getElementById('btn-group-sub').classList.remove('active');
 }
 
 function resetForm() { if(confirm('초기화하시겠습니까?')) location.reload(); }
-function smartPrint() { if(!validateInputs()) return; window.print(); }
 function saveToLocal() { alert('저장되었습니다.'); }
