@@ -1,4 +1,4 @@
-/* [estimate.js Ver 1.71 - 계약서 배분 및 줄바꿈 최적화] */
+/* [estimate.js Ver 1.72 - 아이콘 제거 및 안정 로직 통합] */
 
 document.addEventListener('DOMContentLoaded', function() {
     const body = document.getElementById('estimate-body');
@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="col-right row-sum">0</div>
                 </div>`;
             });
-            c.innerHTML = `<div id="fixed-${idx}">${html}</div><div id="dynamic-${idx}"></div><div class="no-print" style="padding:10px;"><button class="fab-btn btn-reset" style="width:100%; border:1px dashed #ccc; height:44px;" onclick="addCustomRow(${idx})">+ 항목 직접 추가</button></div>`;
+            c.innerHTML = `<div id="fixed-${idx}">${html}</div><div id="dynamic-${idx}"></div><div class="no-print" style="padding:10px;"><button class="fab-btn btn-reset" style="width:100%; border:1px dashed #ccc; height:44px;" onclick="addCustomRow(${idx})">항목 직접 추가</button></div>`;
             cont.appendChild(c);
             body.appendChild(cont);
         });
@@ -78,6 +78,21 @@ function addCustomRow(idx) {
     updateSum();
 }
 
+function updatePaintPrice(idx, select) {
+    const section = document.getElementById('c-' + idx), val = select.value;
+    let price = (val === 'elastic') ? 22 : (val === 'ceramic') ? 30 : 12;
+    section.querySelectorAll('.grid-row.item-line').forEach(row => {
+        const nameText = row.querySelector('.item-name-text')?.innerText || "";
+        if(nameText.includes('베란다')) row.querySelector('.price').value = price;
+    });
+    updateSum();
+}
+
+function toggleSec(idx, master) {
+    document.getElementById('c-' + idx).querySelectorAll('.chk').forEach(c => c.checked = master.checked);
+    updateSum();
+}
+
 function updateSum() {
     let total = 0;
     document.querySelectorAll('.grid-row.item-line').forEach(row => {
@@ -96,12 +111,9 @@ function switchToDetailed() {
     if(!validateInputs()) return;
     const total = updateSum();
     document.getElementById('page-title').innerText = "계약서 작성";
-    
-    // [Ver 1.71 수정] 계약서용 텍스트 필드에 값 맵핑
     document.getElementById('d-name-display').innerText = document.getElementById('g-name').value;
     document.getElementById('d-tel-display').innerText = document.getElementById('g-tel').value;
     document.getElementById('d-addr-display').innerText = document.getElementById('g-addr').value;
-    
     const dBody = document.getElementById('detailed-body'); dBody.innerHTML = '';
     data.forEach((sec, idx) => {
         const rows = document.querySelectorAll(`#c-${idx} .item-line`);
@@ -118,11 +130,7 @@ function switchToDetailed() {
                     const q = row.querySelector('.qty').value, p = row.querySelector('.price').value, sum = q * p * 10000;
                     const div = document.createElement('div');
                     div.className = 'grid-row contract-grid';
-                    div.innerHTML = `
-                        <div style="white-space:normal;">${nameText}</div>
-                        <div><textarea class="spec-field" rows="1" placeholder="사양 입력" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea></div>
-                        <div class="col-center">${q}</div>
-                        <div class="col-right">${sum.toLocaleString()}</div>`;
+                    div.innerHTML = `<div style="white-space:normal;">${nameText}</div><div><textarea class="spec-field" rows="1" placeholder="사양 입력" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea></div><div class="col-center">${q}</div><div class="col-right">${sum.toLocaleString()}</div>`;
                     dBody.appendChild(div);
                 }
             });
@@ -148,21 +156,6 @@ function resetForm() { if(confirm('초기화하시겠습니까?')) location.relo
 function saveToLocal() {
     const t = document.getElementById('toast-msg');
     t.classList.add('show'); setTimeout(() => { t.classList.remove('show'); }, 2500);
-}
-
-function updatePaintPrice(idx, select) {
-    const section = document.getElementById('c-' + idx), val = select.value;
-    let price = (val === 'elastic') ? 22 : (val === 'ceramic') ? 30 : 12;
-    section.querySelectorAll('.grid-row.item-line').forEach(row => {
-        const nameText = row.querySelector('.item-name-text')?.innerText || "";
-        if(nameText.includes('베란다')) row.querySelector('.price').value = price;
-    });
-    updateSum();
-}
-
-function toggleSec(idx, master) {
-    document.getElementById('c-' + idx).querySelectorAll('.chk').forEach(c => c.checked = master.checked);
-    updateSum();
 }
 
 function initTelFormat() {
