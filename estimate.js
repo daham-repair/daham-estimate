@@ -1,4 +1,4 @@
-/* [estimate.js Ver 1.33 - 인쇄 최적화 및 전화번호 포맷] */
+/* [estimate.js Ver 1.34 - 최종 로직] */
 const supabaseUrl = 'YOUR_SUPABASE_URL';
 const supabaseKey = 'YOUR_SUPABASE_KEY';
 let dbClient = null;
@@ -57,8 +57,7 @@ function initTelFormat() {
     if(telInput) {
         telInput.addEventListener('input', function(e) {
             let v = e.target.value.replace(/[^0-9]/g, '');
-            if (v.length > 11) v = v.substring(0, 11); // 11자리 제한
-            
+            if (v.length > 11) v = v.substring(0, 11);
             if (v.length > 3 && v.length <= 7) e.target.value = v.replace(/(\d{3})(\d{1,4})/, '$1-$2');
             else if (v.length > 7) e.target.value = v.replace(/(\d{3})(\d{3,4})(\d{4})/, '$1-$2-$3');
             else e.target.value = v;
