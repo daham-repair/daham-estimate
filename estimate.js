@@ -1,4 +1,4 @@
-/* [estimate.js Ver 1.30 - 인쇄 최적화 및 전화번호 포맷] */
+/* [estimate.js Ver 1.30 - 최종 통합본] */
 const supabaseUrl = 'YOUR_SUPABASE_URL';
 const supabaseKey = 'YOUR_SUPABASE_KEY';
 let dbClient = null;
@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const cont = document.createElement('div'); cont.id = 'cont-'+idx;
             const h = document.createElement('div'); h.className = 'section-bar';
             
-            // [Ver 1.30] 화살표에 arrow-icon 클래스 추가 (인쇄 시 숨김)
+            // [핵심] 화살표에 'arrow-icon' 클래스 추가 -> CSS에서 인쇄 시 숨김 처리됨
             h.innerHTML = `<span class="section-title"><svg class="section-icon" viewBox="0 0 24 24">${icons[sec.key]}</svg> ${sec.category}</span> <span class="arrow-icon">▼</span>`;
             
             h.onclick = () => {
@@ -52,12 +52,14 @@ document.addEventListener('DOMContentLoaded', function() {
     initTelFormat();
 });
 
+// 전화번호 11자 제한 및 하이픈 자동 입력
 function initTelFormat() {
     const telInput = document.getElementById('g-tel');
     if(telInput) {
         telInput.addEventListener('input', function(e) {
             let v = e.target.value.replace(/[^0-9]/g, '');
-            if (v.length > 11) v = v.substring(0, 11);
+            if (v.length > 11) v = v.substring(0, 11); // 11자리 제한
+            
             if (v.length > 3 && v.length <= 7) e.target.value = v.replace(/(\d{3})(\d{1,4})/, '$1-$2');
             else if (v.length > 7) e.target.value = v.replace(/(\d{3})(\d{3,4})(\d{4})/, '$1-$2-$3');
             else e.target.value = v;
@@ -106,6 +108,8 @@ function update() {
     document.getElementById('final-sum').innerText = total.toLocaleString() + " 원";
 }
 
+function formatKRW(num) { if (!num && num !== 0) return "0"; return Math.floor(parseFloat(num) * 10000).toLocaleString(); }
+
 function toggleSec(idx, master) {
     const content = document.getElementById(`c-${idx}`);
     content.querySelectorAll('.chk').forEach(chk => {
@@ -114,6 +118,7 @@ function toggleSec(idx, master) {
     update();
 }
 
+// 스마트 인쇄 (빈 섹션 숨기기 포함)
 function smartPrint() {
     update();
     const name = document.getElementById('g-name').value;
