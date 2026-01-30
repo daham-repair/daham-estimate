@@ -1,4 +1,4 @@
-/* [estimate.js Ver 1.63 - 페인트 연동 및 전체선택 통합] */
+/* [estimate.js Ver 1.64 - 유효성 검사 및 정렬 로직 통합] */
 
 document.addEventListener('DOMContentLoaded', function() {
     const body = document.getElementById('estimate-body');
@@ -24,7 +24,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 </label>
             </div>`;
 
-            // [Ver 1.63] 페인트 전용 로직 복구
             if(sec.isPaint) {
                 html += `
                 <div class="grid-row quote-grid no-print" style="background:#fffbe6; border-bottom:2px solid #ffe58f;">
@@ -69,48 +68,64 @@ document.addEventListener('DOMContentLoaded', function() {
     initTelFormat();
 });
 
-// [Ver 1.63] 페인트 단가 자동 연동 로직
+// [Ver 1.64] 필수 입력값 검증 및 커서 이동 함수
+function validateInputs() {
+    const nameEl = document.getElementById('g-name');
+    const telEl = document.getElementById('g-tel');
+    const addrEl = document.getElementById('g-addr');
+
+    if (!nameEl.value.trim()) {
+        alert("고객명을 입력해주세요.");
+        nameEl.focus();
+        return false;
+    }
+    if (!telEl.value.trim()) {
+        alert("연락처를 입력해주세요.");
+        telEl.focus();
+        return false;
+    }
+    if (!addrEl.value.trim()) {
+        alert("현장 주소를 입력해주세요.");
+        addrEl.focus();
+        return false;
+    }
+    return true;
+}
+
 function updatePaintPrice(idx, select) {
     const section = document.getElementById('c-' + idx);
     const val = select.value;
-    let price = 12; // 수성 기본
+    let price = 12;
     if(val === 'elastic') price = 22;
     else if(val === 'ceramic') price = 30;
-
     section.querySelectorAll('.grid-row.item-line').forEach(row => {
         const nameText = row.querySelector('.item-name-text').innerText;
-        if(nameText.includes('베란다')) {
-            row.querySelector('.price').value = price;
-        }
+        if(nameText.includes('베란다')) row.querySelector('.price').value = price;
     });
     updateSum();
 }
 
 function toggleSec(idx, master) {
     const section = document.getElementById('c-' + idx);
-    const checks = section.querySelectorAll('.chk');
-    checks.forEach(c => c.checked = master.checked);
+    section.querySelectorAll('.chk').forEach(c => c.checked = master.checked);
     updateSum();
 }
 
 function smartPrint() {
-    const name = document.getElementById('g-name').value;
-    if(!name.trim()){ alert("고객명을 입력해주세요."); return; }
+    if(!validateInputs()) return; // [Ver 1.64 적용]
     
-    document.getElementById('t-name').innerText = name;
+    document.getElementById('t-name').innerText = document.getElementById('g-name').value;
     document.getElementById('t-tel').innerText = document.getElementById('g-tel').value;
     document.getElementById('t-addr').innerText = document.getElementById('g-addr').value;
 
     document.querySelectorAll('.item-line').forEach(row => {
-        const isChecked = row.querySelector('.chk').checked;
-        if(!isChecked) row.classList.add('hidden-print');
+        if(!row.querySelector('.chk').checked) row.classList.add('hidden-print');
         else row.classList.remove('hidden-print');
     });
 
     data.forEach((_, idx) => {
         const cont = document.getElementById('cont-' + idx);
-        const hasChecked = cont.querySelectorAll('.chk:checked').length > 0;
-        if(!hasChecked) cont.classList.add('hidden-print');
+        if(cont.querySelectorAll('.chk:checked').length === 0) cont.classList.add('hidden-print');
         else cont.classList.remove('hidden-print');
     });
 
@@ -124,18 +139,12 @@ function addCustomRow(idx) {
     div.className = 'grid-row quote-grid item-line';
     div.innerHTML = `
         <div style="display:flex; align-items:flex-start;">
-            <label class="item-label" style="width:auto;">
-                <input type="checkbox" class="chk" checked onchange="updateSum()">
-                <span class="checkmark"></span>
-            </label>
+            <label class="item-label" style="width:auto;"><input type="checkbox" class="chk" checked onchange="updateSum()"><span class="checkmark"></span></label>
             <textarea class="info-input" style="padding:4px; font-size:13px; height:auto; flex:1; min-height:28px; line-height:1.2;" placeholder="항목명" oninput="updateSum()"></textarea>
         </div>
         <div class="col-center"><input type="number" class="input-num qty" value="1" oninput="updateSum()"></div>
         <div class="col-center"><input type="number" class="input-num price" value="0" oninput="updateSum()"></div>
-        <div class="col-right" style="display:flex; align-items:center; justify-content:flex-end;">
-            <span class="row-sum" style="margin-right:5px;">0</span>
-            <button class="btn-del-row" onclick="this.closest('.grid-row').remove(); updateSum();">×</button>
-        </div>
+        <div class="col-right" style="display:flex; align-items:center; justify-content:flex-end;"><span class="row-sum" style="margin-right:5px;">0</span><button class="btn-del-row" onclick="this.closest('.grid-row').remove(); updateSum();">×</button></div>
     `;
     target.appendChild(div);
     updateSum();
@@ -163,11 +172,8 @@ function updateSum() {
             const p = row.querySelector('.price')?.value || 0;
             const sum = q * p * 10000;
             total += sum;
-            const sEl = row.querySelector('.row-sum');
-            if(sEl) sEl.innerText = sum.toLocaleString();
-        } else if(row.querySelector('.row-sum')) {
-            row.querySelector('.row-sum').innerText = "0";
-        }
+            if(row.querySelector('.row-sum')) row.querySelector('.row-sum').innerText = sum.toLocaleString();
+        } else if(row.querySelector('.row-sum')) { row.querySelector('.row-sum').innerText = "0"; }
     });
     const fs = document.getElementById('final-sum');
     if(fs) fs.innerText = total.toLocaleString() + " 원";
@@ -175,12 +181,10 @@ function updateSum() {
 }
 
 function switchToDetailed() {
-    const name = document.getElementById('g-name').value;
-    if(!name.trim()){ alert("고객명을 입력해주세요."); return; }
-    
+    if(!validateInputs()) return; // [Ver 1.64 적용]
     const total = updateSum();
     document.getElementById('page-title').innerText = "계약서 작성";
-    document.getElementById('d-name-display').innerText = name;
+    document.getElementById('d-name-display').innerText = document.getElementById('g-name').value;
     document.getElementById('d-tel-display').innerText = document.getElementById('g-tel').value;
     document.getElementById('d-addr-display').innerText = document.getElementById('g-addr').value;
     const dBody = document.getElementById('detailed-body'); dBody.innerHTML = '';
