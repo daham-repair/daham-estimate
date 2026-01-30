@@ -1,6 +1,4 @@
-/* [data.js Ver 1.63 - 시공 데이터 및 페인트 로직 복구] */
-const SYSTEM_VERSION = "Ver 1.63";
-
+const SYSTEM_VERSION = "Ver 1.64";
 document.addEventListener('DOMContentLoaded', function() {
     const badge = document.createElement('div');
     badge.className = 'global-version-badge no-print';
@@ -8,7 +6,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const target = document.querySelector('.container') || document.body;
     target.appendChild(badge);
 });
-
 const icons = {
     demo: `<svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H5v-4h9v4zM5 11V7h9v4H5zm14 6h-3v-4h3v4zm0-6h-3V7h3v4z"/></svg>`,
     wood: `<svg viewBox="0 0 24 24"><path d="M4 18v3h3v-3h10v3h3v-6H4v3zm15-8h-3v3h3v-3zM9 10h6v3H9v-3zM4 10h3v3H4v-3z"/></svg>`,
@@ -24,7 +21,6 @@ const icons = {
     etc: `<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>`,
     custom: `<svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>`
 };
-
 const data = [
     { key: 'demo', category: '철거', items: [{n:'마루 철거 (평)', p:35000}, {n:'장판 철거 (평)', p:10000}, {n:'욕실 철거 (개소)', p:500000}, {n:'싱크대 철거', p:100000}, {n:'신발장 철거', p:50000}, {n:'가구 철거', p:100000}, {n:'샷시 철거', p:200000}, {n:'문틀/문짝 철거', p:50000}] },
     { key: 'wood', category: '목공', items: [{n:'몰딩 (평)', p:45000}, {n:'걸레받이 (평)', p:40000}, {n:'문틀+문짝 교체', p:450000}, {n:'문짝 교체', p:250000}, {n:'중문 설치', p:1200000}, {n:'가벽 설치 (M)', p:150000}, {n:'천장 평탄화', p:500000}, {n:'단열 작업 (벽면)', p:200000}] },
