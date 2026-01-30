@@ -1,16 +1,16 @@
-/* [다함 디자인 시스템 Ver 1.27 - Premium & Robust Grid] */
+/* [다함 디자인 시스템 Ver 1.28 - 인쇄 최적화 및 로그인 수정] */
 :root {
     /* Brand Colors */
     --primary-navy: #0A2342;
     --primary-dark: #05162b;
     --accent-gold: #C5A47E;
-    --accent-orange: #FF9F1C; /* 조금 더 세련된 오렌지 */
+    --accent-orange: #FF9F1C;
     --sub-blue: #2E5BFF;
     
     /* UI Colors */
     --text-main: #1A1A1A;
     --text-sub: #666666;
-    --bg-base: #F4F7FC; /* 부드러운 배경톤 */
+    --bg-base: #F4F7FC;
     --bg-white: #FFFFFF;
     --border-light: #ECEFF5;
     --danger-red: #FF4D4D;
@@ -28,6 +28,8 @@ body {
     font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
     background-color: var(--bg-base); color: var(--text-main);
     margin: 0; padding: 0; line-height: 1.5;
+    /* [Ver 1.28] 하단 플로팅 버튼바 공간 확보 */
+    padding-bottom: 80px; 
 }
 
 /* 공통 컨테이너 */
@@ -36,7 +38,7 @@ body {
     padding: 25px; position: relative;
 }
 /* 로그인/메뉴용 좁은 컨테이너 */
-.container-narrow { max-width: 480px; display: flex; flex-direction: column; justify-content: center; }
+.container-narrow { max-width: 480px; display: flex; flex-direction: column; justify-content: center; min-height: 90vh; }
 
 /* 버전 배지 */
 .version-badge { 
@@ -48,7 +50,7 @@ body {
 }
 
 /* =========================================
-   [Ver 1.27] 로그인 페이지 디자인 (Premium Card)
+   [Ver 1.28] 로그인 페이지 디자인 수정
    ========================================= */
 .login-wrap {
     background: var(--bg-white);
@@ -58,9 +60,11 @@ body {
     text-align: center;
     border: 1px solid var(--border-light);
 }
-.login-logo-area { margin-bottom: 40px; }
-.login-logo-img { height: 80px; width: auto; }
-.login-title { font-size: 22px; font-weight: 800; color: var(--primary-navy); margin-bottom: 30px; }
+.login-logo-area { margin-bottom: 30px; }
+/* [Ver 1.28] 로고 이미지 가로로 꽉 차게 수정 */
+.login-logo-img { width: 100%; height: auto; max-width: 300px; }
+.login-title { display: none; } /* [Ver 1.28] 텍스트 타이틀 숨김 */
+
 .input-group-login { position: relative; margin-bottom: 15px; }
 .login-input {
     width: 100%; padding: 16px 20px;
@@ -81,7 +85,7 @@ body {
 
 
 /* =========================================
-   [Ver 1.27] 메인/자재 메뉴 디자인 (Dashboard Tiles)
+   메인/자재 메뉴 디자인 (Dashboard Tiles)
    ========================================= */
 .page-header { margin-bottom: 40px; text-align: center; }
 .page-title { font-size: 28px; font-weight: 900; color: var(--primary-navy); margin: 0; }
@@ -112,14 +116,13 @@ body {
 
 
 /* =========================================
-   [Ver 1.27] 견적서 레이아웃 (Robust Grid System)
+   견적서 레이아웃 (Robust Grid System)
    ========================================= */
 .estimate-container { background: var(--bg-white); padding: 30px; border-radius: var(--radius-xl); box-shadow: var(--shadow-md); }
 .header-section { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 2px solid var(--border-light); padding-bottom: 25px; }
 .header-brand { display: flex; flex-direction: column; gap: 15px; }
 .header-logo { height: 60px; width: auto; }
 .header-doc-title { font-size: 32px; font-weight: 900; color: var(--primary-navy); letter-spacing: -0.03em; }
-/* [수정] 우측 정보 정렬 깨짐 해결 */
 .header-contact { text-align: right; display: flex; flex-direction: column; justify-content: center; }
 .contact-name { font-weight: 700; font-size: 16px; margin-bottom: 5px; }
 .contact-phone { color: var(--danger-red); font-weight: 900; font-size: 22px; letter-spacing: -0.02em; }
@@ -134,11 +137,10 @@ body {
 }
 .info-input:focus { border-color: var(--primary-navy); background: var(--bg-white); }
 
-/* ★★★ [중요] 그리드 레이아웃 시스템 (깨짐 방지 핵심) ★★★ */
+/* 그리드 테이블 */
 .estimate-table-wrap { border: 2px solid var(--primary-navy); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 30px; }
 .grid-row { 
     display: grid; 
-    /* 항목(4.5) 수량(1) 단가(2.5) 합계(2.5) - 비율 고정 */
     grid-template-columns: 4.5fr 1fr 2.5fr 2.5fr; 
     gap: 15px; align-items: center;
     padding: 14px 20px; border-bottom: 1px solid var(--border-light);
@@ -148,12 +150,9 @@ body {
 .col-center { text-align: center; }
 .col-right { text-align: right; }
 
-/* [수정] 체크박스 디자인 완벽 복구 */
+/* 체크박스 디자인 */
 .item-checkbox-wrap { display: flex; align-items: center; cursor: pointer; width: 100%; }
-.item-checkbox-wrap input[type="checkbox"] { 
-    /* 브라우저 기본 체크박스 완벽히 숨김 */
-    position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0;
-}
+.item-checkbox-wrap input[type="checkbox"] { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
 .checkmark-box { 
     height: 22px; width: 22px; background-color: var(--bg-base); 
     border: 2px solid var(--border-light); border-radius: 6px; margin-right: 12px; 
@@ -173,67 +172,4 @@ body {
 /* 섹션 아코디언 */
 .section-bar { 
     padding: 15px 20px; background: #fff; border-bottom: 1px solid var(--border-light); cursor: pointer; 
-    display: flex; justify-content: space-between; align-items: center; font-weight: 800; color: var(--primary-navy);
-}
-.section-title svg { width: 24px; height: 24px; margin-right: 10px; vertical-align: middle; fill: var(--accent-gold); }
-.section-body { display: none; border-top: 1px solid var(--border-light); }
-.section-body.open { display: block; }
-.bulk-action-row { background: var(--bg-light) !important; font-weight: 700; color: var(--primary-navy); }
-
-/* 하단 총계 및 액션바 */
-.final-total-card { background: var(--primary-navy); color: white; padding: 30px; border-radius: var(--radius-lg); text-align: center; box-shadow: var(--shadow-md); }
-.total-label { font-size: 16px; font-weight: 600; opacity: 0.8; margin-bottom: 5px; }
-.total-amount { font-size: 40px; font-weight: 900; color: var(--accent-gold); }
-
-.floating-action-bar {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
-    padding: 15px; display: flex; gap: 10px; justify-content: center;
-    box-shadow: 0 -5px 20px rgba(0,0,0,0.05); border-top: 1px solid var(--border-light); z-index: 100;
-}
-.fab-btn {
-    flex: 1; max-width: 160px; padding: 14px; border: none; border-radius: 12px;
-    font-weight: 700; font-size: 15px; cursor: pointer; color: white;
-    display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s;
-}
-.btn-reset { background: var(--border-light); color: var(--text-sub); }
-.btn-save { background: var(--accent-gold); }
-.btn-print { background: var(--primary-navy); }
-.btn-contract { background: var(--danger-red); }
-.fab-btn:active { transform: scale(0.97); }
-
-/* 기타 유틸리티 */
-.btn-add-row { width: 95%; margin: 15px auto; display: block; padding: 12px; background: var(--bg-base); border: 2px dashed var(--border-light); color: var(--text-sub); font-weight: 700; border-radius: 10px; cursor: pointer; }
-.btn-add-row:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
-.btn-del-row { background: #FFECEC; color: var(--danger-red); border: none; width: 24px; height: 24px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-.custom-input { border: none; border-bottom: 2px solid var(--border-light); width: 100%; padding: 5px; outline: none; font-family: inherit; }
-.toast { visibility: hidden; position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: rgba(10,35,66,0.9); color: white; padding: 15px 30px; border-radius: 50px; z-index: 2000; font-weight: bold; }
-.toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
-@keyframes fadein { from {bottom: 80px; opacity: 0;} to {bottom: 100px; opacity: 1;} }
-@keyframes fadeout { from {bottom: 100px; opacity: 1;} to {bottom: 80px; opacity: 0;} }
-
-/* 인쇄 최적화 */
-@media print {
-    .no-print, .floating-action-bar, .version-badge, .btn-add-row, .btn-del-row { display: none !important; }
-    .container { max-width: 100%; padding: 0; box-shadow: none; background: white; }
-    .estimate-container { box-shadow: none; padding: 0; }
-    .estimate-table-wrap { border: 2px solid #000; }
-    .grid-header { background: #ddd !important; color: #000 !important; border-bottom: 2px solid #000; }
-    .grid-row { border-bottom: 1px solid #000; }
-    .input-num { border: none; background: transparent; text-align: center; padding: 0; }
-    .checkmark-box { border: 2px solid #000; }
-    .item-checkbox-wrap input:checked ~ .checkmark-box { background: #000; border-color: #000; }
-    .hidden-print { display: none !important; }
-}
-
-/* 반응형 (모바일) */
-@media (max-width: 480px) {
-    .container { padding: 15px; }
-    .grid-row { gap: 8px; padding: 12px 10px; grid-template-columns: 4fr 1.2fr 2.2fr 2.2fr; } /* 모바일 비율 조정 */
-    .item-name { font-size: 13px; }
-    .input-num { padding: 8px 4px; font-size: 13px; }
-    .row-sum { font-size: 13px; }
-    .header-doc-title { font-size: 24px; }
-    .contact-phone { font-size: 18px; }
-    .fab-btn { padding: 12px 8px; font-size: 13px; }
-}
+    display: flex; justify-content: space-between; align
