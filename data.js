@@ -1,12 +1,12 @@
-/* [data.js Ver 1.46 - 데이터 중앙 관리] */
-const SYSTEM_VERSION = "Ver 1.46";
+/* [data.js Ver 1.47 - 버전 중앙 관리] */
+const SYSTEM_VERSION = "Ver 1.47";
 
 document.addEventListener('DOMContentLoaded', function() {
     const badge = document.createElement('div');
     badge.className = 'global-version-badge no-print';
     badge.innerText = SYSTEM_VERSION;
-    const target = document.querySelector('.container') || document.body;
-    target.appendChild(badge);
+    const container = document.querySelector('.container');
+    if(container) container.appendChild(badge);
 });
 
 const icons = {
