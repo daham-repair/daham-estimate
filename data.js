@@ -1,4 +1,4 @@
-const SYSTEM_VERSION = "Ver 1.74";
+const SYSTEM_VERSION = "Ver 1.75";
 document.addEventListener('DOMContentLoaded', function() {
     const b = document.createElement('div'); b.className = 'global-version-badge no-print'; b.innerText = SYSTEM_VERSION;
     const t = document.querySelector('.container') || document.body; t.appendChild(b);
