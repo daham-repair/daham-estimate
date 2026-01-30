@@ -1,4 +1,4 @@
-/* [다함 디자인 시스템 Ver 1.35 - 하단바 강제 균등 분배 픽스] */
+/* [다함 디자인 시스템 Ver 1.36 - 버튼 제어 및 화면 전환 픽스] */
 :root {
     --primary-navy: #0A2342;
     --accent-gold: #C5A47E;
@@ -15,7 +15,6 @@ body {
     font-family: 'Pretendard', sans-serif; 
     background-color: var(--bg-light); color: var(--text-dark); 
     margin: 0; padding: 0; line-height: 1.5; 
-    /* 하단 버튼바가 내용을 가리지 않도록 충분한 여백 확보 */
     padding-bottom: 120px; 
 }
 
@@ -80,57 +79,33 @@ body {
 .section-content.show { display: block; }
 
 /* ==========================================================
-   [Ver 1.35 수정] 하단 메뉴바 강제 고정 및 균등 분배
+   [Ver 1.36] 하단 메뉴바 고정 및 버튼 제어 (JS 호환성 확보)
    ========================================================== */
 .floating-action-bar { 
-    /* 1. 위치 고정 */
-    position: fixed !important; 
-    bottom: 0 !important; 
-    left: 50% !important; /* 화면 정중앙 시작 */
-    transform: translateX(-50%) !important; /* 자기 크기 절반만큼 이동해 중앙 맞춤 */
-    
-    /* 2. 크기 설정 */
-    width: 100% !important; 
-    max-width: 900px !important; /* PC에서 너무 커지지 않게 제한 */
-    
-    /* 3. 내부 정렬 (무조건 가로 한 줄) */
-    display: flex !important; 
-    flex-direction: row !important; /* 가로 방향 강제 */
-    flex-wrap: nowrap !important; /* 줄바꿈 금지 */
-    justify-content: space-between !important; 
-    align-items: center !important;
-    
-    /* 4. 디자인 */
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 900px;
     background: rgba(255,255,255,0.98); 
-    padding: 10px !important; 
-    gap: 8px !important; 
-    border-top: 1px solid #ddd; 
-    box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
-    z-index: 9999; 
-    box-sizing: border-box;
+    padding: 10px; gap: 8px; 
+    
+    display: flex !important; 
+    flex-direction: row !important; 
+    justify-content: space-between; /* 버튼 숨겨져도 남은 버튼끼리 꽉 차게 */
+    align-items: center;
+    
+    border-top: 1px solid #ddd; box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+    z-index: 9999; box-sizing: border-box;
 }
 
-/* 버튼 스타일 (균등 분배 핵심) */
 .fab-btn { 
-    /* [핵심] 1 1 0% -> 컨텐츠 크기 무시하고 무조건 1/N 등분 */
-    flex: 1 1 0% !important; 
+    flex: 1; /* 1/N 등분 */
+    height: 50px; 
+    border: none; border-radius: 8px; 
+    font-weight: 700; cursor: pointer; color: white; font-size: 14px; 
     
-    width: auto !important; /* 고정 너비 해제 */
-    height: 50px !important; 
-    
-    border: none; 
-    border-radius: 8px; 
-    font-weight: 700; 
-    cursor: pointer; 
-    color: white; 
-    font-size: 14px; 
-    
-    /* 내용물 정렬 */
-    display: flex !important; 
-    align-items: center !important; 
-    justify-content: center !important;
-    white-space: nowrap !important; /* 글자 줄바꿈 금지 */
-    min-width: 0 !important; /* Flexbox 버그 방지 */
+    /* [Ver 1.36 수정] !important 제거 -> JS가 display:none 할 수 있게 함 */
+    display: flex; 
+    align-items: center; justify-content: center;
+    white-space: nowrap; min-width: 0;
 }
 
 .btn-reset { background: #eee; color: #333; }
