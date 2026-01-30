@@ -1,10 +1,7 @@
-const SYSTEM_VERSION = "Ver 1.73";
+const SYSTEM_VERSION = "Ver 1.74";
 document.addEventListener('DOMContentLoaded', function() {
-    const b = document.createElement('div');
-    b.className = 'global-version-badge no-print';
-    b.innerText = SYSTEM_VERSION;
-    const t = document.querySelector('.container') || document.body;
-    t.appendChild(b);
+    const b = document.createElement('div'); b.className = 'global-version-badge no-print'; b.innerText = SYSTEM_VERSION;
+    const t = document.querySelector('.container') || document.body; t.appendChild(b);
 });
 const icons = {
     demo: `<svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H5v-4h9v4zM5 11V7h9v4H5zm14 6h-3v-4h3v4zm0-6h-3V7h3v4z"/></svg>`,
