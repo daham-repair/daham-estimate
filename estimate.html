@@ -2,11 +2,11 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>견적서 작성 | 다함</title>
+    <title>견적 시스템 | 다함</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="estimate-body">
-    <div class="container estimate-container">
+    <div class="container">
         <div class="header-simple no-print">
             <button class="back-nav" onclick="location.href='main.html'">←</button>
             <h2 id="page-title" class="header-doc-title">견적서 작성</h2>
@@ -16,7 +16,10 @@
             <div class="header-card">
                 <div class="header-top">
                     <img src="logo.png" alt="다함" class="img-logo" onerror="this.style.display='none'">
-                    <h1 class="doc-title">견적서</h1>
+                    <div class="rep-info">
+                        <strong>대표 김재영</strong>
+                        <span class="tel">010.5404.8747</span>
+                    </div>
                 </div>
                 <div class="info-grid">
                     <div><label class="input-label">발주처 (고객명)</label><input type="text" id="g-name" class="info-input" placeholder="이름 입력"></div>
@@ -27,10 +30,7 @@
 
             <div class="estimate-section">
                 <div class="grid-header-fixed quote-grid">
-                    <div>공정 항목</div>
-                    <div class="col-center">수량</div>
-                    <div class="col-center">단가</div>
-                    <div class="col-right">합계</div>
+                    <div>공정 항목</div><div class="col-center">수량</div><div class="col-center">단가</div><div class="col-right">합계</div>
                 </div>
                 <div id="estimate-body"></div>
             </div>
@@ -46,20 +46,17 @@
             <div class="header-card">
                 <div class="header-top">
                     <img src="logo.png" alt="다함" class="img-logo">
-                    <h1 class="doc-title">계약서</h1>
+                    <div class="rep-info"><strong>공급자: 김재영 (인)</strong><span class="tel">010.5404.8747</span></div>
                 </div>
                 <div class="info-grid">
-                    <div><label class="input-label">발주처</label><div id="d-name-display" class="info-input" style="background:#eee; min-height:46px;"></div></div>
-                    <div><label class="input-label">연락처</label><div id="d-tel-display" class="info-input" style="background:#eee; min-height:46px;"></div></div>
-                    <div class="full-row"><label class="input-label">현장 주소</label><div id="d-addr-display" class="info-input" style="background:#eee; min-height:46px;"></div></div>
+                    <div><label class="input-label">발주처</label><div id="d-name-display" class="info-input" style="background:#eee; min-height:42px;"></div></div>
+                    <div><label class="input-label">연락처</label><div id="d-tel-display" class="info-input" style="background:#eee; min-height:42px;"></div></div>
+                    <div class="full-row"><label class="input-label">현장 주소</label><div id="d-addr-display" class="info-input" style="background:#eee; min-height:42px;"></div></div>
                 </div>
             </div>
             <div class="estimate-section">
                 <div class="grid-header-fixed contract-grid">
-                    <div>공정 및 항목</div>
-                    <div>자재 사양 (직접입력)</div>
-                    <div class="col-center">수량</div>
-                    <div class="col-right">금액</div>
+                    <div>공정 및 항목</div><div>자재 사양 (직접입력)</div><div class="col-center">수량</div><div class="col-right">금액</div>
                 </div>
                 <div id="detailed-body"></div>
             </div>
