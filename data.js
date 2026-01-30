@@ -1,6 +1,4 @@
-/* [data.js Ver 1.65 - 전체 시공 데이터] */
-const SYSTEM_VERSION = "Ver 1.65";
-
+const SYSTEM_VERSION = "Ver 1.67";
 document.addEventListener('DOMContentLoaded', function() {
     const badge = document.createElement('div');
     badge.className = 'global-version-badge no-print';
