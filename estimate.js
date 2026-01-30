@@ -1,4 +1,4 @@
-/* [estimate.js Ver 1.23 - 로직 완전 복구 및 최적화] */
+/* [estimate.js Ver 1.24] */
 const supabaseUrl = 'YOUR_SUPABASE_URL';
 const supabaseKey = 'YOUR_SUPABASE_KEY';
 let dbClient = null;
@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     loadFromLocal();
+    // 전화번호 서식
     const telInput = document.getElementById('g-tel');
     if(telInput) {
         telInput.addEventListener('input', function(e) {
@@ -102,7 +103,7 @@ function switchToDetailed() {
                 let pRaw = row.querySelector('.price').value.toString().replace(/,/g, '');
                 const realPrice = parseFloat(pRaw) * 10000; const qty = parseFloat(row.querySelector('.qty').value);
                 const sum = qty * realPrice; dTotal += sum;
-                const div = document.createElement('div'); div.className = 'grid-row detail-grid';
+                const div = document.createElement('div'); div.className = 'grid-row master-grid'; // detail-grid -> master-grid로 통일 (비율 유지)
                 div.innerHTML = `<strong>${itemName}</strong><textarea class="spec-field" placeholder="사양 입력" rows="1"></textarea><div>${qty}</div><div>${realPrice.toLocaleString()}</div><div style="text-align:right;">${sum.toLocaleString()}</div>`;
                 dBody.appendChild(div);
             });
@@ -134,3 +135,4 @@ function loadFromLocal() {
         update();
     }, 200);
 }
+function changeP(sIdx, type) { const np = {'water':12, 'elastic':22, 'ceramic':30}[type]; const content = document.getElementById(`cont-${sIdx}`); if (content) content.querySelectorAll('.price').forEach(el => { el.value = np; }); update(); }
