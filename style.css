@@ -1,4 +1,4 @@
-/* [다함 디자인 시스템 Ver 1.67 - 인쇄 최적화 및 레이아웃 고정] */
+/* [다함 디자인 시스템 Ver 1.68 - 직접입력 발행 복구 및 최적화] */
 :root {
     --primary-navy: #0A2342;
     --accent-gold: #C5A47E;
@@ -21,7 +21,7 @@ body { font-family: 'Pretendard', sans-serif; margin: 0; padding: 0; background-
 .login-input { width: 100%; padding: 15px; background: #f4f7fc; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 12px; font-size: 16px; outline: none; }
 .btn-login { width: 100%; padding: 16px; background: var(--accent-orange); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: 800; cursor: pointer; }
 
-/* [견적서/계약서 공용 레이아웃] */
+/* [견적서/계약서 레이아웃] */
 .estimate-body .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 15px; min-height: 100vh; position: relative; padding-bottom: 140px; }
 .header-simple { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #333; }
 .header-doc-title { font-size: 18px; font-weight: 800; margin: 0; }
@@ -40,7 +40,7 @@ img.img-logo { height: 42px !important; width: auto !important; display: block; 
 .info-text { display: none; padding: 10px 0; font-size: 15px; font-weight: 600; border-bottom: 1px solid #eee; min-height: 38px; color: #000; }
 .info-select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; background: #fff; font-size: 13px; outline: none; cursor: pointer; }
 
-/* 표 및 그리드 레이아웃 */
+/* 표 및 그리드 */
 .estimate-section { background: white; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; margin-bottom: 25px; }
 .grid-header-fixed { background: var(--primary-navy); color: white; padding: 12px 10px; font-weight: 600; font-size: 12px; display: grid; }
 .grid-row { display: grid; align-items: center; padding: 12px 10px; border-bottom: 1px solid #f0f0f0; background: white; }
@@ -52,15 +52,17 @@ img.img-logo { height: 42px !important; width: auto !important; display: block; 
 .grid-row .col-name, .grid-row .item-name-text { white-space: normal !important; word-break: keep-all; line-height: 1.3; }
 .grid-header-fixed div, .col-center, .col-right { white-space: nowrap !important; }
 
-/* 체크박스 & 항목 삭제 */
+/* 체크박스 & 버튼 */
 .item-label { display: flex; align-items: flex-start; cursor: pointer; width: 100%; padding: 2px 0; }
 .item-label input { display: none !important; }
 .checkmark { width: 18px; height: 18px; border: 2px solid #ddd; border-radius: 4px; margin-right: 8px; margin-top: 1px; position: relative; flex-shrink: 0; background: #fff; }
 .item-label input:checked + .checkmark { background: var(--accent-gold); border-color: var(--accent-gold); }
 .checkmark:after { content: ""; position: absolute; display: none; left: 5px; top: 1px; width: 4px; height: 8px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); }
 .item-label input:checked + .checkmark:after { display: block; }
-.btn-del-row { background: #eee; border: none; color: #999; width: 22px; height: 22px; border-radius: 50%; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-left: 5px; flex-shrink: 0; }
+.item-name-text { font-size: 13px; font-weight: 500; }
 
+.custom-name-print { display: none; font-size: 13px; font-weight: 500; white-space: normal; line-height: 1.3; }
+.btn-del-row { background: #eee; border: none; color: #999; width: 22px; height: 22px; border-radius: 50%; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-left: 5px; flex-shrink: 0; }
 .input-num { width: 100%; padding: 5px; text-align: center; background: #f8f9fa; border: none; border-radius: 4px; font-weight: 700; font-size: 13px; outline: none; }
 
 /* 아코디언 */
@@ -85,7 +87,7 @@ img.img-logo { height: 42px !important; width: auto !important; display: block; 
 .btn-print { background: var(--primary-navy); }
 .btn-contract { background: var(--danger-red); }
 
-/* 알림 토스트 (Saved! 메시지) */
+/* 알림 토스트 */
 .toast {
     position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
     background: rgba(10, 35, 66, 0.9); color: white; padding: 12px 25px;
@@ -101,12 +103,7 @@ img.img-logo { height: 42px !important; width: auto !important; display: block; 
     100% { opacity: 0; top: 10px; }
 }
 
-/* 총계 */
-.total-card { background: #fff; border: 2px solid var(--primary-navy); padding: 25px; text-align: center; border-radius: 10px; margin-top: 20px; }
-.total-amount { font-size: 36px; font-weight: 900; color: var(--danger-red); letter-spacing: -1px; }
-.vat-notice { font-size: 12px; color: #888; margin-top: 5px; }
-
-/* [Ver 1.67 핵심] 인쇄 설정 - 저장 문구 및 UI 완전 차단 */
+/* [Ver 1.68] 인쇄 시 직접입력 데이터 노출 강제 설정 */
 @media print {
     body { background: white !important; padding-bottom: 0 !important; }
     .no-print, .floating-action-bar, .global-version-badge, .checkmark, .section-bar span:last-child, .toast, .btn-del-row { display: none !important; }
@@ -116,6 +113,11 @@ img.img-logo { height: 42px !important; width: auto !important; display: block; 
     .grid-row, .grid-header-fixed { min-width: 0 !important; border-bottom: 1px solid #eee !important; }
     .info-input { display: none !important; }
     .info-text { display: block !important; border-bottom: 1px solid #000 !important; }
+    
+    /* 직접입력 텍스트 노출 */
+    .grid-row textarea.info-input { display: none !important; }
+    .custom-name-print { display: block !important; }
+    
     .hidden-print { display: none !important; }
     .section-content { display: block !important; border: none !important; }
 }
