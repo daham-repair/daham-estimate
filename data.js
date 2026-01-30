@@ -1,4 +1,6 @@
-const SYSTEM_VERSION = "Ver 1.64";
+/* [data.js Ver 1.65 - 전체 시공 데이터] */
+const SYSTEM_VERSION = "Ver 1.65";
+
 document.addEventListener('DOMContentLoaded', function() {
     const badge = document.createElement('div');
     badge.className = 'global-version-badge no-print';
@@ -6,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const target = document.querySelector('.container') || document.body;
     target.appendChild(badge);
 });
+
 const icons = {
     demo: `<svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H5v-4h9v4zM5 11V7h9v4H5zm14 6h-3v-4h3v4zm0-6h-3V7h3v4z"/></svg>`,
     wood: `<svg viewBox="0 0 24 24"><path d="M4 18v3h3v-3h10v3h3v-6H4v3zm15-8h-3v3h3v-3zM9 10h6v3H9v-3zM4 10h3v3H4v-3z"/></svg>`,
@@ -21,6 +24,7 @@ const icons = {
     etc: `<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>`,
     custom: `<svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>`
 };
+
 const data = [
     { key: 'demo', category: '철거', items: [{n:'마루 철거 (평)', p:35000}, {n:'장판 철거 (평)', p:10000}, {n:'욕실 철거 (개소)', p:500000}, {n:'싱크대 철거', p:100000}, {n:'신발장 철거', p:50000}, {n:'가구 철거', p:100000}, {n:'샷시 철거', p:200000}, {n:'문틀/문짝 철거', p:50000}] },
     { key: 'wood', category: '목공', items: [{n:'몰딩 (평)', p:45000}, {n:'걸레받이 (평)', p:40000}, {n:'문틀+문짝 교체', p:450000}, {n:'문짝 교체', p:250000}, {n:'중문 설치', p:1200000}, {n:'가벽 설치 (M)', p:150000}, {n:'천장 평탄화', p:500000}, {n:'단열 작업 (벽면)', p:200000}] },
@@ -29,7 +33,7 @@ const data = [
     { key: 'tile', category: '타일', items: [{n:'현관 타일', p:300000}, {n:'주방 타일', p:350000}, {n:'베란다 타일', p:400000}, {n:'욕실 바닥 타일', p:300000}, {n:'욕실 전체 타일', p:1500000}, {n:'아트월 타일', p:800000}] },
     { key: 'elec', category: '전기', items: [{n:'스위치 교체', p:20000}, {n:'콘센트 교체', p:20000}, {n:'메인 조명 교체', p:50000}, {n:'매입등 타공+설치', p:30000}, {n:'간접 조명 설치', p:200000}, {n:'배선 이동', p:100000}, {n:'차단기 교체', p:100000}, {n:'인터폰 교체', p:150000}] },
     { key: 'paint', category: '페인트', isPaint: true, items: [{n:'거실 베란다', p:120000}, {n:'큰방 베란다', p:120000}, {n:'작은방 베란다', p:120000}, {n:'주방 베란다', p:120000}] },
-    { key: 'bath', category: '욕실', items: [{n:'욕실 전체 리모델링', p:2800000}, {n:'변기 교체', p:350000}, {n:'세면대 교체', p:300000}, {n:'욕조 교체', p:600000}, {n:'샤워 파티션', p:250000}, {n:'수전 교체', p:100000}, {n:'악세사리 세트', p:150000}] },
+    { key: 'bath', category: '욕실', items: [{n:'욕실 전체 리모델링', p:2800000}, {n:'욕실 돔 천장', p:300000}, {n:'변기 교체', p:350000}, {n:'세면대 교체', p:300000}, {n:'욕조 교체', p:600000}, {n:'샤워 파티션', p:250000}, {n:'수전 교체', p:100000}, {n:'악세사리 세트', p:150000}] },
     { key: 'paper', category: '도배', items: [{n:'광폭 합지 (평)', p:45000}, {n:'실크 벽지 (평)', p:75000}] },
     { key: 'floor', category: '바닥', items: [{n:'1.8T 장판 (평)', p:45000}, {n:'2.2T 장판 (평)', p:65000}, {n:'강마루 (평)', p:120000}, {n:'강화마루 (평)', p:90000}, {n:'데코타일 (평)', p:60000}] },
     { key: 'kitchen', category: '가구', items: [{n:'싱크대 (m)', p:400000}, {n:'아일랜드 식탁', p:600000}, {n:'냉장고장', p:500000}, {n:'신발장', p:400000}, {n:'붙박이장 (자)', p:150000}, {n:'시스템 행거', p:300000}] },
