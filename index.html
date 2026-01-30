@@ -2,11 +2,10 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8"><title>로그인 | 다함</title>
-    <link rel="stylesheet" href="style.css?v=30">
+    <link rel="stylesheet" href="style.css?v=33">
 </head>
 <body>
 <div class="container" style="display:flex; align-items:center; justify-content:center;">
-    <span class="version-badge">Ver 1.20</span>
     <div style="text-align:center; width:100%; max-width:300px;">
         <div style="width:120px; height:120px; background:#ddd; margin:0 auto 40px; border-radius:15px; display:flex; align-items:center; justify-content:center;">로고</div>
         <input type="text" id="id" placeholder="ID" style="width:100%; padding:15px; margin-bottom:10px; border:none; border-radius:8px; background:#4a74c9; color:white;">
@@ -14,6 +13,7 @@
         <button onclick="login()" class="btn-orange" style="width:100%; padding:15px; font-size:18px;">로그인</button>
     </div>
 </div>
+<script src="data.js?v=33"></script>
 <script>
     function login() {
         if(document.getElementById('id').value && document.getElementById('pw').value) location.href = 'main.html';
