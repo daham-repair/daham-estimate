@@ -1,4 +1,4 @@
-/* [estimate.js Ver 1.32 - 최종 로직] */
+/* [estimate.js Ver 1.33 - 인쇄 최적화 및 전화번호 포맷] */
 const supabaseUrl = 'YOUR_SUPABASE_URL';
 const supabaseKey = 'YOUR_SUPABASE_KEY';
 let dbClient = null;
@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', function() {
         data.forEach((sec, idx) => {
             const cont = document.createElement('div'); cont.id = 'cont-'+idx;
             const h = document.createElement('div'); h.className = 'section-bar';
+            
+            // [핵심] 화살표에 'arrow-icon' 클래스 추가 -> CSS에서 인쇄 시 숨김 처리됨
             h.innerHTML = `<span class="section-title"><svg class="section-icon" viewBox="0 0 24 24">${icons[sec.key]}</svg> ${sec.category}</span> <span class="arrow-icon">▼</span>`;
             
             h.onclick = () => {
@@ -55,7 +57,7 @@ function initTelFormat() {
     if(telInput) {
         telInput.addEventListener('input', function(e) {
             let v = e.target.value.replace(/[^0-9]/g, '');
-            if (v.length > 11) v = v.substring(0, 11);
+            if (v.length > 11) v = v.substring(0, 11); // 11자리 제한
             
             if (v.length > 3 && v.length <= 7) e.target.value = v.replace(/(\d{3})(\d{1,4})/, '$1-$2');
             else if (v.length > 7) e.target.value = v.replace(/(\d{3})(\d{3,4})(\d{4})/, '$1-$2-$3');
@@ -105,6 +107,8 @@ function update() {
     document.getElementById('final-sum').innerText = total.toLocaleString() + " 원";
 }
 
+function formatKRW(num) { if (!num && num !== 0) return "0"; return Math.floor(parseFloat(num) * 10000).toLocaleString(); }
+
 function toggleSec(idx, master) {
     const content = document.getElementById(`c-${idx}`);
     content.querySelectorAll('.chk').forEach(chk => {
@@ -118,13 +122,11 @@ function smartPrint() {
     const name = document.getElementById('g-name').value;
     if(!name) return alert('고객명을 입력해주세요.');
     
-    // 1. 체크 안된 항목 숨기기
     document.querySelectorAll('.item-line').forEach(row => {
         if(!row.querySelector('.chk').checked) row.classList.add('hidden-print');
         else row.classList.remove('hidden-print');
     });
     
-    // 2. 빈 섹션 숨기기 & 내용 열기
     data.forEach((_, idx) => {
         const cont = document.getElementById('cont-' + idx);
         const hasChecked = cont.querySelectorAll('.chk:checked').length > 0;
@@ -138,7 +140,6 @@ function smartPrint() {
 
     window.print();
     
-    // 3. 복구
     setTimeout(() => {
         document.querySelectorAll('.hidden-print').forEach(el => el.classList.remove('hidden-print'));
         document.querySelectorAll('.section-content').forEach(c => c.classList.remove('show'));
