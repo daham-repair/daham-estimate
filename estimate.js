@@ -1,4 +1,4 @@
-/* [estimate.js Ver 1.58 - 삭제 기능 및 동적 추가 완벽화] */
+/* [estimate.js Ver 1.59 - 줄바꿈 및 삭제기능 완벽화] */
 
 document.addEventListener('DOMContentLoaded', function() {
     const body = document.getElementById('estimate-body');
@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', function() {
             h.className = 'section-bar';
             h.innerHTML = `<div><span class="section-icon">${icons[sec.key] || ''}</span>${sec.category}</div> <span>▼</span>`;
             
-            // 초기 닫힘 상태 유지
             h.onclick = () => document.getElementById('c-' + idx).classList.toggle('show');
             cont.appendChild(h);
 
@@ -21,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
             sec.items.forEach(item => {
                 html += `
                 <div class="grid-row quote-grid">
-                    <div>
+                    <div class="col-name">
                         <label class="item-label">
                             <input type="checkbox" class="chk" data-name="${item.n}" onchange="updateSum()">
                             <span class="checkmark"></span>
@@ -34,7 +33,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>`;
             });
 
-            // 직접 추가 항목 및 삭제 지원 컨테이너
             c.innerHTML = `
                 <div id="fixed-${idx}">${html}</div>
                 <div id="dynamic-${idx}"></div>
@@ -49,18 +47,17 @@ document.addEventListener('DOMContentLoaded', function() {
     initTelFormat();
 });
 
-// [Ver 1.58] 직접 입력 항목 추가 + 삭제 버튼 세트 구성
 function addCustomRow(idx) {
     const target = document.getElementById(`dynamic-${idx}`);
     const div = document.createElement('div');
     div.className = 'grid-row quote-grid';
     div.innerHTML = `
-        <div style="display:flex; align-items:center;">
+        <div style="display:flex; align-items:flex-start;">
             <label class="item-label" style="width:auto;">
                 <input type="checkbox" class="chk" checked onchange="updateSum()">
                 <span class="checkmark"></span>
             </label>
-            <input type="text" class="info-input" style="padding:4px; font-size:13px; height:28px; flex:1;" placeholder="항목명" oninput="updateSum()">
+            <textarea class="info-input" style="padding:4px; font-size:13px; height:auto; flex:1; min-height:28px; line-height:1.2;" placeholder="항목명" oninput="updateSum()"></textarea>
         </div>
         <div class="col-center"><input type="number" class="input-num qty" value="1" oninput="updateSum()"></div>
         <div class="col-center"><input type="number" class="input-num price" value="0" oninput="updateSum()"></div>
@@ -134,13 +131,13 @@ function switchToDetailed() {
             rows.forEach(row => {
                 const chk = row.querySelector('.chk');
                 if(chk && chk.checked) {
-                    const nameText = chk.dataset.name || row.querySelector('input[type="text"]')?.value || "직접 입력";
+                    const nameText = chk.dataset.name || row.querySelector('textarea')?.value || row.querySelector('input[type="text"]')?.value || "직접 입력";
                     const q = row.querySelector('.qty').value;
                     const p = row.querySelector('.price').value;
                     const sum = q * p * 10000;
                     const div = document.createElement('div');
                     div.className = 'grid-row contract-grid';
-                    div.innerHTML = `<div>${nameText}</div><div><textarea class="spec-field" rows="1" placeholder="사양 입력"></textarea></div><div class="col-center">${q}</div><div class="col-right">${sum.toLocaleString()}</div>`;
+                    div.innerHTML = `<div style="white-space:normal;">${nameText}</div><div><textarea class="spec-field" rows="1" placeholder="사양 입력"></textarea></div><div class="col-center">${q}</div><div class="col-right">${sum.toLocaleString()}</div>`;
                     dBody.appendChild(div);
                 }
             });
