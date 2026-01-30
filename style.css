@@ -1,4 +1,4 @@
-/* [다함 디자인 시스템 Ver 1.65 - 욕실 항목 복구 및 안정화] */
+/* [다함 디자인 시스템 Ver 1.67 - 인쇄 최적화 및 레이아웃 고정] */
 :root {
     --primary-navy: #0A2342;
     --accent-gold: #C5A47E;
@@ -23,7 +23,7 @@ body { font-family: 'Pretendard', sans-serif; margin: 0; padding: 0; background-
 
 /* [견적서/계약서 공용 레이아웃] */
 .estimate-body .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 15px; min-height: 100vh; position: relative; padding-bottom: 140px; }
-.header-simple { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #333; }
+.header-simple { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #333; }
 .header-doc-title { font-size: 18px; font-weight: 800; margin: 0; }
 .back-nav { background: none; border: none; font-size: 20px; cursor: pointer; padding: 0; }
 
@@ -36,41 +36,40 @@ img.img-logo { height: 42px !important; width: auto !important; display: block; 
 
 .info-grid { display: grid; grid-template-columns: 1fr 1fr !important; gap: 8px; }
 .full-row { grid-column: span 2; }
-.input-label { font-size: 12px; font-weight: 700; color: var(--primary-navy); display: block; margin-bottom: 3px; }
 .info-input { width: 100%; padding: 10px; border: 1px solid #ddd; background: #f9f9f9; border-radius: 6px; outline: none; font-size: 14px; display: block; }
 .info-text { display: none; padding: 10px 0; font-size: 15px; font-weight: 600; border-bottom: 1px solid #eee; min-height: 38px; color: #000; }
 .info-select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; background: #fff; font-size: 13px; outline: none; cursor: pointer; }
 
-/* 표 레이아웃 */
+/* 표 및 그리드 레이아웃 */
 .estimate-section { background: white; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; margin-bottom: 25px; }
 .grid-header-fixed { background: var(--primary-navy); color: white; padding: 12px 10px; font-weight: 600; font-size: 12px; display: grid; }
 .grid-row { display: grid; align-items: center; padding: 12px 10px; border-bottom: 1px solid #f0f0f0; background: white; }
 
-.quote-grid { grid-template-columns: 1fr 38px 70px 80px !important; gap: 6px; }
+.quote-grid { grid-template-columns: 4fr 38px 70px 80px !important; gap: 6px; }
 .contract-grid { grid-template-columns: 1fr 1.2fr 38px 80px !important; gap: 6px; }
 
+/* 공정명 줄바꿈 허용 */
 .grid-row .col-name, .grid-row .item-name-text { white-space: normal !important; word-break: keep-all; line-height: 1.3; }
 .grid-header-fixed div, .col-center, .col-right { white-space: nowrap !important; }
 
-/* 체크박스 & 버튼 */
+/* 체크박스 & 항목 삭제 */
 .item-label { display: flex; align-items: flex-start; cursor: pointer; width: 100%; padding: 2px 0; }
 .item-label input { display: none !important; }
 .checkmark { width: 18px; height: 18px; border: 2px solid #ddd; border-radius: 4px; margin-right: 8px; margin-top: 1px; position: relative; flex-shrink: 0; background: #fff; }
 .item-label input:checked + .checkmark { background: var(--accent-gold); border-color: var(--accent-gold); }
 .checkmark:after { content: ""; position: absolute; display: none; left: 5px; top: 1px; width: 4px; height: 8px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); }
 .item-label input:checked + .checkmark:after { display: block; }
-.item-name-text { font-size: 13px; font-weight: 500; }
-
 .btn-del-row { background: #eee; border: none; color: #999; width: 22px; height: 22px; border-radius: 50%; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-left: 5px; flex-shrink: 0; }
+
 .input-num { width: 100%; padding: 5px; text-align: center; background: #f8f9fa; border: none; border-radius: 4px; font-weight: 700; font-size: 13px; outline: none; }
 
 /* 아코디언 */
 .section-bar { padding: 15px 12px; background: #fff; border: 1px solid #eee; margin-top: -1px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 800; color: var(--primary-navy); font-size: 15px; }
 .section-icon svg { width: 18px; height: 18px; fill: var(--accent-gold); margin-right: 6px; vertical-align: middle; flex-shrink: 0; }
-.section-content { display: none; }
+.section-content { display: none; background: #fff; }
 .section-content.show { display: block; }
 
-/* 하단바 버튼 그룹 */
+/* 하단 플로팅 바 */
 .floating-action-bar { 
     position: fixed !important; bottom: 0 !important; left: 50% !important; transform: translateX(-50%) !important;
     width: 100% !important; max-width: 900px !important;
@@ -79,30 +78,47 @@ img.img-logo { height: 42px !important; width: auto !important; display: block; 
 }
 .btn-group { display: none; flex-direction: row; gap: 8px; width: 100%; } 
 .btn-group.active { display: flex !important; }
-
 .fab-btn { flex: 1 1 0%; height: 50px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: white; font-size: 13px; display: flex; align-items: center; justify-content: center; white-space: nowrap; }
+
 .btn-reset { background: #f0f0f0; color: #333; }
 .btn-save { background: var(--accent-gold); }
 .btn-print { background: var(--primary-navy); }
 .btn-contract { background: var(--danger-red); }
 
-/* 기타 */
+/* 알림 토스트 (Saved! 메시지) */
+.toast {
+    position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+    background: rgba(10, 35, 66, 0.9); color: white; padding: 12px 25px;
+    border-radius: 30px; font-size: 14px; font-weight: 600; z-index: 10001;
+    display: none; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+.toast.show { display: block; animation: fadeInOut 2.5s forwards; }
+
+@keyframes fadeInOut {
+    0% { opacity: 0; top: 10px; }
+    15% { opacity: 1; top: 20px; }
+    85% { opacity: 1; top: 20px; }
+    100% { opacity: 0; top: 10px; }
+}
+
+/* 총계 */
 .total-card { background: #fff; border: 2px solid var(--primary-navy); padding: 25px; text-align: center; border-radius: 10px; margin-top: 20px; }
 .total-amount { font-size: 36px; font-weight: 900; color: var(--danger-red); letter-spacing: -1px; }
 .vat-notice { font-size: 12px; color: #888; margin-top: 5px; }
-.spec-field { width: 100%; border: 1px solid #eee; border-radius: 4px; padding: 8px; font-size: 13px; background: #fff; outline: none; resize: none; }
-.col-center { text-align: center; }
-.col-right { text-align: right; }
 
+/* [Ver 1.67 핵심] 인쇄 설정 - 저장 문구 및 UI 완전 차단 */
 @media print {
-    body { background: white; padding-bottom: 0; }
-    .no-print, .floating-action-bar, .global-version-badge, .checkmark, .section-bar span:last-child { display: none !important; }
-    .container { max-width: 100%; padding: 0; margin: 0; border: none; }
-    .header-card { border: 1px solid #000; border-top: 5px solid #000; }
-    .estimate-section { border: 1px solid #000; overflow: visible; }
-    .grid-row, .grid-header-fixed { min-width: 0; border-bottom: 1px solid #eee; }
+    body { background: white !important; padding-bottom: 0 !important; }
+    .no-print, .floating-action-bar, .global-version-badge, .checkmark, .section-bar span:last-child, .toast, .btn-del-row { display: none !important; }
+    .container { max-width: 100% !important; padding: 0 !important; margin: 0 !important; border: none !important; }
+    .header-card { border: 1px solid #000 !important; border-top: 5px solid #000 !important; }
+    .estimate-section { border: 1px solid #000 !important; overflow: visible !important; }
+    .grid-row, .grid-header-fixed { min-width: 0 !important; border-bottom: 1px solid #eee !important; }
     .info-input { display: none !important; }
-    .info-text { display: block !important; border-bottom: 1px solid #000; }
+    .info-text { display: block !important; border-bottom: 1px solid #000 !important; }
     .hidden-print { display: none !important; }
     .section-content { display: block !important; border: none !important; }
 }
+
+.col-center { text-align: center; }
+.col-right { text-align: right; }
