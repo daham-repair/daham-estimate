@@ -1,5 +1,5 @@
-/* [data.js Ver 1.56 - 시공 데이터 완전판] */
-const SYSTEM_VERSION = "Ver 1.56";
+/* [data.js Ver 1.57 - 전수 데이터 복구판] */
+const SYSTEM_VERSION = "Ver 1.57";
 
 document.addEventListener('DOMContentLoaded', function() {
     const badge = document.createElement('div');
