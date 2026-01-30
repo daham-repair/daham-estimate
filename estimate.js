@@ -1,4 +1,4 @@
-/* [estimate.js Ver 1.46 - 시뮬레이션 통과 로직] */
+/* [estimate.js Ver 1.47 - 모바일/PC 통합 픽스] */
 
 document.addEventListener('DOMContentLoaded', function() {
     const body = document.getElementById('estimate-body');
@@ -10,9 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             h.onclick = () => {
                 const target = document.getElementById('c-' + idx);
-                const isShown = target.classList.contains('show');
-                document.querySelectorAll('.section-content').forEach(c => c.classList.remove('show'));
-                if (!isShown) target.classList.add('show');
+                target.classList.toggle('show');
             };
             cont.appendChild(h);
             const c = document.createElement('div'); c.className = 'section-content'; c.id = 'c-'+idx;
@@ -25,11 +23,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="col-sum row-sum">0</div>
                 </div>`;
             });
-            c.innerHTML = `<div id="fixed-${idx}">${html}</div><div id="dynamic-${idx}"></div><div class="no-print" style="text-align:center;"><button class="btn-add-row" onclick="addCustomRow(${idx})">+ 항목 추가</button></div>`;
+            c.innerHTML = `<div id="fixed-${idx}">${html}</div><div id="dynamic-${idx}"></div><div class="no-print" style="text-align:center;"><button class="btn-add-row" style="width:90%; padding:10px; margin:10px; border:1px dashed #ccc; background:#fff;" onclick="addCustomRow(${idx})">+ 항목 추가</button></div>`;
             cont.appendChild(c); body.appendChild(cont);
         });
     }
-    loadFromLocal();
     initTelFormat();
 });
 
@@ -56,28 +53,16 @@ function initTelFormat() {
     }
 }
 
-function addCustomRow(idx) {
-    const div = document.createElement('div'); div.className = `grid-row item-line custom-row-${idx} quote-grid`;
-    div.innerHTML = `<div class="col-name" style="display:flex; align-items:center;"><label class="item-label" style="width:auto;"><input type="checkbox" class="chk" data-name="직접 입력" checked onchange="update()"><span class="checkmark"></span></label><input type="text" class="custom-input" placeholder="항목 입력" oninput="this.previousElementSibling.querySelector('.chk').dataset.name=this.value"></div><div class="col-qty"><input type="number" class="input-num qty" value="1" oninput="update()"></div><div class="col-price"><input type="number" class="input-num price" value="0" oninput="update()"></div><div class="col-sum row-sum" style="display:flex; justify-content:flex-end; align-items:center;"><span>0</span> <button class="btn-del-row" onclick="this.closest('.grid-row').remove(); update();">×</button></div>`;
-    document.getElementById(`dynamic-${idx}`).appendChild(div);
-    update();
-}
-
 function update() {
     let total = 0;
     document.querySelectorAll('.item-line').forEach(row => {
         const chk = row.querySelector('.chk');
         const qty = parseFloat(row.querySelector('.qty').value) || 0;
         const price = parseFloat(row.querySelector('.price').value) || 0;
-        const sumEl = row.querySelector('.row-sum');
         if (chk.checked) {
             const sum = qty * price * 10000; total += sum;
-            if(sumEl.querySelector('span')) sumEl.querySelector('span').innerText = sum.toLocaleString();
-            else sumEl.innerText = sum.toLocaleString();
-        } else {
-            if(sumEl.querySelector('span')) sumEl.querySelector('span').innerText = "0";
-            else sumEl.innerText = "0";
-        }
+            row.querySelector('.row-sum').innerText = sum.toLocaleString();
+        } else { row.querySelector('.row-sum').innerText = "0"; }
     });
     document.getElementById('final-sum').innerText = total.toLocaleString() + " 원";
 }
@@ -95,17 +80,8 @@ function smartPrint() {
         if(!row.querySelector('.chk').checked) row.classList.add('hidden-print');
         else row.classList.remove('hidden-print');
     });
-    data.forEach((_, idx) => {
-        const cont = document.getElementById('cont-' + idx);
-        const hasChecked = cont.querySelectorAll('.chk:checked').length > 0;
-        if(!hasChecked) cont.classList.add('hidden-print');
-        else { cont.classList.remove('hidden-print'); document.getElementById('c-'+idx).classList.add('show'); }
-    });
     window.print();
-    setTimeout(() => {
-        document.querySelectorAll('.hidden-print').forEach(el => el.classList.remove('hidden-print'));
-        document.querySelectorAll('.section-content').forEach(c => c.classList.remove('show'));
-    }, 1000);
+    setTimeout(() => { document.querySelectorAll('.hidden-print').forEach(el => el.classList.remove('hidden-print')); }, 1000);
 }
 
 function switchToDetailed() {
@@ -115,26 +91,17 @@ function switchToDetailed() {
     document.getElementById('d-name-display').innerText = document.getElementById('g-name').value;
     document.getElementById('d-tel-display').innerText = document.getElementById('g-tel').value;
     document.getElementById('d-addr-display').innerText = document.getElementById('g-addr').value;
-    
-    const dBody = document.getElementById('detailed-body');
-    dBody.innerHTML = '';
-    let dTotal = 0;
-
+    const dBody = document.getElementById('detailed-body'); dBody.innerHTML = ''; let dTotal = 0;
     data.forEach((sec, idx) => {
         const checked = document.querySelectorAll(`#c-${idx} .item-line .chk:checked`);
         if(checked.length > 0) {
-            const sh = document.createElement('div');
-            sh.className = 'grid-row'; sh.style.backgroundColor = '#f1f3f5'; sh.style.fontWeight = 'bold'; sh.style.gridTemplateColumns = '1fr'; 
-            sh.innerText = sec.category; dBody.appendChild(sh);
+            const sh = document.createElement('div'); sh.className = 'grid-row'; sh.style.backgroundColor = '#f1f3f5'; sh.style.fontWeight = 'bold'; sh.style.gridTemplateColumns = '1fr'; sh.innerText = sec.category; dBody.appendChild(sh);
             checked.forEach(chk => {
                 const row = chk.closest('.item-line');
-                const name = chk.dataset.name || row.querySelector('.custom-input')?.value || "직접 입력";
-                const qty = row.querySelector('.qty').value;
-                const price = row.querySelector('.price').value;
+                const qty = row.querySelector('.qty').value; const price = row.querySelector('.price').value;
                 const sum = qty * price * 10000; dTotal += sum;
-                const div = document.createElement('div');
-                div.className = 'grid-row contract-grid';
-                div.innerHTML = `<div style="text-align:left;">${name}</div><div><textarea class="spec-field" rows="1" placeholder="사양 입력"></textarea></div><div class="col-center">${qty}</div><div class="col-right">${sum.toLocaleString()}</div>`;
+                const div = document.createElement('div'); div.className = 'grid-row contract-grid';
+                div.innerHTML = `<div style="text-align:left;">${chk.dataset.name}</div><div><textarea class="spec-field" rows="1" placeholder="사양 입력"></textarea></div><div class="col-center">${qty}</div><div class="col-right">${sum.toLocaleString()}</div>`;
                 dBody.appendChild(div);
             });
         }
@@ -149,13 +116,11 @@ function switchToDetailed() {
 
 function backToGeneral() {
     document.getElementById('page-title').innerText = "견적서 작성";
-    document.getElementById('view-detailed').style.display = 'none';
     document.getElementById('view-general').style.display = 'block';
+    document.getElementById('view-detailed').style.display = 'none';
     document.getElementById('btn-group-main').style.display = 'flex';
     document.getElementById('btn-group-sub').style.display = 'none';
 }
 
-function saveToLocal() { const t = document.getElementById('toast-msg'); t.className = "toast show"; setTimeout(()=>t.className="toast", 2000); }
-function loadFromLocal() {}
 function resetForm() { if(confirm('초기화하시겠습니까?')) location.reload(); }
 function printContract() { window.print(); }
