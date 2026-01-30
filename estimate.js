@@ -1,4 +1,4 @@
-/* [estimate.js Ver 1.59 - 줄바꿈 및 삭제기능 완벽화] */
+/* [estimate.js Ver 1.60 - 버튼 그룹 제어 및 삭제 기능 통합] */
 
 document.addEventListener('DOMContentLoaded', function() {
     const body = document.getElementById('estimate-body');
@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const h = document.createElement('div');
             h.className = 'section-bar';
             h.innerHTML = `<div><span class="section-icon">${icons[sec.key] || ''}</span>${sec.category}</div> <span>▼</span>`;
-            
             h.onclick = () => document.getElementById('c-' + idx).classList.toggle('show');
             cont.appendChild(h);
 
@@ -131,7 +130,7 @@ function switchToDetailed() {
             rows.forEach(row => {
                 const chk = row.querySelector('.chk');
                 if(chk && chk.checked) {
-                    const nameText = chk.dataset.name || row.querySelector('textarea')?.value || row.querySelector('input[type="text"]')?.value || "직접 입력";
+                    const nameText = chk.dataset.name || row.querySelector('textarea')?.value || "직접 입력";
                     const q = row.querySelector('.qty').value;
                     const p = row.querySelector('.price').value;
                     const sum = q * p * 10000;
@@ -146,8 +145,10 @@ function switchToDetailed() {
     document.getElementById('d-total').innerText = total.toLocaleString() + " 원";
     document.getElementById('view-general').style.display = 'none';
     document.getElementById('view-detailed').style.display = 'block';
-    document.getElementById('btn-group-main').style.display = 'none';
-    document.getElementById('btn-group-sub').style.display = 'flex';
+    
+    // [Ver 1.60] 버튼 그룹 클래스 제어
+    document.getElementById('btn-group-main').classList.remove('active');
+    document.getElementById('btn-group-sub').classList.add('active');
     window.scrollTo(0,0);
 }
 
@@ -155,10 +156,12 @@ function backToGeneral() {
     document.getElementById('page-title').innerText = "견적서 작성";
     document.getElementById('view-general').style.display = 'block';
     document.getElementById('view-detailed').style.display = 'none';
-    document.getElementById('btn-group-main').style.display = 'flex';
-    document.getElementById('btn-group-sub').style.display = 'none';
+    
+    // [Ver 1.60] 버튼 그룹 클래스 제어
+    document.getElementById('btn-group-main').classList.add('active');
+    document.getElementById('btn-group-sub').classList.remove('active');
 }
 
-function saveToLocal() { alert('저장되었습니다.'); }
 function resetForm() { if(confirm('초기화하시겠습니까?')) location.reload(); }
 function smartPrint() { if(!validateInputs()) return; window.print(); }
+function saveToLocal() { alert('저장되었습니다.'); }
