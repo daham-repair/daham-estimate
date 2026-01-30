@@ -2,22 +2,15 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>견적서 작성 | 다함</title>
+    <title>견적서 | 다함</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="estimate-body">
     <div class="estimate-container">
         <div class="header-simple no-print">
-            <button class="back-nav" onclick="location.href='main.html'">←</button>
-            <h2 class="header-doc-title">견적서 작성</h2>
+            <button onclick="location.href='main.html'" style="background:none; border:none; font-size:24px; cursor:pointer;">←</button>
+            <h2 style="font-size:22px; font-weight:800; margin:0;">견적서 작성</h2>
         </div>
-
-        <div class="header-card">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <img src="logo.png" class="img-logo-small" alt="다함">
-                <h1 style="margin:0; font-size:24px; color:var(--primary-navy);">견적서</h1>
-            </div>
-            </div>
 
         <div class="estimate-section">
             <div class="grid-header-fixed quote-grid">
@@ -31,10 +24,10 @@
     </div>
 
     <div class="floating-action-bar no-print">
-        <button class="fab-btn btn-reset" onclick="location.reload()">🔄 초기화</button>
-        <button class="fab-btn btn-save">💾 임시저장</button>
-        <button class="fab-btn btn-print" onclick="window.print()">🖨️ 견적발행</button>
-        <button class="fab-btn btn-contract" onclick="alert('계약서 화면으로 전환합니다.')">📑 계약서</button>
+        <button class="fab-btn" style="background:#eee; color:#333;" onclick="location.reload()">🔄 초기화</button>
+        <button class="fab-btn" style="background:var(--accent-gold);">💾 임시저장</button>
+        <button class="fab-btn" style="background:var(--primary-navy);" onclick="window.print()">🖨️ 견적발행</button>
+        <button class="fab-btn" style="background:#E03E3E;" onclick="switchToDetailed()">📑 계약서</button>
     </div>
 
     <script src="data.js"></script>
