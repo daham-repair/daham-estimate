@@ -1,5 +1,5 @@
 /* =========================================
-   다함 인테리어 견적 시스템 (전 섹션 동적 행 추가 Ver 1.16)
+   다함 인테리어 견적 시스템 (버전 동기화 Ver 1.17)
    ========================================= */
 
 const supabaseUrl = 'YOUR_SUPABASE_URL';
@@ -20,18 +20,14 @@ document.addEventListener('DOMContentLoaded', function() {
             h.innerHTML = `<span><div class="section-icon">${icons[sec.key]}</div> ${sec.category}<span id="pv-${idx}" class="paint-print-val"></span></span><span class="no-print">▼</span>`;
             h.onclick = () => document.getElementById('c-'+idx).classList.toggle('show');
             cont.appendChild(h);
-            
             const c = document.createElement('div'); c.className = 'section-content'; c.id = 'c-'+idx;
             
-            // 공통 벌크 행 (전체 선택 및 페인트 선택)
             let rowsHtml = `<div class="grid-row master-grid no-print bulk-row"><div style="text-align:left;"><label class="item-label bulk-text"><input type="checkbox" onchange="toggleSec(${idx}, this)"><span class="checkmark"></span><span>전체선택</span></label></div><div style="grid-column: span 3; text-align:right;">${sec.isPaint ? `<select id="p-sel" class="paint-select" onchange="changeP(${idx}, this.value)"><option value="water">수성 페인트</option><option value="elastic">탄성 코트</option><option value="ceramic">세라믹 코트</option></select>` : ''}</div></div>`;
             
-            // 기존 데이터 항목 렌더링
             sec.items.forEach((item) => {
                 rowsHtml += `<div class="grid-row master-grid row-${idx} item-line"><div style="text-align:left;"><label class="item-label"><input type="checkbox" class="chk" data-name="${item.n}" onchange="update()"><span class="checkmark"></span><span>${item.n}</span></label></div><div><input type="number" class="in-num qty" value="1" oninput="update()"></div><div><input type="number" class="in-num price" value="${item.p / 10000}" oninput="update()"></div><div class="row-total" style="text-align:right;">0</div></div>`;
             });
             
-            // 동적 행 컨테이너 및 추가 버튼 삽입
             c.innerHTML = `
                 <div id="fixed-rows-${idx}">${rowsHtml}</div>
                 <div id="dynamic-rows-container-${idx}"></div>
@@ -39,7 +35,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     <button class="btn-add-row" onclick="addCustomRow(${idx})">+ 항목 추가하기</button>
                 </div>
             `;
-
             cont.appendChild(c); body.appendChild(cont);
         });
     }
@@ -57,24 +52,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function addCustomRow(secIdx, savedData = null) {
     const container = document.getElementById(`dynamic-rows-container-${secIdx}`);
+    if(!container) return;
     const div = document.createElement('div'); div.className = `grid-row master-grid row-${secIdx} item-line custom-dynamic-row`;
     const nameVal = savedData ? savedData.name : ""; const qtyVal = savedData ? savedData.qty : 1; const priceVal = savedData ? (parseFloat(savedData.price) / 10000) : 0;
-    
-    div.innerHTML = `
-        <div style="text-align:left; display:flex; align-items:center;">
-            <label class="item-label" style="width:auto; margin-right:10px;">
-                <input type="checkbox" class="chk" data-name="${nameVal || '직접 입력'}" checked onchange="update()">
-                <span class="checkmark" style="margin-right:0;"></span>
-            </label>
-            <input type="text" class="custom-name" placeholder="항목 입력" value="${nameVal}" oninput="syncCustomName(this)">
-        </div>
-        <div><input type="number" class="in-num qty" value="${qtyVal}" oninput="update()"></div>
-        <div><input type="number" class="in-num price" value="${priceVal}" oninput="update()"></div>
-        <div style="text-align:right; display:flex; justify-content:flex-end; align-items:center;">
-            <span class="row-total">0</span>
-            <button class="btn-del-row no-print" onclick="deleteRow(this)">-</button>
-        </div>
-    `;
+    div.innerHTML = `<div style="text-align:left; display:flex; align-items:center;"><label class="item-label" style="width:auto; margin-right:10px;"><input type="checkbox" class="chk" data-name="${nameVal || '직접 입력'}" checked onchange="update()"><span class="checkmark" style="margin-right:0;"></span></label><input type="text" class="custom-name" placeholder="항목 입력" value="${nameVal}" oninput="syncCustomName(this)"></div><div><input type="number" class="in-num qty" value="${qtyVal}" oninput="update()"></div><div><input type="number" class="in-num price" value="${priceVal}" oninput="update()"></div><div style="text-align:right; display:flex; justify-content:flex-end; align-items:center;"><span class="row-total">0</span><button class="btn-del-row no-print" onclick="deleteRow(this)">-</button></div>`;
     container.appendChild(div); update();
 }
 
@@ -82,10 +63,7 @@ function deleteRow(btn) { btn.closest('.grid-row').remove(); update(); }
 const paintMap = { water: 12, elastic: 22, ceramic: 30 };
 function syncCustomName(el) { const row = el.closest('.grid-row'); const chk = row.querySelector('.chk'); chk.dataset.name = el.value.trim() === "" ? "직접 입력" : el.value; }
 function changeP(sIdx, type) { const np = paintMap[type]; const content = document.getElementById(`cont-${sIdx}`); if (content) content.querySelectorAll('.price').forEach(el => { el.value = np; }); update(); }
-function toggleSec(idx, master) { 
-    document.querySelectorAll(`.row-${idx} .chk`).forEach(c => c.checked = master.checked); 
-    update(); 
-}
+function toggleSec(idx, master) { document.querySelectorAll(`.row-${idx} .chk`).forEach(c => c.checked = master.checked); update(); }
 function formatKRW(num) { if (!num && num !== 0) return "0"; return Math.floor(parseFloat(num) * 10000).toLocaleString(); }
 
 function update() {
@@ -104,22 +82,13 @@ async function smartPrint() {
     const inputs = document.querySelectorAll('.in-num');
     inputs.forEach(input => { if (input.classList.contains('price')) { input.dataset.orig = input.value; input.type = "text"; input.value = formatKRW(parseFloat(input.value.toString().replace(/,/g, ''))||0); } });
     const ps = document.getElementById('p-sel'); if(ps) { const txt = ps.options[ps.selectedIndex].text; data.forEach((sec, idx) => { if (sec.isPaint) { const el = document.getElementById(`pv-${idx}`); if(el) el.innerText = ` [${txt}]`; } }); }
-    
-    // 인쇄 모드 전환
-    document.querySelectorAll('.item-line').forEach(row => {
-        if(!row.querySelector('.chk').checked) row.classList.add('hidden-print');
-        else row.classList.remove('hidden-print');
-    });
-    
+    document.querySelectorAll('.item-line').forEach(row => { if(!row.querySelector('.chk').checked) row.classList.add('hidden-print'); else row.classList.remove('hidden-print'); });
     data.forEach((_, idx) => {
         const hasChecked = document.querySelectorAll(`.row-${idx} .chk:checked`).length > 0;
         const cont = document.getElementById('cont-'+idx);
-        const content = document.getElementById('c-'+idx);
-        if(cont) { if(hasChecked) { cont.classList.remove('hidden-print'); content.classList.add('show'); } else cont.classList.add('hidden-print'); }
+        if(cont) { if(hasChecked) { cont.classList.remove('hidden-print'); document.getElementById('c-'+idx).classList.add('show'); } else cont.classList.add('hidden-print'); }
     });
-
     window.print();
-
     setTimeout(() => {
         inputs.forEach(input => { if (input.classList.contains('price')) { input.type = "number"; input.value = input.dataset.orig; } });
         document.querySelectorAll('.section-container, .grid-row').forEach(el => el.classList.remove('hidden-print'));
@@ -133,22 +102,17 @@ function switchToDetailed() {
     update(); const nameEl = document.getElementById('g-name'); const telEl = document.getElementById('g-tel'); const addrEl = document.getElementById('g-addr');
     if(!nameEl.value || !telEl.value || !addrEl.value) { alert("고객 정보를 입력해주세요."); return; }
     const dBody = document.getElementById('detailed-body'); dBody.innerHTML = ''; let dTotal = 0;
-    
     data.forEach((sec, idx) => {
         const checkedRows = document.querySelectorAll(`.row-${idx} .chk:checked`);
         if (checkedRows.length > 0) {
             const secHeader = document.createElement('div'); secHeader.className = 'contract-section-header'; secHeader.innerHTML = `${sec.category}`; dBody.appendChild(secHeader);
             checkedRows.forEach(chk => {
                 const row = chk.closest('.grid-row');
-                let itemName = chk.dataset.name; 
-                const customInput = row.querySelector('.custom-name');
+                let itemName = chk.dataset.name; const customInput = row.querySelector('.custom-name');
                 if(customInput && customInput.value.trim() !== "") itemName = customInput.value;
-                
                 let pRaw = row.querySelector('.price').value.toString().replace(/,/g, '');
-                const realPrice = parseFloat(pRaw) * 10000;
-                const qty = parseFloat(row.querySelector('.qty').value);
+                const realPrice = parseFloat(pRaw) * 10000; const qty = parseFloat(row.querySelector('.qty').value);
                 const sum = qty * realPrice; dTotal += sum;
-                
                 const div = document.createElement('div'); div.className = 'grid-row detail-grid';
                 div.innerHTML = `<strong>${itemName}</strong><textarea class="spec-field" placeholder="사양 입력" rows="1"></textarea><div>${qty}</div><div>${realPrice.toLocaleString()}</div><div style="text-align:right;">${sum.toLocaleString()}</div>`;
                 dBody.appendChild(div);
@@ -164,55 +128,41 @@ function switchToDetailed() {
 function backToGeneral() { document.getElementById('view-detailed').classList.remove('active-view'); document.getElementById('view-general').classList.add('active-view'); toggleButtons(false); update(); }
 function toggleButtons(isContractMode) {
     const estBtns = ['btn-reset', 'btn-save', 'btn-print-est', 'btn-go-contract']; const contBtns = ['btn-back', 'btn-print-cont'];
-    estBtns.forEach(id => document.getElementById(id).style.display = isContractMode ? 'none' : 'flex'); contBtns.forEach(id => document.getElementById(id).style.display = isContractMode ? 'flex' : 'none');
+    estBtns.forEach(id => { const el = document.getElementById(id); if(el) el.style.display = isContractMode ? 'none' : 'flex'; }); 
+    contBtns.forEach(id => { const el = document.getElementById(id); if(el) el.style.display = isContractMode ? 'flex' : 'none'; });
 }
 
 function saveToLocal() {
-    update(); const saveData = { name: document.getElementById('g-name').value, tel: document.getElementById('g-tel').value, addr: document.getElementById('g-addr').value, paintType: document.getElementById('p-sel') ? document.getElementById('p-sel').value : null, items: [], customItems: [] };
-    
-    // 1. 고정 항목 저장
+    update(); 
+    const saveData = { name: document.getElementById('g-name').value, tel: document.getElementById('g-tel').value, addr: document.getElementById('g-addr').value, paintType: document.getElementById('p-sel') ? document.getElementById('p-sel').value : null, items: [], customItems: [] };
     document.querySelectorAll('.item-line:not(.custom-dynamic-row)').forEach((row) => { 
         if(row.querySelector('.chk').checked) {
-            // 섹션 인덱스와 해당 섹션 내에서의 상대적 순서 계산 필요하지만 
-            // 현재 구조상 모든 체크된 고정 항목의 데이터를 취합
-            const secIdx = row.classList[2].split('-')[1]; // row-X 클래스에서 X 추출
-            saveData.items.push({ secIdx: secIdx, name: row.querySelector('.chk').dataset.name, qty: row.querySelector('.qty').value, price: parseFloat(row.querySelector('.price').value) * 10000 }); 
+            const secIdx = row.classList[2].split('-')[1];
+            saveData.items.push({ secIdx: secIdx, name: row.querySelector('.chk').dataset.name, qty: row.querySelector('.qty').value, price: parseFloat(row.querySelector('.price').value.toString().replace(/,/g, '')) * 10000 }); 
         }
     });
-    
-    // 2. 동적 행 저장
     document.querySelectorAll('.custom-dynamic-row').forEach(row => { 
         const secIdx = row.classList[2].split('-')[1];
         if(row.querySelector('.chk').checked) {
-            saveData.customItems.push({ secIdx: secIdx, name: row.querySelector('.custom-name').value, qty: row.querySelector('.qty').value, price: parseFloat(row.querySelector('.price').value) * 10000 }); 
+            saveData.customItems.push({ secIdx: secIdx, name: row.querySelector('.custom-name').value, qty: row.querySelector('.qty').value, price: parseFloat(row.querySelector('.price').value.toString().replace(/,/g, '')) * 10000 }); 
         }
     });
-    
-    localStorage.setItem('daham_estimate_draft', JSON.stringify(saveData)); showToast("임시 저장되었습니다.");
+    localStorage.setItem('daham_estimate_draft', JSON.stringify(saveData)); 
+    showToast("임시 저장되었습니다.");
 }
 
 function loadFromLocal() {
     const saved = localStorage.getItem('daham_estimate_draft'); if(!saved) return; if(!confirm("저장된 내용을 불러오시겠습니까?")) return;
     const savedData = JSON.parse(saved); document.getElementById('g-name').value = savedData.name || ''; document.getElementById('g-tel').value = savedData.tel || ''; document.getElementById('g-addr').value = savedData.addr || '';
     if(savedData.paintType && document.getElementById('p-sel')) document.getElementById('p-sel').value = savedData.paintType;
-    
     setTimeout(() => {
-        // 1. 고정 항목 복구
         savedData.items.forEach(item => { 
             const rows = document.querySelectorAll(`.row-${item.secIdx}:not(.custom-dynamic-row)`);
             rows.forEach(row => {
-                if(row.querySelector('.chk').dataset.name === item.name) {
-                    row.querySelector('.chk').checked = true;
-                    row.querySelector('.qty').value = item.qty;
-                    row.querySelector('.price').value = item.price / 10000;
-                }
+                if(row.querySelector('.chk').dataset.name === item.name) { row.querySelector('.chk').checked = true; row.querySelector('.qty').value = item.qty; row.querySelector('.price').value = item.price / 10000; }
             });
         });
-        
-        // 2. 동적 행 복구
-        if(savedData.customItems) {
-            savedData.customItems.forEach(cItem => addCustomRow(cItem.secIdx, cItem));
-        }
+        if(savedData.customItems) { savedData.customItems.forEach(cItem => addCustomRow(cItem.secIdx, cItem)); }
         update();
     }, 200);
 }
