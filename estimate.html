@@ -22,9 +22,20 @@
                     </div>
                 </div>
                 <div class="info-grid">
-                    <div><label class="input-label">발주처 (고객명)</label><input type="text" id="g-name" class="info-input" placeholder="이름 입력"></div>
-                    <div><label class="input-label">연락처</label><input type="tel" id="g-tel" class="info-input" placeholder="010-0000-0000"></div>
-                    <div class="full-row"><label class="input-label">현장 주소</label><input type="text" id="g-addr" class="info-input" placeholder="주소를 입력해주세요"></div>
+                    <div>
+                        <label class="input-label">발주처 (고객명)</label>
+                        <input type="text" id="g-name" class="info-input" placeholder="이름 입력">
+                        <div id="t-name" class="info-text"></div> </div>
+                    <div>
+                        <label class="input-label">연락처</label>
+                        <input type="tel" id="g-tel" class="info-input" placeholder="010-0000-0000">
+                        <div id="t-tel" class="info-text"></div>
+                    </div>
+                    <div class="full-row">
+                        <label class="input-label">현장 주소</label>
+                        <input type="text" id="g-addr" class="info-input" placeholder="주소를 입력해주세요">
+                        <div id="t-addr" class="info-text"></div>
+                    </div>
                 </div>
             </div>
 
@@ -80,7 +91,6 @@
             <button class="fab-btn btn-print" onclick="window.print()" style="background:var(--primary-navy);">계약서 출력</button>
         </div>
     </div>
-    <div id="toast-msg" class="toast">저장되었습니다!</div>
     <script src="data.js"></script>
     <script src="estimate.js"></script>
 </body>
