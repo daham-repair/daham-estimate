@@ -1,4 +1,4 @@
-/* [estimate.js Ver 1.42 - 아이콘 크기 고정 버전] */
+/* [estimate.js Ver 1.39 - 원복 및 로직 고도화] */
 
 document.addEventListener('DOMContentLoaded', function() {
     const body = document.getElementById('estimate-body');
@@ -6,10 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
         data.forEach((sec, idx) => {
             const cont = document.createElement('div'); cont.id = 'cont-'+idx;
             const h = document.createElement('div'); h.className = 'section-bar';
-            
-            // [Ver 1.42] 아이콘 SVG를 감싸는 span에 클래스 부여
-            h.innerHTML = `<span class="section-title"><span class="section-icon">${icons[sec.key]}</span> ${sec.category}</span> <span class="arrow-icon">▼</span>`;
-            
+            h.innerHTML = `<span class="section-title"><svg class="section-icon" viewBox="0 0 24 24">${icons[sec.key]}</svg> ${sec.category}</span> <span class="arrow-icon">▼</span>`;
             h.onclick = () => {
                 const target = document.getElementById('c-' + idx);
                 const isShown = target.classList.contains('show');
@@ -125,9 +122,12 @@ function switchToDetailed() {
             sh.innerText = sec.category; dBody.appendChild(sh);
             checked.forEach(chk => {
                 const row = chk.closest('.item-line');
-                const name = chk.dataset.name; const qty = row.querySelector('.qty').value;
-                const price = row.querySelector('.price').value; const sum = qty * price * 10000; dTotal += sum;
-                const div = document.createElement('div'); div.className = 'grid-row contract-grid';
+                const name = chk.dataset.name;
+                const qty = row.querySelector('.qty').value;
+                const price = row.querySelector('.price').value;
+                const sum = qty * price * 10000; dTotal += sum;
+                const div = document.createElement('div');
+                div.className = 'grid-row contract-grid';
                 div.innerHTML = `<div style="text-align:left;">${name}</div><div><textarea class="spec-field" rows="1" placeholder="사양 입력"></textarea></div><div class="col-center">${qty}</div><div class="col-right">${sum.toLocaleString()}</div>`;
                 dBody.appendChild(div);
             });
@@ -158,5 +158,5 @@ function backToGeneral() {
 
 function saveToLocal() { const t = document.getElementById('toast-msg'); t.className = "toast show"; setTimeout(()=>t.className="toast", 2000); }
 function loadFromLocal() {}
-function resetForm() { if(confirm('초기화하시겠습니까?')) location.reload(); }
+function resetForm() { if(confirm('초기화?')) location.reload(); }
 function printContract() { window.print(); }
