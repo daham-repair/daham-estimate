@@ -1,4 +1,4 @@
-/* [estimate.js Ver 1.62 - 전체선택 및 페인트 옵션 복구 완료] */
+/* [estimate.js Ver 1.63 - 페인트 연동 및 전체선택 통합] */
 
 document.addEventListener('DOMContentLoaded', function() {
     const body = document.getElementById('estimate-body');
@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', function() {
             c.className = 'section-content'; 
             c.id = 'c-'+idx;
             
-            // [복구 1] 전체 선택 행 추가
             let html = `
             <div class="grid-row quote-grid no-print" style="background:#f8f9fa;">
                 <label class="item-label">
@@ -25,17 +24,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 </label>
             </div>`;
 
-            // [복구 2] 페인트 전용 셀렉트 박스
+            // [Ver 1.63] 페인트 전용 로직 복구
             if(sec.isPaint) {
                 html += `
                 <div class="grid-row quote-grid no-print" style="background:#fffbe6; border-bottom:2px solid #ffe58f;">
                     <div style="font-weight:bold; color:var(--primary-navy);">페인트 종류</div>
                     <div colspan="3" style="grid-column: span 3;">
-                        <select class="info-select paint-opt" onchange="updateSum()">
-                            <option value="water">수성 (기본)</option>
-                            <option value="oil">유성 (에나멜)</option>
-                            <option value="lacquer">락카</option>
-                            <option value="special">특수 페인트</option>
+                        <select class="info-select paint-opt" onchange="updatePaintPrice(${idx}, this)">
+                            <option value="water">수성 페인트 (12만)</option>
+                            <option value="elastic">탄성 코트 (22만)</option>
+                            <option value="ceramic">세라믹 코트 (30만)</option>
                         </select>
                     </div>
                 </div>`;
@@ -71,7 +69,23 @@ document.addEventListener('DOMContentLoaded', function() {
     initTelFormat();
 });
 
-// [Ver 1.62] 전체 선택 토글 함수
+// [Ver 1.63] 페인트 단가 자동 연동 로직
+function updatePaintPrice(idx, select) {
+    const section = document.getElementById('c-' + idx);
+    const val = select.value;
+    let price = 12; // 수성 기본
+    if(val === 'elastic') price = 22;
+    else if(val === 'ceramic') price = 30;
+
+    section.querySelectorAll('.grid-row.item-line').forEach(row => {
+        const nameText = row.querySelector('.item-name-text').innerText;
+        if(nameText.includes('베란다')) {
+            row.querySelector('.price').value = price;
+        }
+    });
+    updateSum();
+}
+
 function toggleSec(idx, master) {
     const section = document.getElementById('c-' + idx);
     const checks = section.querySelectorAll('.chk');
@@ -81,13 +95,11 @@ function toggleSec(idx, master) {
 
 function smartPrint() {
     const name = document.getElementById('g-name').value;
-    const tel = document.getElementById('g-tel').value;
-    const addr = document.getElementById('g-addr').value;
     if(!name.trim()){ alert("고객명을 입력해주세요."); return; }
-
+    
     document.getElementById('t-name').innerText = name;
-    document.getElementById('t-tel').innerText = tel;
-    document.getElementById('t-addr').innerText = addr;
+    document.getElementById('t-tel').innerText = document.getElementById('g-tel').value;
+    document.getElementById('t-addr').innerText = document.getElementById('g-addr').value;
 
     document.querySelectorAll('.item-line').forEach(row => {
         const isChecked = row.querySelector('.chk').checked;
@@ -103,9 +115,7 @@ function smartPrint() {
     });
 
     window.print();
-    setTimeout(() => {
-        document.querySelectorAll('.hidden-print').forEach(el => el.classList.remove('hidden-print'));
-    }, 1000);
+    setTimeout(() => { document.querySelectorAll('.hidden-print').forEach(el => el.classList.remove('hidden-print')); }, 1000);
 }
 
 function addCustomRow(idx) {
