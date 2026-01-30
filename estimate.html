@@ -2,32 +2,55 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>견적서 | 다함</title>
+    <title>견적서 작성 | 다함</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="estimate-body">
-    <div class="estimate-container">
+    <div class="container">
         <div class="header-simple no-print">
             <button onclick="location.href='main.html'" style="background:none; border:none; font-size:24px; cursor:pointer;">←</button>
-            <h2 style="font-size:22px; font-weight:800; margin:0;">견적서 작성</h2>
+            <h2 id="page-title" class="header-doc-title">견적서 작성</h2>
         </div>
 
-        <div class="estimate-section">
-            <div class="grid-header-fixed quote-grid">
-                <div>공정 항목</div>
-                <div class="col-center">수량</div>
-                <div class="col-center">단가</div>
-                <div class="col-right">합계</div>
+        <div id="view-general">
+            <div class="header-card">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <img src="logo.png" style="height:45px;" alt="다함">
+                    <h1 style="margin:0; font-size:24px; color:var(--primary-navy);">견적서</h1>
+                </div>
             </div>
-            <div id="estimate-body"></div>
+
+            <div class="estimate-section">
+                <div class="grid-header-fixed quote-grid">
+                    <div>공정 항목</div>
+                    <div class="col-center">수량</div>
+                    <div class="col-center">단가</div>
+                    <div class="col-right">합계</div>
+                </div>
+                <div id="estimate-body"></div>
+            </div>
+            
+            <div class="total-card">
+                <div style="font-weight:700; color:#555;">예상 견적 합계</div>
+                <div id="final-sum" style="font-size:40px; font-weight:900; color:var(--danger-red);">0 원</div>
+                <div class="vat-notice">* 부가세(VAT) 별도 금액입니다.</div>
+            </div>
         </div>
+
+        <div id="view-detailed" style="display:none;"></div>
     </div>
 
     <div class="floating-action-bar no-print">
-        <button class="fab-btn" style="background:#eee; color:#333;" onclick="location.reload()">🔄 초기화</button>
-        <button class="fab-btn" style="background:var(--accent-gold);">💾 임시저장</button>
-        <button class="fab-btn" style="background:var(--primary-navy);" onclick="window.print()">🖨️ 견적발행</button>
-        <button class="fab-btn" style="background:#E03E3E;" onclick="switchToDetailed()">📑 계약서</button>
+        <div id="btn-group-main" style="display:flex; width:100%; gap:10px;">
+            <button class="fab-btn" style="background:#eee; color:#333;" onclick="location.reload()">🔄 초기화</button>
+            <button class="fab-btn" style="background:var(--accent-gold);">💾 임시저장</button>
+            <button class="fab-btn" style="background:var(--primary-navy);" onclick="window.print()">🖨️ 견적발행</button>
+            <button class="fab-btn" style="background:var(--danger-red);" onclick="switchToDetailed()">📑 계약서</button>
+        </div>
+        <div id="btn-group-sub" style="display:none; width:100%; gap:10px;">
+            <button class="fab-btn" style="background:#eee; color:#333;" onclick="location.reload()">목록으로</button>
+            <button class="fab-btn" style="background:var(--primary-navy);" onclick="window.print()">계약서 출력</button>
+        </div>
     </div>
 
     <script src="data.js"></script>
