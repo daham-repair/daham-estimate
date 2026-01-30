@@ -1,5 +1,5 @@
 /* =========================================
-   다함 인테리어 견적 시스템 (버전 동기화 Ver 1.17)
+   다함 인테리어 견적 시스템 (아코디언 기능 Ver 1.18)
    ========================================= */
 
 const supabaseUrl = 'YOUR_SUPABASE_URL';
@@ -18,7 +18,22 @@ document.addEventListener('DOMContentLoaded', function() {
             const cont = document.createElement('div'); cont.className = 'section-container'; cont.id = 'cont-'+idx;
             const h = document.createElement('div'); h.className = 'section-header'; 
             h.innerHTML = `<span><div class="section-icon">${icons[sec.key]}</div> ${sec.category}<span id="pv-${idx}" class="paint-print-val"></span></span><span class="no-print">▼</span>`;
-            h.onclick = () => document.getElementById('c-'+idx).classList.toggle('show');
+            
+            // [수정] 아코디언 로직 적용: 클릭 시 다른 섹션은 모두 닫음
+            h.onclick = () => {
+                const allContents = document.querySelectorAll('.section-content');
+                const targetContent = document.getElementById('c-' + idx);
+                const isAlreadyShown = targetContent.classList.contains('show');
+
+                // 모든 섹션 닫기
+                allContents.forEach(content => content.classList.remove('show'));
+
+                // 클릭한 섹션이 닫혀있었다면 열기
+                if (!isAlreadyShown) {
+                    targetContent.classList.add('show');
+                }
+            };
+            
             cont.appendChild(h);
             const c = document.createElement('div'); c.className = 'section-content'; c.id = 'c-'+idx;
             
