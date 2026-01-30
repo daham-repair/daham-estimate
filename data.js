@@ -1,4 +1,15 @@
-/* [data.js Ver 1.22 - 금색 아이콘 복구] */
+/* [data.js Ver 1.23 - 전 페이지 버전 통합 관리] */
+
+// 1. 여기서 버전을 고치면 모든 페이지가 한 번에 바뀝니다.
+const SYSTEM_VERSION = "Ver 1.23";
+
+// 2. 모든 페이지 상단에 버전 배지를 자동으로 삽입하는 코드
+document.addEventListener('DOMContentLoaded', function() {
+    const badge = document.createElement('div');
+    badge.className = 'global-version-badge no-print'; // 인쇄 시에는 안 보이게 설정
+    badge.innerText = SYSTEM_VERSION;
+    document.body.appendChild(badge);
+});
 const icons = {
     demo: `<svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H5v-4h9v4zM5 11V7h9v4H5zm14 6h-3v-4h3v4zm0-6h-3V7h3v4z"/></svg>`,
     wood: `<svg viewBox="0 0 24 24"><path d="M4 18v3h3v-3h10v3h3v-6H4v3zm15-8h-3v3h3v-3zM9 10h6v3H9v-3zM4 10h3v3H4v-3z"/></svg>`,
@@ -30,3 +41,4 @@ const data = [
     { key: 'etc', category: '기타', items: [{n:'입주 청소 (평)', p:15000}, {n:'엘리베이터 보양', p:150000}, {n:'폐기물 처리 (1톤)', p:400000}, {n:'운반비', p:200000}, {n:'공과잡비', p:0}] },
     { key: 'custom', category: '직접 입력', items: [] }
 ];
+
