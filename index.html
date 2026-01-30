@@ -2,11 +2,11 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>로그인</title>
-    <link rel="stylesheet" href="style.css?v=47">
+    <title>로그인 | 다함 파트너</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body style="display:flex; align-items:center; justify-content:center; min-height:100vh;">
-    <div class="container-narrow">
+    <div class="container container-narrow">
         <div class="login-wrap">
             <div class="login-logo-box">
                 <img src="logo.png" alt="다함" class="login-logo-img" onerror="this.style.display='none'">
@@ -20,14 +20,11 @@
             <button class="btn-login-action" onclick="login()">로그인</button>
         </div>
     </div>
-    <script src="data.js?v=47"></script>
+    <script src="data.js"></script>
     <script>
         function login() {
-            if(document.getElementById('id').value && document.getElementById('pw').value) {
-                location.href = 'main.html';
-            } else {
-                alert("아이디와 비밀번호를 입력해주세요.");
-            }
+            if(document.getElementById('id').value && document.getElementById('pw').value) location.href = 'main.html';
+            else alert("아이디와 비밀번호를 입력해주세요.");
         }
     </script>
 </body>
