@@ -1,5 +1,5 @@
-/* [data.js Ver 1.27 - 데이터 중앙 관리] */
-const SYSTEM_VERSION = "Ver 1.27";
+/* [data.js Ver 1.28 - 데이터 중앙 관리] */
+const SYSTEM_VERSION = "Ver 1.28";
 
 document.addEventListener('DOMContentLoaded', function() {
     const badge = document.createElement('div');
@@ -40,3 +40,4 @@ const data = [
     { key: 'etc', category: '기타', items: [{n:'입주 청소 (평)', p:15000}, {n:'엘리베이터 보양', p:150000}, {n:'폐기물 처리 (1톤)', p:400000}, {n:'운반비', p:200000}, {n:'공과잡비', p:0}] },
     { key: 'custom', category: '직접 입력', items: [] }
 ];
+
