@@ -1,4 +1,4 @@
-/* [estimate.js Ver 1.69 - 인쇄 최적화 및 유효성 검사 통합] */
+/* [estimate.js Ver 1.70 - 1.68 로직 복구 및 인쇄 엔진 강화] */
 
 document.addEventListener('DOMContentLoaded', function() {
     const body = document.getElementById('estimate-body');
@@ -11,20 +11,16 @@ document.addEventListener('DOMContentLoaded', function() {
             h.innerHTML = `<div><span class="section-icon">${icons[sec.key] || ''}</span>${sec.category}</div> <span>▼</span>`;
             h.onclick = () => document.getElementById('c-' + idx).classList.toggle('show');
             cont.appendChild(h);
-
             const c = document.createElement('div');
             c.className = 'section-content'; 
             c.id = 'c-'+idx;
-            
             let html = '';
             if (sec.key !== 'custom') {
                 html += `<div class="grid-row quote-grid no-print" style="background:#f8f9fa;"><label class="item-label"><input type="checkbox" onchange="toggleSec(${idx}, this)"><span class="checkmark"></span> <b>전체 선택</b></label></div>`;
             }
-
             if(sec.isPaint) {
                 html += `<div class="grid-row quote-grid no-print" style="background:#fffbe6; border-bottom:2px solid #ffe58f;"><div style="font-weight:bold;">페인트 종류</div><div style="grid-column: span 3;"><select class="info-select" onchange="updatePaintPrice(${idx}, this)"><option value="water">수성 페인트 (12만)</option><option value="elastic">탄성 코트 (22만)</option><option value="ceramic">세라믹 코트 (30만)</option></select></div></div>`;
             }
-
             sec.items.forEach(item => {
                 html += `
                 <div class="grid-row quote-grid item-line">
@@ -34,7 +30,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="col-right row-sum">0</div>
                 </div>`;
             });
-
             c.innerHTML = `<div id="fixed-${idx}">${html}</div><div id="dynamic-${idx}"></div><div class="no-print" style="padding:10px;"><button class="fab-btn btn-reset" style="width:100%; border:1px dashed #ccc; height:44px;" onclick="addCustomRow(${idx})">+ 항목 직접 추가</button></div>`;
             cont.appendChild(c);
             body.appendChild(cont);
@@ -56,20 +51,17 @@ function smartPrint() {
     document.getElementById('t-name').innerText = document.getElementById('g-name').value;
     document.getElementById('t-tel').innerText = document.getElementById('g-tel').value;
     document.getElementById('t-addr').innerText = document.getElementById('g-addr').value;
-
     document.querySelectorAll('.item-line').forEach(row => {
-        const txtArea = row.querySelector('.custom-name-input'), printSpan = row.querySelector('.custom-name-print');
-        if(txtArea && printSpan) printSpan.innerText = txtArea.value || "(공정명 없음)";
+        const txt = row.querySelector('.custom-name-input'), span = row.querySelector('.custom-name-print');
+        if(txt && span) span.innerText = txt.value || "(내용 없음)";
         if(!row.querySelector('.chk').checked) row.classList.add('hidden-print');
         else row.classList.remove('hidden-print');
     });
-
-    data.forEach((_, idx) => {
-        const cont = document.getElementById('cont-' + idx);
+    data.forEach((_, i) => {
+        const cont = document.getElementById('cont-' + i);
         if(cont.querySelectorAll('.chk:checked').length === 0) cont.classList.add('hidden-print');
         else cont.classList.remove('hidden-print');
     });
-
     window.print();
     setTimeout(() => { document.querySelectorAll('.hidden-print').forEach(el => el.classList.remove('hidden-print')); }, 1000);
 }
@@ -135,7 +127,7 @@ function switchToDetailed() {
                 const chk = row.querySelector('.chk');
                 if(chk && chk.checked) {
                     const nameText = chk.dataset.name || row.querySelector('.custom-name-input')?.value || "직접 입력";
-                    const q = row.querySelector('.qty').value, sum = q * row.querySelector('.price').value * 10000;
+                    const q = row.querySelector('.qty').value, p = row.querySelector('.price').value, sum = q * p * 10000;
                     const div = document.createElement('div');
                     div.className = 'grid-row contract-grid';
                     div.innerHTML = `<div style="white-space:normal;">${nameText}</div><div><textarea class="spec-field" rows="1" placeholder="사양 입력"></textarea></div><div class="col-center">${q}</div><div class="col-right">${sum.toLocaleString()}</div>`;
@@ -163,8 +155,7 @@ function backToGeneral() {
 function resetForm() { if(confirm('초기화하시겠습니까?')) location.reload(); }
 function saveToLocal() {
     const t = document.getElementById('toast-msg');
-    t.classList.add('show');
-    setTimeout(() => { t.classList.remove('show'); }, 2500);
+    t.classList.add('show'); setTimeout(() => { t.classList.remove('show'); }, 2500);
 }
 
 function initTelFormat() {
