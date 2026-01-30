@@ -1,4 +1,4 @@
-/* [다함 디자인 시스템 Ver 1.29 - 견적서 레이아웃 롤백 & 안정화] */
+/* [다함 디자인 시스템 Ver 1.30 - 인쇄 및 정렬 긴급 수정] */
 :root {
     --primary-navy: #0A2342;
     --accent-gold: #C5A47E;
@@ -14,7 +14,7 @@
 body { 
     font-family: 'Pretendard', sans-serif; 
     background-color: var(--bg-light); color: var(--text-dark); 
-    margin: 0; padding: 0; line-height: 1.5; padding-bottom: 80px; 
+    margin: 0; padding: 0; line-height: 1.5; padding-bottom: 100px; /* 하단 버튼 공간 확보 */
 }
 
 .container { max-width: 900px; margin: 0 auto; min-height: 100vh; padding: 25px; background: #fff; position: relative; }
@@ -23,25 +23,31 @@ body {
 /* 버전 배지 */
 .version-badge { position: fixed; top: 15px; right: 15px; background: rgba(10,35,66,0.9); color: white; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 800; z-index: 9999; }
 
-/* [로그인 & 메인 메뉴 스타일 (Ver 1.28 유지)] */
-.login-wrap { background: #fff; padding: 50px 40px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; border: 1px solid #eee; }
-.login-logo-img { width: 100%; max-width: 250px; height: auto; margin-bottom: 30px; }
+/* [로그인 수정] 텍스트 제거 및 로고 최적화 */
+.login-wrap { 
+    background: #fff; padding: 50px 40px; border-radius: 20px; 
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; border: 1px solid #eee; 
+}
+.login-logo-box {
+    margin-bottom: 30px; display: flex; justify-content: center;
+}
+.login-logo-img { 
+    width: 100%; max-width: 200px; height: auto; display: block; 
+}
 .login-input { width: 100%; padding: 15px; background: #f4f7fc; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 10px; font-size: 16px; outline: none; }
 .btn-login-action { width: 100%; padding: 15px; background: var(--accent-orange); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: 800; cursor: pointer; margin-top: 10px; }
 
+/* 메인 메뉴 */
 .nav-grid { display: grid; gap: 15px; }
 .nav-card { background: #fff; padding: 25px; border-radius: 15px; border: 1px solid #eee; cursor: pointer; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 .nav-card-info h3 { margin: 0 0 5px 0; font-size: 18px; font-weight: 700; color: var(--primary-navy); }
 .nav-card-icon { font-size: 24px; width: 50px; height: 50px; background: #f4f7fc; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 
-/* ============================================================
-   [Ver 1.29] 견적서/계약서 레이아웃 (Ver 1.22 기준 복구)
-   ============================================================ */
+/* [견적서 레이아웃] */
 .header-simple { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #333; }
 .back-nav { background: none; border: none; font-size: 24px; cursor: pointer; }
 .header-doc-title { font-size: 24px; font-weight: 800; margin: 0; }
 
-/* 헤더 카드 (네이비 탑 보더 스타일 복구) */
 .header-card { background: #fff; border: 1px solid #ddd; border-top: 5px solid var(--primary-navy); padding: 25px; margin-bottom: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
 .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
 .img-logo { height: 60px; }
@@ -53,20 +59,18 @@ body {
 .input-label { font-size: 13px; font-weight: 700; color: var(--primary-navy); display: block; margin-bottom: 5px; }
 .info-input { width: 100%; padding: 10px; border: 1px solid #ddd; background: #f9f9f9; border-radius: 6px; outline: none; }
 
-/* 그리드 레이아웃 (비율 고정 - 깨짐 방지) */
+/* 그리드 레이아웃 */
 .estimate-section { background: white; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; margin-bottom: 30px; }
 .grid-header { background: var(--primary-navy); color: white; padding: 12px 15px; font-weight: 600; font-size: 14px; display: flex; }
 .grid-row { display: flex; align-items: center; padding: 10px 15px; border-bottom: 1px solid #f0f0f0; }
 
-/* 컬럼 비율 (Flex 기반 정렬) */
 .col-name { flex: 4; text-align: left; overflow: hidden; }
 .col-qty { flex: 1; text-align: center; }
 .col-price { flex: 2; text-align: center; }
 .col-sum { flex: 2; text-align: right; font-weight: 800; }
 
-/* 체크박스 & 아이템 */
 .item-label { display: flex; align-items: center; cursor: pointer; width: 100%; }
-.item-label input { display: none !important; } /* 중복 체크박스 제거 */
+.item-label input { display: none !important; }
 .checkmark { width: 20px; height: 20px; border: 2px solid #ddd; border-radius: 4px; margin-right: 10px; position: relative; flex-shrink: 0; }
 .item-label input:checked + .checkmark { background: var(--accent-gold); border-color: var(--accent-gold); }
 .checkmark:after { content: ""; position: absolute; display: none; left: 6px; top: 2px; width: 4px; height: 9px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); }
@@ -80,17 +84,32 @@ body {
 .section-content { display: none; }
 .section-content.show { display: block; }
 
-/* 하단 버튼바 */
-.floating-action-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,255,255,0.95); padding: 15px; display: flex; gap: 8px; border-top: 1px solid #ddd; z-index: 100; justify-content: center; }
-.fab-btn { flex: 1; max-width: 150px; padding: 14px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: white; font-size: 14px; }
+/* [하단 버튼 중앙 정렬 수정] */
+.floating-action-bar { 
+    position: fixed; bottom: 0; left: 0; width: 100%; 
+    background: rgba(255,255,255,0.95); padding: 15px; 
+    display: flex; gap: 8px; justify-content: center; /* 중앙 정렬 */
+    border-top: 1px solid #ddd; z-index: 1000; 
+}
+.fab-btn { 
+    flex: 1; max-width: 140px; padding: 14px; 
+    border: none; border-radius: 10px; 
+    font-weight: 700; cursor: pointer; color: white; font-size: 14px; 
+    display: flex; align-items: center; justify-content: center;
+}
 .btn-reset { background: #eee; color: #333; }
 .btn-save { background: var(--accent-gold); }
 .btn-print { background: var(--primary-navy); }
 .btn-contract { background: var(--danger-red); }
 
-/* 총계 */
-.total-card { background: #fff; border: 2px solid var(--primary-navy); padding: 20px; text-align: center; border-radius: 10px; margin-top: 20px; }
-.total-amount { font-size: 36px; font-weight: 900; color: var(--danger-red); }
+/* [예상 견적 합계 박스 수정] */
+.total-card { 
+    background: #fff; border: 2px solid var(--primary-navy); 
+    padding: 30px 20px; text-align: center; border-radius: 10px; margin-top: 20px;
+    page-break-inside: avoid; /* 인쇄 시 잘림 방지 */
+}
+.total-label { font-size: 14px; color: #555; margin-bottom: 10px; font-weight: 700; }
+.total-amount { font-size: 40px; font-weight: 900; color: var(--danger-red); letter-spacing: -1px; }
 
 /* 유틸리티 */
 .no-print { display: block; }
@@ -101,12 +120,21 @@ body {
 .toast { visibility: hidden; position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 10px 20px; border-radius: 30px; z-index: 2000; }
 .toast.show { visibility: visible; }
 
-/* 인쇄 모드 */
+/* [인쇄 모드 수정] */
 @media print {
-    .no-print, .floating-action-bar, .version-badge, .btn-add-row, .btn-del-row { display: none !important; }
+    /* 숨겨야 할 요소들 */
+    .no-print, .floating-action-bar, .version-badge, .btn-add-row, .btn-del-row, .back-nav { display: none !important; }
+    
+    /* [수정] 아코디언 화살표(▼) 숨김 */
+    .arrow-icon { display: none !important; } 
+    
     .container { max-width: 100%; padding: 0; margin: 0; box-shadow: none; }
     .header-card, .estimate-section, .total-card { box-shadow: none; border: 1px solid #000; border-radius: 0; }
-    .section-icon svg, .checkmark { display: none !important; } /* 아이콘/체크박스 숨김 */
-    .input-num { background: transparent; text-align: right; }
+    
+    /* 합계 박스 깔끔하게 */
+    .total-card { border: 2px solid #000; padding: 20px; margin-top: 30px; }
+    
+    .section-icon svg, .checkmark { display: none !important; }
+    .input-num { background: transparent; text-align: right; border: none; }
     .hidden-print { display: none !important; }
 }
