@@ -1,77 +1,69 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>견적서 | 다함</title>
-    <link rel="stylesheet" href="style.css?v=34">
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>견적서</title>
+    <link rel="stylesheet" href="style.css?v=35">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="estimate-mode">
-<div class="container">
-    <div id="view-general">
-        <div class="header-nav no-print">
+<body>
+    <div class="container">
+        <div class="header-simple no-print">
             <button class="back-btn" onclick="location.href='main.html'">←</button>
-            <h2 class="page-title">견적서 작성</h2>
-            <div style="width:40px;"></div>
+            <h2 class="header-title">견적서 작성</h2>
         </div>
 
         <div class="header-card">
             <div class="header-top">
-                <div class="logo-box"><img src="logo.png" alt="다함" class="img-logo"></div>
-                <h1 class="doc-title">견적서</h1>
-                <div class="rep-info"><strong>대표 김재영</strong><div style="color:var(--danger-red); font-weight:800; font-size:18px;">010.5404.8747</div></div>
+                <img src="logo.png" alt="다함" class="img-logo">
+                <div class="doc-title">견적서</div>
+                <div class="rep-info">
+                    대표 김재영<br>
+                    <span style="color:var(--danger-red); font-weight:800; font-size:18px;">010.5404.8747</span>
+                </div>
             </div>
-            <div class="info-grid">
-                <div class="input-group"><label class="input-label">발주처</label><input type="text" id="g-name" class="compact-input" placeholder="고객 성함"></div>
-                <div class="input-group"><label class="input-label">연락처</label><input type="tel" id="g-tel" class="compact-input" placeholder="010.0000.0000"></div>
-                <div class="input-group full-row"><label class="input-label">현장 주소</label><input type="text" id="g-addr" class="compact-input" placeholder="현장 주소를 입력하세요"></div>
+            <div class="info-row">
+                <div style="flex:1;">
+                    <label>발주처</label>
+                    <input type="text" id="g-name" class="info-input" placeholder="고객명">
+                </div>
+                <div style="flex:1;">
+                    <label>연락처</label>
+                    <input type="tel" id="g-tel" class="info-input" placeholder="전화번호">
+                </div>
+            </div>
+            <div>
+                <label>현장 주소</label>
+                <input type="text" id="g-addr" class="info-input" placeholder="주소 입력">
             </div>
         </div>
 
         <div class="estimate-section">
-            <div class="grid-header master-grid"><div>공정 항목</div><div>수량</div><div>단가</div><div style="text-align:right;">합계</div></div>
+            <div class="grid-header">
+                <div class="col-name">공정 항목</div>
+                <div class="col-qty">수량</div>
+                <div class="col-price">단가</div>
+                <div class="col-sum">합계</div>
+            </div>
             <div id="estimate-body"></div>
         </div>
 
-        <div class="total-card">
-            <div class="total-label">예상 견적 합계</div>
-            <div id="final-sum" class="total-val">0 원</div>
+        <div class="total-bar">
+            <div>예상 견적 합계</div>
+            <div id="final-sum" class="total-text">0 원</div>
         </div>
+
+        <div class="bottom-actions">
+            <button class="action-btn btn-gray" onclick="resetForm()">초기화</button>
+            <button class="action-btn btn-gold" onclick="saveToLocal()">임시저장</button>
+            <button class="action-btn btn-navy" onclick="smartPrint()">견적발행</button>
+            <button class="action-btn btn-red" onclick="alert('계약서 기능 준비중')">계약서</button>
+        </div>
+        
+        <div id="toast-msg" class="toast">저장되었습니다!</div>
     </div>
 
-    <div id="view-detailed" style="display:none;">
-        <div class="header-card">
-            <div class="header-top">
-                <div class="logo-box"><img src="logo.png" alt="다함" class="img-logo"></div>
-                <h1 class="doc-title">계약서</h1>
-                <div class="rep-info"><strong>공급자: 김재영 (인)</strong><div style="color:var(--danger-red); font-weight:800; font-size:18px;">010.5404.8747</div></div>
-            </div>
-            <div class="info-grid">
-                <div class="input-group"><label class="input-label">발주처</label><div id="d-name-display" class="display-text"></div></div>
-                <div class="input-group"><label class="input-label">연락처</label><div id="d-tel-display" class="display-text"></div></div>
-                <div class="input-group full-row"><label class="input-label">현장 주소</label><div id="d-addr-display" class="display-text"></div></div>
-            </div>
-        </div>
-        <div class="estimate-section">
-            <div class="grid-header master-grid"><div>공정 및 항목</div><div>자재 사양</div><div>수량</div><div>단가</div><div style="text-align:right;">금액</div></div> <div id="detailed-body"></div>
-        </div>
-        <div class="total-card">
-            <div class="total-label">최종 시공 합계</div>
-            <div id="d-total" class="total-val">0 원</div>
-        </div>
-    </div>
-
-    <div class="bottom-action-bar no-print">
-        <button id="btn-reset" class="action-btn btn-reset" onclick="resetForm()">초기화</button>
-        <button id="btn-save" class="action-btn btn-save" onclick="saveToLocal()">임시저장</button>
-        <button id="btn-print-est" class="action-btn btn-print" onclick="smartPrint()">견적발행</button>
-        <button id="btn-go-contract" class="action-btn btn-next" onclick="switchToDetailed()">계약서</button>
-        <button id="btn-back" class="action-btn btn-reset" onclick="backToGeneral()" style="display:none;">목록으로</button>
-        <button id="btn-print-cont" class="action-btn btn-print" onclick="printContract()" style="display:none; flex: 2; background:var(--primary-navy);">계약서 출력</button>
-    </div>
-    <div id="toast-msg" class="toast">저장되었습니다!</div>
-</div>
-<script src="data.js?v=34"></script>
-<script src="estimate.js?v=34"></script>
+    <script src="data.js?v=35"></script>
+    <script src="estimate.js?v=35"></script>
 </body>
 </html>
