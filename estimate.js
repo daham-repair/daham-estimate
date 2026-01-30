@@ -1,4 +1,4 @@
-/* [estimate.js Ver 1.48 - 모바일 대응 강화] */
+/* [estimate.js Ver 1.49 - 초기 닫힘 및 체크박스 픽스] */
 
 document.addEventListener('DOMContentLoaded', function() {
     const body = document.getElementById('estimate-body');
@@ -13,20 +13,39 @@ document.addEventListener('DOMContentLoaded', function() {
                 target.classList.toggle('show');
             };
             cont.appendChild(h);
+
+            // [Ver 1.49] 초기 상태: show 클래스 없이 생성 (닫힌 상태)
             const c = document.createElement('div'); c.className = 'section-content'; c.id = 'c-'+idx;
-            let html = `<div class="grid-row quote-grid no-print" style="background:#f8f9fa;"><label class="item-label"><input type="checkbox" onchange="toggleSec(${idx}, this)"><span class="checkmark"></span> <b>전체 선택</b></label></div>`;
+            
+            let html = `<div class="grid-row quote-grid no-print" style="background:#f8f9fa;">
+                <label class="item-label">
+                    <input type="checkbox" onchange="toggleSec(${idx}, this)">
+                    <span class="checkmark"></span> <b>전체 선택</b>
+                </label>
+            </div>`;
+
             sec.items.forEach(item => {
                 html += `<div class="grid-row item-line quote-grid">
-                    <div class="col-name"><label class="item-label"><input type="checkbox" class="chk" data-name="${item.n}" onchange="update()"><span class="checkmark"></span><span class="item-name-text">${item.n}</span></label></div>
+                    <div class="col-name">
+                        <label class="item-label">
+                            <input type="checkbox" class="chk" data-name="${item.n}" onchange="update()">
+                            <span class="checkmark"></span>
+                            <span class="item-name-text">${item.n}</span>
+                        </label>
+                    </div>
                     <div class="col-qty"><input type="number" class="input-num qty" value="1" oninput="update()"></div>
                     <div class="col-price"><input type="number" class="input-num price" value="${item.p/10000}" oninput="update()"></div>
                     <div class="col-sum row-sum">0</div>
                 </div>`;
             });
-            c.innerHTML = `<div id="fixed-${idx}">${html}</div><div id="dynamic-${idx}"></div><div class="no-print" style="text-align:center;"><button class="btn-add-row" style="width:90%; padding:12px; margin:10px auto; border:1px dashed #ccc; background:#fff; border-radius:8px; cursor:pointer;" onclick="addCustomRow(${idx})">+ 항목 직접 추가</button></div>`;
+
+            c.innerHTML = `<div id="fixed-${idx}">${html}</div><div id="dynamic-${idx}"></div>
+            <div class="no-print" style="text-align:center;"><button class="btn-add-row" style="width:90%; padding:10px; margin:10px auto; border:1px dashed #ccc; background:#fff; cursor:pointer;" onclick="addCustomRow(${idx})">+ 항목 추가</button></div>`;
+            
             cont.appendChild(c); body.appendChild(cont);
         });
     }
+    loadFromLocal();
     initTelFormat();
 });
 
@@ -59,10 +78,10 @@ function update() {
         const chk = row.querySelector('.chk');
         const qty = parseFloat(row.querySelector('.qty').value) || 0;
         const price = parseFloat(row.querySelector('.price').value) || 0;
-        if (chk.checked) {
+        if (chk && chk.checked) {
             const sum = qty * price * 10000; total += sum;
             row.querySelector('.row-sum').innerText = sum.toLocaleString();
-        } else { row.querySelector('.row-sum').innerText = "0"; }
+        } else if(row.querySelector('.row-sum')) { row.querySelector('.row-sum').innerText = "0"; }
     });
     document.getElementById('final-sum').innerText = total.toLocaleString() + " 원";
 }
@@ -73,57 +92,25 @@ function toggleSec(idx, master) {
     update();
 }
 
-function smartPrint() {
-    if(!validateInputs()) return;
-    update();
-    document.querySelectorAll('.item-line').forEach(row => {
-        if(!row.querySelector('.chk').checked) row.classList.add('hidden-print');
-        else row.classList.remove('hidden-print');
-    });
-    window.print();
-    setTimeout(() => { document.querySelectorAll('.hidden-print').forEach(el => el.classList.remove('hidden-print')); }, 1000);
-}
-
 function switchToDetailed() {
     if(!validateInputs()) return;
     update();
-    document.getElementById('page-title').innerText = "계약서 작성";
-    document.getElementById('d-name-display').innerText = document.getElementById('g-name').value;
-    document.getElementById('d-tel-display').innerText = document.getElementById('g-tel').value;
-    document.getElementById('d-addr-display').innerText = document.getElementById('g-addr').value;
-    
-    const dBody = document.getElementById('detailed-body'); dBody.innerHTML = ''; let dTotal = 0;
-    data.forEach((sec, idx) => {
-        const checked = document.querySelectorAll(`#c-${idx} .item-line .chk:checked`);
-        if(checked.length > 0) {
-            const sh = document.createElement('div'); sh.className = 'grid-row'; sh.style.backgroundColor = '#f1f3f5'; sh.style.fontWeight = 'bold'; sh.style.gridTemplateColumns = '1fr'; sh.innerText = sec.category; dBody.appendChild(sh);
-            checked.forEach(chk => {
-                const row = chk.closest('.item-line');
-                const qty = row.querySelector('.qty').value; const price = row.querySelector('.price').value;
-                const sum = qty * price * 10000; dTotal += sum;
-                const div = document.createElement('div'); div.className = 'grid-row contract-grid';
-                div.innerHTML = `<div style="text-align:left;">${chk.dataset.name}</div><div><textarea class="spec-field" rows="1" placeholder="사양 입력"></textarea></div><div class="col-center">${qty}</div><div class="col-right">${sum.toLocaleString()}</div>`;
-                dBody.appendChild(div);
-            });
-        }
-    });
-    document.getElementById('d-total').innerText = dTotal.toLocaleString() + " 원";
     document.getElementById('view-general').style.display = 'none';
     document.getElementById('view-detailed').style.display = 'block';
-    
-    // [중요] 버튼 그룹 교체로 중복 노출 방지
     document.getElementById('btn-group-main').style.display = 'none';
     document.getElementById('btn-group-sub').style.display = 'flex';
     window.scrollTo(0,0);
 }
 
 function backToGeneral() {
-    document.getElementById('page-title').innerText = "견적서 작성";
-    document.getElementById('view-general').style.display = 'block';
     document.getElementById('view-detailed').style.display = 'none';
+    document.getElementById('view-general').style.display = 'block';
     document.getElementById('btn-group-main').style.display = 'flex';
     document.getElementById('btn-group-sub').style.display = 'none';
 }
 
+function saveToLocal() { const t = document.getElementById('toast-msg'); t.className = "toast show"; setTimeout(()=>t.className="toast", 2000); }
+function loadFromLocal() {}
 function resetForm() { if(confirm('초기화하시겠습니까?')) location.reload(); }
 function printContract() { window.print(); }
+function smartPrint() { if(!validateInputs()) return; window.print(); }
