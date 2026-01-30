@@ -1,4 +1,4 @@
-/* [다함 디자인 시스템 Ver 1.73 - 인쇄 잔상 완전 제거 버전] */
+/* [다함 디자인 시스템 Ver 1.74 - 레이아웃 안정화 및 합계 정렬 픽스] */
 :root {
     --primary-navy: #0A2342;
     --accent-gold: #C5A47E;
@@ -14,14 +14,14 @@ body { font-family: 'Pretendard', sans-serif; margin: 0; padding: 0; background-
 
 .global-version-badge { position: absolute; top: 15px; right: 15px; background: rgba(10, 35, 66, 0.8); color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; z-index: 100; }
 
-/* [로그인 전용] */
+/* [로그인/메인] */
 .login-body { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
 .login-box { background: #fff; padding: 50px 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center; border: 1px solid #eee; width: 100%; max-width: 400px; position: relative; }
 .login-logo { width: 100%; max-width: 180px !important; height: auto !important; margin-bottom: 40px; display: block; margin-left: auto; margin-right: auto; }
 .login-input { width: 100%; padding: 15px; background: #f4f7fc; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 12px; font-size: 16px; outline: none; }
 .btn-login { width: 100%; padding: 16px; background: var(--accent-orange); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: 800; cursor: pointer; }
 
-/* [견적서/계약서 공용] */
+/* [공용 레이아웃] */
 .estimate-body .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 15px; min-height: 100vh; position: relative; padding-bottom: 140px; }
 .header-simple { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #333; }
 .header-doc-title { font-size: 18px; font-weight: 800; margin: 0; }
@@ -40,17 +40,20 @@ img.img-logo { height: 42px !important; width: auto !important; display: block; 
 .info-text { display: none; padding: 10px 0; font-size: 15px; font-weight: 600; border-bottom: 1px solid #eee; min-height: 38px; color: #000; }
 .info-select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; background: #fff; font-size: 13px; outline: none; cursor: pointer; }
 
-/* 표 레이아웃 */
-.estimate-section { background: white; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; margin-bottom: 25px; }
+/* 표 레이아웃 (Ver 1.74 비율 최적화) */
+.estimate-section { background: white; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
 .grid-header-fixed { background: var(--primary-navy); color: white; padding: 12px 10px; font-weight: 600; font-size: 12px; display: grid; }
-.grid-row { display: grid; align-items: center; padding: 12px 10px; border-bottom: 1px solid #f0f0f0; background: white; }
-.quote-grid { grid-template-columns: 4fr 38px 70px 80px !important; gap: 6px; }
-.contract-grid { grid-template-columns: 1fr 2fr 35px 80px !important; gap: 8px; }
+.grid-row { display: grid; align-items: center; padding: 10px 12px; border-bottom: 1px solid #f0f0f0; background: white; }
 
+.quote-grid { grid-template-columns: 4.5fr 1.2fr 2fr 2.3fr !important; gap: 6px; }
+.contract-grid { grid-template-columns: 1.2fr 2fr 1fr 2fr !important; gap: 8px; }
+
+/* 공정명 줄바꿈 허용 */
 .grid-row .col-name, .grid-row .item-name-text { white-space: normal !important; word-break: keep-all; line-height: 1.3; }
 .grid-header-fixed div, .col-center, .col-right { white-space: nowrap !important; }
 
-.spec-field { width: 100%; border: 1px solid #eee; border-radius: 4px; padding: 6px; font-size: 13px; background: #fff; outline: none; resize: none; overflow: hidden; min-height: 30px; word-break: break-all; }
+/* 자재 사양 필드 */
+.spec-field { width: 100%; border: 1px solid #eee; border-radius: 4px; padding: 6px; font-size: 13px; background: #fff; outline: none; resize: none; overflow: hidden; min-height: 32px; word-break: break-all; }
 
 /* 체크박스 & 항목 삭제 */
 .item-label { display: flex; align-items: flex-start; cursor: pointer; width: 100%; padding: 2px 0; }
@@ -61,6 +64,7 @@ img.img-logo { height: 42px !important; width: auto !important; display: block; 
 .item-label input:checked + .checkmark:after { display: block; }
 .custom-name-print { display: none; font-size: 13px; font-weight: 500; white-space: normal; line-height: 1.3; }
 .btn-del-row { background: #eee; border: none; color: #999; width: 22px; height: 22px; border-radius: 50%; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-left: 5px; flex-shrink: 0; }
+.input-num { width: 100%; padding: 5px; text-align: center; background: #f8f9fa; border: none; border-radius: 4px; font-weight: 700; font-size: 13px; outline: none; }
 
 /* 아코디언 */
 .section-bar { padding: 15px 12px; background: #fff; border: 1px solid #eee; margin-top: -1px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 800; color: var(--primary-navy); font-size: 15px; }
@@ -84,25 +88,24 @@ img.img-logo { height: 42px !important; width: auto !important; display: block; 
 .btn-print { background: var(--primary-navy) !important; color: white !important; }
 .btn-contract { background: var(--danger-red) !important; color: white !important; }
 
-/* 알림 토스트 (Saved! 메시지) */
-.toast {
-    position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-    background: rgba(10, 35, 66, 0.95); color: white; padding: 12px 25px;
-    border-radius: 30px; font-size: 14px; font-weight: 600; z-index: 10001;
-    display: none; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+/* [Ver 1.74 수정] 합계 영역 안정화 */
+.total-card { 
+    background: #fff; border: 2px solid var(--primary-navy); padding: 25px; 
+    text-align: center; border-radius: 12px; margin-top: 25px;
+    clear: both; display: block; width: 100%;
 }
-.toast.show { display: block; animation: fadeInOut 2.5s forwards; }
+.total-amount { font-size: 36px; font-weight: 900; color: var(--danger-red); letter-spacing: -1px; margin-top: 5px; }
+.vat-notice { font-size: 12px; color: #888; margin-top: 5px; font-weight: 500; }
 
+.toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(10, 35, 66, 0.95); color: white; padding: 12px 25px; border-radius: 30px; font-size: 14px; z-index: 10001; display: none; }
+.toast.show { display: block; animation: fadeInOut 2.5s forwards; }
 @keyframes fadeInOut { 0% { opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; } }
 
-/* [Ver 1.73 핵심] 인쇄 시 빈 페이지 방지 및 저장 메시지 강제 차단 */
+/* 인쇄 최적화 */
 @media print {
     html, body { height: auto !important; overflow: visible !important; background: white !important; }
     .estimate-body .container { min-height: 0 !important; height: auto !important; padding: 0 !important; margin: 0 !important; max-width: 100% !important; padding-bottom: 0 !important; }
-    /* toast 포함 모든 불필요 UI 차단 */
-    .no-print, .floating-action-bar, .global-version-badge, .toast, .checkmark, .section-bar span:last-child, .btn-del-row { 
-        display: none !important; opacity: 0 !important; visibility: hidden !important; 
-    }
+    .no-print, .floating-action-bar, .global-version-badge, .toast, .checkmark, .section-bar span:last-child, .btn-del-row { display: none !important; opacity: 0 !important; }
     .header-card { border: 1px solid #000 !important; border-top: 5px solid #000 !important; margin-bottom: 10px !important; }
     .estimate-section { border: 1px solid #000 !important; overflow: visible !important; margin-bottom: 10px !important; }
     .grid-row, .grid-header-fixed { min-width: 0 !important; border-bottom: 1px solid #eee !important; page-break-inside: avoid; }
