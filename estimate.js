@@ -1,4 +1,4 @@
-/* [estimate.js Ver 1.40 - 최종 로직] */
+/* [estimate.js Ver 1.42 - 아이콘 크기 고정 버전] */
 
 document.addEventListener('DOMContentLoaded', function() {
     const body = document.getElementById('estimate-body');
@@ -6,7 +6,10 @@ document.addEventListener('DOMContentLoaded', function() {
         data.forEach((sec, idx) => {
             const cont = document.createElement('div'); cont.id = 'cont-'+idx;
             const h = document.createElement('div'); h.className = 'section-bar';
-            h.innerHTML = `<span class="section-title"><svg class="section-icon" viewBox="0 0 24 24">${icons[sec.key]}</svg> ${sec.category}</span> <span class="arrow-icon">▼</span>`;
+            
+            // [Ver 1.42] 아이콘 SVG를 감싸는 span에 클래스 부여
+            h.innerHTML = `<span class="section-title"><span class="section-icon">${icons[sec.key]}</span> ${sec.category}</span> <span class="arrow-icon">▼</span>`;
+            
             h.onclick = () => {
                 const target = document.getElementById('c-' + idx);
                 const isShown = target.classList.contains('show');
