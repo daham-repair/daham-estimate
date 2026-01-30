@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>견적서 | 다함</title>
+    <title>견적 시스템 | 다함</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -65,14 +65,18 @@
     </div>
 
     <div class="floating-action-bar no-print">
-        <button id="btn-reset" class="fab-btn btn-reset" onclick="resetForm()">🔄 초기화</button>
-        <button id="btn-save" class="fab-btn btn-save" onclick="saveToLocal()">💾 임시저장</button>
-        <button id="btn-print-est" class="fab-btn btn-print" onclick="smartPrint()">🖨️ 견적발행</button>
-        <button id="btn-go-contract" class="fab-btn btn-contract" onclick="switchToDetailed()">📑 계약서</button>
-        
-        <button id="btn-back" class="fab-btn btn-reset" onclick="backToGeneral()" style="display:none;">목록으로</button>
-        <button id="btn-print-cont" class="fab-btn btn-print" onclick="printContract()" style="display:none; background:var(--primary-navy);">계약서 출력</button>
+        <div id="btn-group-main" class="btn-group">
+            <button class="fab-btn btn-reset" onclick="resetForm()">🔄 초기화</button>
+            <button class="fab-btn btn-save" onclick="saveToLocal()">💾 임시저장</button>
+            <button class="fab-btn btn-print" onclick="smartPrint()">🖨️ 견적발행</button>
+            <button class="fab-btn btn-contract" onclick="switchToDetailed()">📑 계약서</button>
+        </div>
+        <div id="btn-group-sub" class="btn-group" style="display:none;">
+            <button class="fab-btn btn-reset" onclick="backToGeneral()">목록으로</button>
+            <button class="fab-btn btn-print" onclick="printContract()" style="background:var(--primary-navy);">계약서 출력</button>
+        </div>
     </div>
+
     <div id="toast-msg" class="toast">저장되었습니다!</div>
     <script src="data.js"></script>
     <script src="estimate.js"></script>
