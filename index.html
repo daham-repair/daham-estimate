@@ -7,14 +7,13 @@
 </head>
 <body class="login-body">
     <div class="login-box">
-        <img src="logo.png" alt="다함" class="login-logo" onerror="this.style.display='none'">
+        <img src="logo.png" alt="다함 인테리어" class="login-logo" onerror="this.style.display='none'">
         <div class="input-group">
-            <input type="text" id="id" class="login-input" placeholder="아이디">
+            <input type="text" id="id" class="login-input" placeholder="관리자 아이디">
             <input type="password" id="pw" class="login-input" placeholder="비밀번호">
         </div>
         <button class="btn-login" onclick="login()">로그인</button>
     </div>
-    <script src="data.js"></script>
     <script>
         function login() {
             if(document.getElementById('id').value && document.getElementById('pw').value) location.href = 'main.html';
