@@ -9,12 +9,12 @@
 body { font-family: 'Pretendard', sans-serif; background-color: var(--bg-light); color: var(--text-dark); margin: 0; padding: 0; line-height: 1.5; letter-spacing: -0.02em; }
 .container { max-width: 950px; margin: 0 auto; min-height: 100vh; padding: 20px; position: relative; }
 
-/* 공통 요소 */
+/* 공통 UI */
 .version-badge { background: #44619d; color: white; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; position: absolute; top: 20px; right: 20px; }
 .header-simple { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #ddd; }
 .back-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--primary-navy); }
 
-/* 헤더 & 정보 그리드 */
+/* 헤더 카드 */
 .header-card { background: var(--card-bg); border-radius: var(--radius-lg); box-shadow: var(--shadow-soft); padding: 25px; margin-bottom: 20px; border-top: 5px solid var(--primary-navy); }
 .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
 .img-logo { height: 60px; width: auto; }
@@ -25,7 +25,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: var(--bg-light);
 .input-group label { font-size: 13px; font-weight: 700; color: var(--primary-navy); margin-bottom: 4px; display: block; }
 .input-field { width: 100%; background: var(--input-bg); border: 1px solid #EEE; border-radius: var(--radius-md); padding: 10px; font-size: 15px; outline: none; }
 
-/* 견적 리스트 - 라인 틀어짐 방지 핵심 비율 */
+/* 견적 리스트 - 라인 고정 비율 */
 .estimate-section { background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow-soft); overflow: hidden; margin-bottom: 24px; }
 .grid-header { padding: 15px 25px; background: var(--primary-navy); color: white; font-weight: 600; font-size: 14px; }
 .master-grid { display: grid; grid-template-columns: 3.5fr 1fr 2.7fr 2.8fr; gap: 10px; align-items: center; }
@@ -40,7 +40,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: var(--bg-light);
 .in-num { width: 100%; padding: 8px; background: #F8F9FA; border: none; border-radius: 6px; text-align: center; font-weight: 600; font-size: 15px; }
 .row-total { text-align: right; font-weight: 800; font-size: 15px; }
 
-/* 섹션 & 아이콘 (기존 금색 스타일) */
+/* 섹션 & 아이콘 */
 .section-header { padding: 12px 20px; border-bottom: 1px solid var(--border-color); cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: white; font-weight: 800; }
 .section-icon { width: 24px; height: 24px; color: var(--accent-gold); margin-right: 10px; flex-shrink: 0; }
 .section-icon svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 2.5; }
@@ -49,7 +49,6 @@ body { font-family: 'Pretendard', sans-serif; background-color: var(--bg-light);
 
 /* 추가 행 버튼 */
 .btn-add-row { width: calc(100% - 40px); padding: 10px; background: #FFF; border: 1px dashed #CCC; color: #777; font-weight: 600; border-radius: 8px; margin: 10px 20px; cursor: pointer; font-size: 13px; text-align: center; }
-.btn-add-row:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
 .btn-del-row { background: #FFECEC; color: #E03E3E; border: none; width: 22px; height: 22px; border-radius: 4px; cursor: pointer; margin-left: 10px; }
 
 /* 하단 액션 바 */
@@ -64,7 +63,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: var(--bg-light);
 .total-card { background: white; border: 2px solid var(--primary-navy); padding: 30px; text-align: center; border-radius: var(--radius-lg); margin-top: 30px; }
 .total-val { font-size: 42px; font-weight: 900; color: var(--danger-red); }
 
-/* 인쇄 모드 */
+/* 인쇄 모드 최적화 */
 @media print {
     .no-print, .bottom-action-bar, .header-simple, .btn-add-row, .btn-del-row { display: none !important; }
     .container { padding: 0; max-width: 100%; }
@@ -76,5 +75,4 @@ body { font-family: 'Pretendard', sans-serif; background-color: var(--bg-light);
 
 @media (max-width: 480px) {
     .master-grid { grid-template-columns: 3.2fr 1.2fr 1.8fr 2fr !important; gap: 5px; }
-    .doc-title { font-size: 20px; }
 }
