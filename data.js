@@ -1,5 +1,5 @@
-/* [data.js Ver 1.54 - 데이터 전체 관리] */
-const SYSTEM_VERSION = "Ver 1.54";
+/* [data.js Ver 1.55] */
+const SYSTEM_VERSION = "Ver 1.55";
 
 document.addEventListener('DOMContentLoaded', function() {
     const badge = document.createElement('div');
