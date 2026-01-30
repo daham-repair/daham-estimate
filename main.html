@@ -1,23 +1,43 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>메인</title>
-    <link rel="stylesheet" href="style.css?v=36">
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>메인 | 다함</title>
+    <link rel="stylesheet" href="style.css?v=37">
 </head>
 <body>
-    <div class="container">
-        <div class="header-simple" style="justify-content:center; border:none; margin-top:20px;">
-            <h1 style="font-size:36px; font-weight:800;">메인화면</h1>
+    <div class="container container-narrow">
+        <div class="page-header">
+            <h2 class="page-title">메인 메뉴</h2>
+            <p class="page-subtitle">원하시는 작업을 선택해주세요</p>
         </div>
 
-        <div class="menu-wrap">
-            <button class="btn-main" onclick="location.href='estimate.html'">견적서</button>
-            <button class="btn-main" onclick="location.href='material.html'">자재산출</button>
-            <button class="btn-main">공사안내문</button>
+        <div class="nav-grid">
+            <div class="nav-card primary" onclick="location.href='estimate.html'">
+                <div class="nav-card-info">
+                    <h3>견적서 작성</h3>
+                    <p>고객 견적 및 계약 진행</p>
+                </div>
+                <div class="nav-card-icon">📄</div>
+            </div>
+
+            <div class="nav-card secondary" onclick="location.href='material.html'">
+                <div class="nav-card-info">
+                    <h3>자재 산출</h3>
+                    <p>공정별 필요 자재 계산</p>
+                </div>
+                <div class="nav-card-icon">🧮</div>
+            </div>
+
+            <div class="nav-card" style="opacity:0.6; cursor:not-allowed;">
+                <div class="nav-card-info">
+                    <h3>공사 안내문</h3>
+                    <p>준비 중인 기능입니다</p>
+                </div>
+                <div class="nav-card-icon" style="background:#eee; color:#999;">📢</div>
+            </div>
         </div>
     </div>
-    <script src="data.js?v=35"></script>
+    <script src="data.js?v=37"></script>
 </body>
 </html>
-
