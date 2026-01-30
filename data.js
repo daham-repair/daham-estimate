@@ -1,4 +1,4 @@
-/* [data.js Ver 1.33 - 데이터 중앙 관리] */
+/* [data.js Ver 1.34] */
 const SYSTEM_VERSION = "Ver 1.34";
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -20,7 +20,7 @@ const icons = {
     bath: `<svg viewBox="0 0 24 24"><circle cx="7" cy="7" r="2"/><circle cx="11" cy="7" r="2"/><circle cx="15" cy="7" r="2"/><path d="M20.6 12.5c-.3-.4-.8-.5-1.1-.1L18 13.9V5c0-1.6-1.4-3-3-3s-3 1.4-3 3v4.2l-5.6-5.6c-.4-.4-1-.4-1.4 0L2 6.6c-.4.4-.4 1 0 1.4l5.6 5.6H4c-1.1 0-2 .9-2 2v4h18v-4c0-1.1-.9-2-2-2h-3.4l1.9-2.2c.4-.3.5-.8.1-1.1z"/></svg>`,
     paper: `<svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 14h-8v-2h8v2zm0-4h-8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>`,
     floor: `<svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>`,
-    kitchen: `<svg viewBox="0 0 24 24"><path d="M20 4H4v16h16V4zM9 16H6v-3h3v3zm0-5H6V8h3v3zm5 5h-3v-3h3v3zm0-5h-3V8h3v3z"/></svg>`,
+    kitchen: `<svg viewBox="0 0 24 24"><path d="M20 4H4v16h16V4zM9 16H6v-3h3v3zm0-5H6V8h3v3zm5 5h-3v-3h3v3zm0-5h-3V8h3v3zm5 5h-3v-3h3v3zm0-5h-3V8h3v3z"/></svg>`,
     etc: `<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>`,
     custom: `<svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>`
 };
@@ -40,4 +40,3 @@ const data = [
     { key: 'etc', category: '기타', items: [{n:'입주 청소 (평)', p:15000}, {n:'엘리베이터 보양', p:150000}, {n:'폐기물 처리 (1톤)', p:400000}, {n:'운반비', p:200000}, {n:'공과잡비', p:0}] },
     { key: 'custom', category: '직접 입력', items: [] }
 ];
-
