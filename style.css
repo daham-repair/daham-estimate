@@ -1,4 +1,4 @@
-/* [다함 디자인 시스템 Ver 1.54 - 줄내림 방지 및 모바일 최적화] */
+/* [다함 디자인 시스템 Ver 1.55 - 모바일 최적화 및 레이아웃 완전 고정] */
 :root {
     --primary-navy: #0A2342;
     --accent-gold: #C5A47E;
@@ -12,10 +12,10 @@
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body { font-family: 'Pretendard', sans-serif; margin: 0; padding: 0; background-color: var(--bg-light); color: var(--text-dark); line-height: 1.5; }
 
-/* 버전 표시 (본문 고정) */
+/* 버전 표시 */
 .global-version-badge { position: absolute; top: 15px; right: 15px; background: rgba(10, 35, 66, 0.8); color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; z-index: 100; }
 
-/* [로그인 페이지 전용] */
+/* [로그인 페이지 전용 스타일] */
 .login-body { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
 .login-box { background: #fff; padding: 50px 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center; border: 1px solid #eee; width: 100%; max-width: 400px; position: relative; }
 .login-logo { width: 100%; max-width: 180px !important; height: auto !important; margin-bottom: 40px; display: block; margin-left: auto; margin-right: auto; }
@@ -23,67 +23,73 @@ body { font-family: 'Pretendard', sans-serif; margin: 0; padding: 0; background-
 .btn-login { width: 100%; padding: 16px; background: var(--accent-orange); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: 800; cursor: pointer; }
 
 /* [견적서/계약서 공용 레이아웃] */
-.estimate-body .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 20px; min-height: 100vh; position: relative; padding-bottom: 140px; }
-.header-simple { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #333; }
-.header-doc-title { font-size: 20px; font-weight: 800; margin: 0; }
-.back-nav { background: none; border: none; font-size: 24px; cursor: pointer; }
+.estimate-body .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 15px; min-height: 100vh; position: relative; padding-bottom: 140px; }
+.header-simple { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #333; }
+.header-doc-title { font-size: 18px; font-weight: 800; margin: 0; }
+.back-nav { background: none; border: none; font-size: 20px; cursor: pointer; padding: 0; }
 
-/* 대표 정보 포함 헤더 */
-.header-card { background: #fff; border: 1px solid #ddd; border-top: 5px solid var(--primary-navy); padding: 20px; margin-bottom: 20px; border-radius: 10px; }
-.header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-img.img-logo { height: 45px !important; width: auto !important; display: block; }
-.rep-info { text-align: right; line-height: 1.4; }
-.rep-info strong { font-size: 15px; color: var(--text-dark); }
-.rep-info .tel { color: var(--danger-red); font-weight: 800; font-size: 16px; display: block; }
+/* 헤더 정보 (로고 + 대표정보) */
+.header-card { background: #fff; border: 1px solid #ddd; border-top: 5px solid var(--primary-navy); padding: 15px; margin-bottom: 15px; border-radius: 10px; }
+.header-top { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; }
+img.img-logo { height: 40px !important; width: auto !important; display: block; }
+.rep-info { text-align: right; line-height: 1.2; }
+.rep-info strong { font-size: 14px; color: var(--text-dark); }
+.rep-info .tel { color: var(--danger-red); font-weight: 800; font-size: 15px; display: block; margin-top: 2px; }
 
-/* [Ver 1.54] 표 레이아웃 - 줄내림 방지 핵심 */
-.estimate-section { background: white; border: 1px solid #ddd; border-radius: 10px; overflow-x: auto; margin-bottom: 20px; -webkit-overflow-scrolling: touch; }
-.grid-header-fixed { background: var(--primary-navy); color: white; padding: 10px 15px; font-weight: 600; font-size: 13px; display: grid; min-width: 480px; }
-.grid-row { display: grid; align-items: center; padding: 10px 15px; border-bottom: 1px solid #f0f0f0; background: white; min-width: 480px; }
+/* 발주처 정보 (모바일 한 줄 유지 핵심) */
+.info-grid { display: grid; grid-template-columns: 1fr 1fr !important; gap: 8px; }
+.full-row { grid-column: span 2; }
+.input-label { font-size: 12px; font-weight: 700; color: var(--primary-navy); display: block; margin-bottom: 3px; }
+.info-input { width: 100%; padding: 10px; border: 1px solid #ddd; background: #f9f9f9; border-radius: 6px; outline: none; font-size: 14px; }
 
-/* 그리드 비율 (PC/모바일 동일하게 유지) */
-.quote-grid { grid-template-columns: 4fr 1fr 2fr 2fr !important; gap: 10px; }
-.contract-grid { grid-template-columns: 2fr 3.5fr 1fr 2fr !important; gap: 10px; }
+/* [Ver 1.55] 표 레이아웃 - 스크롤 없이 한 줄 고정 */
+.estimate-section { background: white; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+.grid-header-fixed { background: var(--primary-navy); color: white; padding: 10px; font-weight: 600; font-size: 12px; display: grid; }
+.grid-row { display: grid; align-items: center; padding: 10px; border-bottom: 1px solid #f0f0f0; background: white; }
 
-/* 모든 셀 텍스트 줄내림 방지 */
-.grid-header-fixed div, .grid-row div { white-space: nowrap !important; }
+/* 그리드 비율 최적화 (항목명은 유연하게, 숫자는 최소폭 고정) */
+.quote-grid { grid-template-columns: 1fr 35px 65px 75px !important; gap: 5px; }
+.contract-grid { grid-template-columns: 1fr 1fr 35px 75px !important; gap: 5px; }
 
-/* 체크박스 & 입력필드 */
+/* 텍스트 줄내림 방지 및 항목명 말줄임 */
+.grid-header-fixed div, .grid-row div { white-space: nowrap !important; overflow: hidden; text-overflow: ellipsis; }
+
+/* 체크박스 다함 전용 디자인 */
 .item-label { display: flex; align-items: center; cursor: pointer; width: 100%; overflow: hidden; }
 .item-label input { display: none !important; }
-.checkmark { width: 18px; height: 18px; border: 2px solid #ddd; border-radius: 4px; margin-right: 8px; position: relative; flex-shrink: 0; background: #fff; }
+.checkmark { width: 16px; height: 16px; border: 2px solid #ddd; border-radius: 3px; margin-right: 6px; position: relative; flex-shrink: 0; background: #fff; }
 .item-label input:checked + .checkmark { background: var(--accent-gold); border-color: var(--accent-gold); }
-.checkmark:after { content: ""; position: absolute; display: none; left: 5px; top: 1px; width: 4px; height: 8px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.checkmark:after { content: ""; position: absolute; display: none; left: 4px; top: 0px; width: 4px; height: 8px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); }
 .item-label input:checked + .checkmark:after { display: block; }
-.input-num { width: 100%; padding: 6px; text-align: center; background: #f8f9fa; border: none; border-radius: 4px; font-weight: 700; font-size: 13px; }
+.item-name-text { font-size: 13px; font-weight: 500; }
 
-/* 아코디언 */
-.section-bar { padding: 12px 15px; background: #fff; border: 1px solid #eee; margin-top: -1px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 800; color: var(--primary-navy); white-space: nowrap; }
-.section-icon svg { width: 18px; height: 18px; fill: var(--accent-gold); margin-right: 6px; vertical-align: middle; flex-shrink: 0; }
+.input-num { width: 100%; padding: 4px; text-align: center; background: #f8f9fa; border: none; border-radius: 4px; font-weight: 700; font-size: 12px; }
+
+/* 섹션 아코디언 */
+.section-bar { padding: 12px 10px; background: #fff; border: 1px solid #eee; margin-top: -1px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 800; color: var(--primary-navy); font-size: 14px; }
+.section-icon svg { width: 16px; height: 16px; fill: var(--accent-gold); margin-right: 5px; vertical-align: middle; flex-shrink: 0; }
 .section-content { display: none; }
 .section-content.show { display: block; }
 
-/* 하단 플로팅 바 (버튼 그룹화) */
+/* 하단 플로팅 바 (버튼 그룹 분리 완벽화) */
 .floating-action-bar { 
     position: fixed !important; bottom: 0 !important; left: 50% !important; transform: translateX(-50%) !important;
     width: 100% !important; max-width: 900px !important;
-    background: rgba(255,255,255,0.98); padding: 12px 15px !important; 
-    border-top: 1px solid #ddd; box-shadow: 0 -4px 12px rgba(0,0,0,0.08); z-index: 1000; box-sizing: border-box;
+    background: rgba(255,255,255,0.98); padding: 12px 10px !important; 
+    border-top: 1px solid #ddd; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); z-index: 1000; box-sizing: border-box;
 }
 .btn-group { display: flex !important; flex-direction: row !important; gap: 6px; width: 100%; }
-.fab-btn { flex: 1; height: 50px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; color: white; font-size: 12px; display: flex; align-items: center; justify-content: center; white-space: nowrap; }
+.fab-btn { flex: 1; height: 48px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; color: white; font-size: 12px; display: flex; align-items: center; justify-content: center; white-space: nowrap; }
 
-.btn-reset { background: #eee; color: #333; }
+.btn-reset { background: #f0f0f0; color: #333; }
 .btn-save { background: var(--accent-gold); }
 .btn-print { background: var(--primary-navy); }
 .btn-contract { background: var(--danger-red); }
 
-/* 총계 및 유틸리티 */
-.total-card { background: #fff; border: 2px solid var(--primary-navy); padding: 20px; text-align: center; border-radius: 10px; margin-top: 15px; }
-.total-amount { font-size: 32px; font-weight: 900; color: var(--danger-red); letter-spacing: -1px; }
-.vat-notice { font-size: 12px; color: #888; margin-top: 5px; }
-.col-center { text-align: center; }
-.col-right { text-align: right; }
+/* 총계 */
+.total-card { background: #fff; border: 2px solid var(--primary-navy); padding: 15px; text-align: center; border-radius: 10px; margin-top: 15px; }
+.total-amount { font-size: 30px; font-weight: 900; color: var(--danger-red); letter-spacing: -1px; }
+.vat-notice { font-size: 11px; color: #888; margin-top: 5px; }
 
 @media print {
     .no-print, .floating-action-bar, .global-version-badge { display: none !important; }
@@ -91,3 +97,6 @@ img.img-logo { height: 45px !important; width: auto !important; display: block; 
     .estimate-section { overflow: visible; border: 1px solid #000; }
     .grid-row, .grid-header-fixed { min-width: 0; }
 }
+
+.col-center { text-align: center; }
+.col-right { text-align: right; }
