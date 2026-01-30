@@ -1,4 +1,4 @@
-/* [estimate.js Ver 1.38 - 미입력 항목 포커스 및 계약서 진입 픽스] */
+/* [estimate.js Ver 1.39 - 계약서 레이아웃 픽스] */
 
 document.addEventListener('DOMContentLoaded', function() {
     const body = document.getElementById('estimate-body');
@@ -15,9 +15,14 @@ document.addEventListener('DOMContentLoaded', function() {
             };
             cont.appendChild(h);
             const c = document.createElement('div'); c.className = 'section-content'; c.id = 'c-'+idx;
-            let html = `<div class="grid-row no-print" style="background:#f8f9fa;"><label class="item-label"><input type="checkbox" onchange="toggleSec(${idx}, this)"><span class="checkmark"></span> <b>전체 선택</b></label></div>`;
+            let html = `<div class="grid-row quote-grid no-print" style="background:#f8f9fa;"><label class="item-label"><input type="checkbox" onchange="toggleSec(${idx}, this)"><span class="checkmark"></span> <b>전체 선택</b></label></div>`;
             sec.items.forEach(item => {
-                html += `<div class="grid-row item-line"><div class="col-name"><label class="item-label"><input type="checkbox" class="chk" data-name="${item.n}" onchange="update()"><span class="checkmark"></span><span class="item-name-text">${item.n}</span></label></div><div class="col-qty"><input type="number" class="input-num qty" value="1" oninput="update()"></div><div class="col-price"><input type="number" class="input-num price" value="${item.p/10000}" oninput="update()"></div><div class="col-sum row-sum">0</div></div>`;
+                html += `<div class="grid-row item-line quote-grid">
+                    <div class="col-name"><label class="item-label"><input type="checkbox" class="chk" data-name="${item.n}" onchange="update()"><span class="checkmark"></span><span class="item-name-text">${item.n}</span></label></div>
+                    <div class="col-qty"><input type="number" class="input-num qty" value="1" oninput="update()"></div>
+                    <div class="col-price"><input type="number" class="input-num price" value="${item.p/10000}" oninput="update()"></div>
+                    <div class="col-sum row-sum">0</div>
+                </div>`;
             });
             c.innerHTML = `<div id="fixed-${idx}">${html}</div><div id="dynamic-${idx}"></div><div class="no-print" style="text-align:center;"><button class="btn-add-row" onclick="addCustomRow(${idx})">+ 항목 추가</button></div>`;
             cont.appendChild(c); body.appendChild(cont);
@@ -27,12 +32,10 @@ document.addEventListener('DOMContentLoaded', function() {
     initTelFormat();
 });
 
-/* [Ver 1.38 추가] 미입력 체크 및 포커스 이동 로직 */
 function validateInputs() {
     const nameEl = document.getElementById('g-name');
     const telEl = document.getElementById('g-tel');
     const addrEl = document.getElementById('g-addr');
-
     if(!nameEl.value.trim()){ alert("고객명을 입력해주세요."); nameEl.focus(); return false; }
     if(!telEl.value.trim()){ alert("연락처를 입력해주세요."); telEl.focus(); return false; }
     if(!addrEl.value.trim()){ alert("현장 주소를 입력해주세요."); addrEl.focus(); return false; }
@@ -53,7 +56,7 @@ function initTelFormat() {
 }
 
 function addCustomRow(idx) {
-    const div = document.createElement('div'); div.className = `grid-row item-line custom-row-${idx}`;
+    const div = document.createElement('div'); div.className = `grid-row item-line custom-row-${idx} quote-grid`;
     div.innerHTML = `<div class="col-name" style="display:flex; align-items:center;"><label class="item-label" style="width:auto;"><input type="checkbox" class="chk" data-name="직접 입력" checked onchange="update()"><span class="checkmark"></span></label><input type="text" class="custom-input" placeholder="항목 입력" oninput="this.previousElementSibling.querySelector('.chk').dataset.name=this.value"></div><div class="col-qty"><input type="number" class="input-num qty" value="1" oninput="update()"></div><div class="col-price"><input type="number" class="input-num price" value="0" oninput="update()"></div><div class="col-sum row-sum" style="display:flex; justify-content:flex-end; align-items:center;"><span>0</span> <button class="btn-del-row" onclick="this.closest('.grid-row').remove(); update();">×</button></div>`;
     document.getElementById(`dynamic-${idx}`).appendChild(div);
     update();
@@ -85,7 +88,7 @@ function toggleSec(idx, master) {
 }
 
 function smartPrint() {
-    if(!validateInputs()) return; // [Ver 1.38] 미입력 체크
+    if(!validateInputs()) return;
     update();
     document.querySelectorAll('.item-line').forEach(row => {
         if(!row.querySelector('.chk').checked) row.classList.add('hidden-print');
@@ -104,9 +107,9 @@ function smartPrint() {
     }, 1000);
 }
 
-/* [Ver 1.38 수정] 계약서 진입 작동 오류 해결 */
+/* [Ver 1.39 핵심] 계약서 화면 전환 로직 - 그리드 정렬 수정 */
 function switchToDetailed() {
-    if(!validateInputs()) return; // [Ver 1.38] 미입력 체크 및 포커스
+    if(!validateInputs()) return;
     update();
     
     document.getElementById('d-name-display').innerText = document.getElementById('g-name').value;
@@ -121,29 +124,35 @@ function switchToDetailed() {
         const checked = document.querySelectorAll(`#c-${idx} .item-line .chk:checked`);
         if(checked.length > 0) {
             const sh = document.createElement('div');
-            sh.className = 'grid-row'; sh.style.backgroundColor = '#f1f3f5'; sh.style.fontWeight = 'bold'; sh.innerText = sec.category;
+            sh.className = 'grid-row'; sh.style.backgroundColor = '#f1f3f5'; sh.style.fontWeight = 'bold'; sh.style.gridTemplateColumns = '1fr'; 
+            sh.innerText = sec.category;
             dBody.appendChild(sh);
+            
             checked.forEach(chk => {
                 const row = chk.closest('.item-line');
                 const name = chk.dataset.name;
                 const qty = row.querySelector('.qty').value;
                 const price = row.querySelector('.price').value;
                 const sum = qty * price * 10000; dTotal += sum;
+                
                 const div = document.createElement('div');
-                div.className = 'grid-row'; div.style.gridTemplateColumns = '2fr 3fr 1fr 2fr';
-                div.innerHTML = `<div style="text-align:left;">${name}</div><div><textarea class="spec-field" rows="1" placeholder="사양 입력"></textarea></div><div style="text-align:center;">${qty}</div><div style="text-align:right;">${sum.toLocaleString()}</div>`;
+                div.className = 'grid-row contract-grid'; // [Ver 1.39] 전용 그리드 적용
+                div.innerHTML = `
+                    <div style="text-align:left;">${name}</div>
+                    <div><textarea class="spec-field" rows="1" placeholder="사양 입력"></textarea></div>
+                    <div class="col-center">${qty}</div>
+                    <div class="col-right">${sum.toLocaleString()}</div>
+                `;
                 dBody.appendChild(div);
             });
         }
     });
     
     document.getElementById('d-total').innerText = dTotal.toLocaleString() + " 원";
-    
-    // 화면 전환 명령
     document.getElementById('view-general').style.display = 'none';
     document.getElementById('view-detailed').style.display = 'block';
     
-    // 버튼 제어 로직 (style.css v47과 연동)
+    // 버튼 제어
     document.getElementById('btn-reset').style.display = 'none';
     document.getElementById('btn-save').style.display = 'none';
     document.getElementById('btn-print-est').style.display = 'none';
