@@ -1,4 +1,4 @@
-/* [estimate.js Ver 1.50] */
+/* [estimate.js Ver 1.51 - 초기 닫힘 고정] */
 document.addEventListener('DOMContentLoaded', function() {
     const body = document.getElementById('estimate-body');
     if(body && typeof data !== 'undefined') {
@@ -7,15 +7,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const h = document.createElement('div');
             h.className = 'section-bar';
             h.innerHTML = `<span>${sec.category}</span> <span>▼</span>`;
-            
-            // 클릭 시 열고 닫기
-            h.onclick = () => {
-                const target = document.getElementById('c-' + idx);
-                target.classList.toggle('show');
-            };
+            h.onclick = () => document.getElementById('c-' + idx).classList.toggle('show');
             cont.appendChild(h);
 
-            // [핵심] 초기 상태: show 클래스 없음 (닫혀있음)
+            // [요청사항 2] 초기 상태는 show 클래스 없이 생성 (닫힌 상태)
             const c = document.createElement('div');
             c.className = 'section-content'; 
             c.id = 'c-'+idx;
@@ -31,9 +26,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             <span>${item.n}</span>
                         </label>
                     </div>
-                    <div class="col-center"><input type="number" class="input-num" value="1"></div>
-                    <div class="col-center"><input type="number" class="input-num" value="${item.p/10000}"></div>
-                    <div class="col-right">0</div>
+                    <div class="col-center"><input type="number" class="input-num" value="1" oninput="updateSum()"></div>
+                    <div class="col-center"><input type="number" class="input-num" value="${item.p/10000}" oninput="updateSum()"></div>
+                    <div class="col-right row-sum">0</div>
                 </div>`;
             });
             c.innerHTML = html;
@@ -43,4 +38,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-function updateSum() { /* 합계 계산 로직 */ }
+function updateSum() { /* 계산 로직 생략 */ }
+function switchToDetailed() { /* 화면 전환 로직 */ }
