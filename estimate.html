@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>견적서 | 다함</title>
-    <link rel="stylesheet" href="style.css?v=48">
+    <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <div class="container estimate-container">
-        <div class="no-print" style="margin-bottom:20px;">
-            <button class="back-nav" style="position:static;" onclick="location.href='main.html'">← 메인으로</button>
+        <div class="header-simple no-print">
+            <button class="back-nav" onclick="location.href='main.html'">←</button>
+            <h2 id="page-title" class="header-doc-title">견적서 작성</h2>
         </div>
 
         <div id="view-general">
@@ -73,7 +74,7 @@
         <button id="btn-print-cont" class="fab-btn btn-print" onclick="printContract()" style="display:none; background:var(--primary-navy);">계약서 출력</button>
     </div>
     <div id="toast-msg" class="toast">저장되었습니다!</div>
-    <script src="data.js?v=48"></script>
-    <script src="estimate.js?v=48"></script>
+    <script src="data.js"></script>
+    <script src="estimate.js"></script>
 </body>
 </html>
