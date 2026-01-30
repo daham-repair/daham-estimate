@@ -5,22 +5,14 @@
     <title>로그인 | 다함</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="login-page-body">
-    <div class="login-page-container">
+<body class="login-body">
+    <div class="login-container">
         <div class="login-box">
-            <img src="logo.png" alt="다함" class="login-logo-img" onerror="this.style.display='none'">
-            <div class="input-group">
-                <input type="text" id="id" class="login-input" placeholder="아이디">
-                <input type="password" id="pw" class="login-input" placeholder="비밀번호">
-            </div>
-            <button class="btn-login-action" onclick="login()">로그인</button>
+            <img src="logo.png" alt="다함" class="login-logo" onerror="this.style.display='none'">
+            <input type="text" id="id" class="login-input" placeholder="아이디">
+            <input type="password" id="pw" class="login-input" placeholder="비밀번호">
+            <button class="btn-login" onclick="location.href='main.html'">로그인</button>
         </div>
     </div>
-    <script>
-        function login() {
-            if(document.getElementById('id').value && document.getElementById('pw').value) location.href = 'main.html';
-            else alert("아이디와 비밀번호를 입력해주세요.");
-        }
-    </script>
 </body>
 </html>
