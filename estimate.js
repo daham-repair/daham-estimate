@@ -1,11 +1,11 @@
-/* [estimate.js Ver 1.61 - 발행 필터링 및 텍스트 변환 로직] */
+/* [estimate.js Ver 1.62 - 전체선택 및 페인트 옵션 복구 완료] */
 
 document.addEventListener('DOMContentLoaded', function() {
     const body = document.getElementById('estimate-body');
     if(body && typeof data !== 'undefined') {
         data.forEach((sec, idx) => {
             const cont = document.createElement('div');
-            cont.id = 'cont-' + idx; // 섹션 ID 부여
+            cont.id = 'cont-' + idx;
             const h = document.createElement('div');
             h.className = 'section-bar';
             h.innerHTML = `<div><span class="section-icon">${icons[sec.key] || ''}</span>${sec.category}</div> <span>▼</span>`;
@@ -16,7 +16,31 @@ document.addEventListener('DOMContentLoaded', function() {
             c.className = 'section-content'; 
             c.id = 'c-'+idx;
             
-            let html = '';
+            // [복구 1] 전체 선택 행 추가
+            let html = `
+            <div class="grid-row quote-grid no-print" style="background:#f8f9fa;">
+                <label class="item-label">
+                    <input type="checkbox" onchange="toggleSec(${idx}, this)">
+                    <span class="checkmark"></span> <b>전체 선택</b>
+                </label>
+            </div>`;
+
+            // [복구 2] 페인트 전용 셀렉트 박스
+            if(sec.isPaint) {
+                html += `
+                <div class="grid-row quote-grid no-print" style="background:#fffbe6; border-bottom:2px solid #ffe58f;">
+                    <div style="font-weight:bold; color:var(--primary-navy);">페인트 종류</div>
+                    <div colspan="3" style="grid-column: span 3;">
+                        <select class="info-select paint-opt" onchange="updateSum()">
+                            <option value="water">수성 (기본)</option>
+                            <option value="oil">유성 (에나멜)</option>
+                            <option value="lacquer">락카</option>
+                            <option value="special">특수 페인트</option>
+                        </select>
+                    </div>
+                </div>`;
+            }
+
             sec.items.forEach(item => {
                 html += `
                 <div class="grid-row quote-grid item-line">
@@ -47,20 +71,24 @@ document.addEventListener('DOMContentLoaded', function() {
     initTelFormat();
 });
 
-// [Ver 1.61 핵심] 견적 발행용 스마트 인쇄 함수
+// [Ver 1.62] 전체 선택 토글 함수
+function toggleSec(idx, master) {
+    const section = document.getElementById('c-' + idx);
+    const checks = section.querySelectorAll('.chk');
+    checks.forEach(c => c.checked = master.checked);
+    updateSum();
+}
+
 function smartPrint() {
     const name = document.getElementById('g-name').value;
     const tel = document.getElementById('g-tel').value;
     const addr = document.getElementById('g-addr').value;
-
     if(!name.trim()){ alert("고객명을 입력해주세요."); return; }
 
-    // 1. 입력값을 정적 텍스트로 동기화
     document.getElementById('t-name').innerText = name;
     document.getElementById('t-tel').innerText = tel;
     document.getElementById('t-addr').innerText = addr;
 
-    // 2. 미체크 항목 및 빈 섹션 필터링
     document.querySelectorAll('.item-line').forEach(row => {
         const isChecked = row.querySelector('.chk').checked;
         if(!isChecked) row.classList.add('hidden-print');
@@ -74,7 +102,6 @@ function smartPrint() {
         else cont.classList.remove('hidden-print');
     });
 
-    // 3. 출력 후 복구
     window.print();
     setTimeout(() => {
         document.querySelectorAll('.hidden-print').forEach(el => el.classList.remove('hidden-print'));
