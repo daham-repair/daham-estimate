@@ -1,36 +1,29 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>로그인 | 다함</title>
-    <link rel="stylesheet" href="style.css?v=34">
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인</title>
+    <link rel="stylesheet" href="style.css?v=35">
 </head>
 <body>
-<div class="login-view">
-    <div class="login-card">
-        <img src="logo.png" alt="다함 인테리어" class="login-logo" onerror="this.style.display='none'">
-        <h1 class="login-title">DAHAM Partner</h1>
-        <p class="login-subtitle">통합 시공 관리 시스템</p>
-        
-        <div class="form-group">
-            <input type="text" id="id" class="form-input" placeholder="아이디를 입력하세요">
+    <div class="container">
+        <div class="login-wrap">
+            <div class="logo-box">
+                <img src="logo.png" alt="다함" class="logo-img" onerror="this.style.display='none'">
+                <div>다함<br>로고</div>
+            </div>
+            
+            <input type="text" id="id" class="login-input" placeholder="ID">
+            <input type="password" id="pw" class="login-input" placeholder="PW">
+            <button class="btn-login" onclick="login()">로그인</button>
         </div>
-        <div class="form-group">
-            <input type="password" id="pw" class="form-input" placeholder="비밀번호를 입력하세요">
-        </div>
-        <button onclick="login()" class="btn-primary">로그인</button>
     </div>
-</div>
-<script src="data.js?v=34"></script>
-<script>
-    function login() {
-        // 임시 로직: 입력값 있으면 통과
-        if(document.getElementById('id').value && document.getElementById('pw').value) {
-            location.href = 'main.html';
-        } else {
-            alert("아이디와 비밀번호를 입력해주세요.");
+    <script src="data.js?v=35"></script>
+    <script>
+        function login() {
+            if(document.getElementById('id').value && document.getElementById('pw').value) location.href = 'main.html';
+            else alert('ID와 PW를 입력하세요.');
         }
-    }
-</script>
+    </script>
 </body>
 </html>
