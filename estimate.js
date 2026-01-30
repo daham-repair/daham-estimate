@@ -1,4 +1,4 @@
-/* [estimate.js Ver 1.64 - 유효성 검사 및 정렬 로직 통합] */
+/* [estimate.js Ver 1.67 - 직접입력 정돈 및 인쇄 최적화] */
 
 document.addEventListener('DOMContentLoaded', function() {
     const body = document.getElementById('estimate-body');
@@ -16,13 +16,17 @@ document.addEventListener('DOMContentLoaded', function() {
             c.className = 'section-content'; 
             c.id = 'c-'+idx;
             
-            let html = `
-            <div class="grid-row quote-grid no-print" style="background:#f8f9fa;">
-                <label class="item-label">
-                    <input type="checkbox" onchange="toggleSec(${idx}, this)">
-                    <span class="checkmark"></span> <b>전체 선택</b>
-                </label>
-            </div>`;
+            // [Ver 1.67 수정] 직접입력 메뉴인 경우 '전체 선택' 줄을 표시하지 않음
+            let html = '';
+            if (sec.key !== 'custom') {
+                html += `
+                <div class="grid-row quote-grid no-print" style="background:#f8f9fa;">
+                    <label class="item-label">
+                        <input type="checkbox" onchange="toggleSec(${idx}, this)">
+                        <span class="checkmark"></span> <b>전체 선택</b>
+                    </label>
+                </div>`;
+            }
 
             if(sec.isPaint) {
                 html += `
@@ -68,27 +72,13 @@ document.addEventListener('DOMContentLoaded', function() {
     initTelFormat();
 });
 
-// [Ver 1.64] 필수 입력값 검증 및 커서 이동 함수
 function validateInputs() {
     const nameEl = document.getElementById('g-name');
     const telEl = document.getElementById('g-tel');
     const addrEl = document.getElementById('g-addr');
-
-    if (!nameEl.value.trim()) {
-        alert("고객명을 입력해주세요.");
-        nameEl.focus();
-        return false;
-    }
-    if (!telEl.value.trim()) {
-        alert("연락처를 입력해주세요.");
-        telEl.focus();
-        return false;
-    }
-    if (!addrEl.value.trim()) {
-        alert("현장 주소를 입력해주세요.");
-        addrEl.focus();
-        return false;
-    }
+    if (!nameEl.value.trim()) { alert("고객명을 입력해주세요."); nameEl.focus(); return false; }
+    if (!telEl.value.trim()) { alert("연락처를 입력해주세요."); telEl.focus(); return false; }
+    if (!addrEl.value.trim()) { alert("현장 주소를 입력해주세요."); addrEl.focus(); return false; }
     return true;
 }
 
@@ -112,12 +102,14 @@ function toggleSec(idx, master) {
 }
 
 function smartPrint() {
-    if(!validateInputs()) return; // [Ver 1.64 적용]
+    if(!validateInputs()) return;
     
+    // 텍스트 동기화
     document.getElementById('t-name').innerText = document.getElementById('g-name').value;
     document.getElementById('t-tel').innerText = document.getElementById('g-tel').value;
     document.getElementById('t-addr').innerText = document.getElementById('g-addr').value;
 
+    // 미선택 항목 숨기기
     document.querySelectorAll('.item-line').forEach(row => {
         if(!row.querySelector('.chk').checked) row.classList.add('hidden-print');
         else row.classList.remove('hidden-print');
@@ -181,7 +173,7 @@ function updateSum() {
 }
 
 function switchToDetailed() {
-    if(!validateInputs()) return; // [Ver 1.64 적용]
+    if(!validateInputs()) return;
     const total = updateSum();
     document.getElementById('page-title').innerText = "계약서 작성";
     document.getElementById('d-name-display').innerText = document.getElementById('g-name').value;
@@ -200,7 +192,7 @@ function switchToDetailed() {
             rows.forEach(row => {
                 const chk = row.querySelector('.chk');
                 if(chk && chk.checked) {
-                    const nameText = chk.dataset.name || row.querySelector('textarea')?.value || "직접 입력";
+                    const nameText = chk.dataset.name || row.querySelector('textarea')?.value || row.querySelector('input[type="text"]')?.value || "직접 입력";
                     const q = row.querySelector('.qty').value;
                     const sum = q * row.querySelector('.price').value * 10000;
                     const div = document.createElement('div');
@@ -228,4 +220,9 @@ function backToGeneral() {
 }
 
 function resetForm() { if(confirm('초기화하시겠습니까?')) location.reload(); }
-function saveToLocal() { alert('저장되었습니다.'); }
+
+function saveToLocal() {
+    const toast = document.getElementById('toast-msg');
+    toast.classList.add('show');
+    setTimeout(() => { toast.classList.remove('show'); }, 2500);
+}
