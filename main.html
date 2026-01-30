@@ -1,17 +1,43 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8"><title>메인메뉴 | 다함</title>
-    <link rel="stylesheet" href="style.css?v=33">
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>메인 | 다함</title>
+    <link rel="stylesheet" href="style.css?v=34">
 </head>
 <body>
 <div class="container">
-    <div style="display:flex; flex-direction:column; gap:15px; padding-top:100px; align-items:center;">
-        <button onclick="location.href='estimate.html'" class="btn-orange" style="width:100%; max-width:400px; padding:30px; font-size:22px;">견적서</button>
-        <button onclick="location.href='material.html'" class="btn-orange" style="width:100%; max-width:400px; padding:30px; font-size:22px;">자재산출</button>
-        <button class="btn-orange" style="width:100%; max-width:400px; padding:30px; font-size:22px; background:#adb5bd;">공사안내문</button>
+    <div style="padding-top: 40px; margin-bottom: 30px;">
+        <h2 style="font-size: 24px; font-weight: 800; color: #0A2342; margin-bottom: 5px;">안녕하세요, 김재영님</h2>
+        <p style="color: #666; margin: 0;">오늘도 안전한 시공 되세요!</p>
+    </div>
+
+    <div class="menu-grid">
+        <div class="menu-card" onclick="location.href='estimate.html'">
+            <div class="menu-content">
+                <h3>견적서 작성</h3>
+                <p>고객 견적 및 계약서 발행</p>
+            </div>
+            <div class="menu-icon">📄</div>
+        </div>
+
+        <div class="menu-card" onclick="location.href='material.html'">
+            <div class="menu-content">
+                <h3>자재 산출</h3>
+                <p>공정별 필요 자재 계산</p>
+            </div>
+            <div class="menu-icon">🧮</div>
+        </div>
+
+        <div class="menu-card disabled">
+            <div class="menu-content">
+                <h3>공사 안내문</h3>
+                <p>준비 중인 기능입니다</p>
+            </div>
+            <div class="menu-icon">📢</div>
+        </div>
     </div>
 </div>
-<script src="data.js?v=33"></script>
+<script src="data.js?v=34"></script>
 </body>
 </html>
