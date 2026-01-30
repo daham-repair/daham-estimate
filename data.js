@@ -1,9 +1,6 @@
-/* [data.js Ver 1.23 - 전 페이지 버전 통합 관리] */
+/* [data.js Ver 1.24 - 중앙 데이터 관리] */
+const SYSTEM_VERSION = "Ver 1.24";
 
-// 1. 여기서 버전을 고치면 모든 페이지가 한 번에 바뀝니다.
-const SYSTEM_VERSION = "Ver 1.23";
-
-// 2. 모든 페이지 상단에 버전 배지를 자동으로 삽입하는 코드
 document.addEventListener('DOMContentLoaded', function() {
     const badge = document.createElement('div');
     badge.className = 'global-version-badge no-print';
