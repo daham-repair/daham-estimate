@@ -1,4 +1,4 @@
-/* [estimate.js Ver 1.52 - 초기 닫힘 및 계산 완벽 로직] */
+/* [estimate.js Ver 1.54 - 한 줄 고정 및 계산 로직] */
 
 document.addEventListener('DOMContentLoaded', function() {
     const body = document.getElementById('estimate-body');
@@ -9,11 +9,8 @@ document.addEventListener('DOMContentLoaded', function() {
             h.className = 'section-bar';
             h.innerHTML = `<span><span class="section-icon">${icons[sec.key] || ''}</span>${sec.category}</span> <span>▼</span>`;
             
-            // [픽스 2] 초기 진입 시 모두 닫힘 상태 유지
-            h.onclick = () => {
-                const target = document.getElementById('c-' + idx);
-                target.classList.toggle('show');
-            };
+            // 초기 닫힘 상태 유지
+            h.onclick = () => document.getElementById('c-' + idx).classList.toggle('show');
             cont.appendChild(h);
 
             const c = document.createElement('div');
@@ -44,16 +41,6 @@ document.addEventListener('DOMContentLoaded', function() {
     initTelFormat();
 });
 
-function validateInputs() {
-    const name = document.getElementById('g-name');
-    const tel = document.getElementById('g-tel');
-    const addr = document.getElementById('g-addr');
-    if(!name.value.trim()){ alert("고객명을 입력해주세요."); name.focus(); return false; }
-    if(!tel.value.trim()){ alert("연락처를 입력해주세요."); tel.focus(); return false; }
-    if(!addr.value.trim()){ alert("현장 주소를 입력해주세요."); addr.focus(); return false; }
-    return true;
-}
-
 function initTelFormat() {
     const telInput = document.getElementById('g-tel');
     if(telInput) {
@@ -71,22 +58,22 @@ function updateSum() {
     let total = 0;
     document.querySelectorAll('.grid-row').forEach(row => {
         const chk = row.querySelector('.chk');
-        const qEl = row.querySelector('.qty');
-        const pEl = row.querySelector('.price');
-        const sEl = row.querySelector('.row-sum');
         if (chk && chk.checked) {
-            const sum = (parseFloat(qEl.value)||0) * (parseFloat(pEl.value)||0) * 10000;
+            const q = row.querySelector('.qty').value || 0;
+            const p = row.querySelector('.price').value || 0;
+            const sum = q * p * 10000;
             total += sum;
-            if(sEl) sEl.innerText = sum.toLocaleString();
-        } else if(sEl) { sEl.innerText = "0"; }
+            if(row.querySelector('.row-sum')) row.querySelector('.row-sum').innerText = sum.toLocaleString();
+        } else if(row.querySelector('.row-sum')) {
+            row.querySelector('.row-sum').innerText = "0";
+        }
     });
-    const finalSum = document.getElementById('final-sum');
-    if(finalSum) finalSum.innerText = total.toLocaleString() + " 원";
+    const fs = document.getElementById('final-sum');
+    if(fs) fs.innerText = total.toLocaleString() + " 원";
     return total;
 }
 
 function switchToDetailed() {
-    if(!validateInputs()) return;
     const total = updateSum();
     document.getElementById('page-title').innerText = "계약서 작성";
     document.getElementById('d-name-display').innerText = document.getElementById('g-name').value;
@@ -132,6 +119,6 @@ function backToGeneral() {
     document.getElementById('btn-group-sub').style.display = 'none';
 }
 
-function saveToLocal() { const t = document.getElementById('toast-msg'); t.className = "toast show"; setTimeout(()=>t.className="toast", 2000); }
+function saveToLocal() { alert('임시 저장되었습니다.'); }
 function resetForm() { if(confirm('초기화하시겠습니까?')) location.reload(); }
-function smartPrint() { if(!validateInputs()) return; window.print(); }
+function smartPrint() { window.print(); }
