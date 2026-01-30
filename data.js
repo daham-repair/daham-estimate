@@ -1,10 +1,10 @@
-const SYSTEM_VERSION = "Ver 1.68";
+const SYSTEM_VERSION = "Ver 1.69";
 document.addEventListener('DOMContentLoaded', function() {
-    const badge = document.createElement('div');
-    badge.className = 'global-version-badge no-print';
-    badge.innerText = SYSTEM_VERSION;
-    const target = document.querySelector('.container') || document.body;
-    target.appendChild(badge);
+    const b = document.createElement('div');
+    b.className = 'global-version-badge no-print';
+    b.innerText = SYSTEM_VERSION;
+    const t = document.querySelector('.container') || document.body;
+    t.appendChild(b);
 });
 
 const icons = {
