@@ -1,4 +1,4 @@
-/* [통합 디자인 시스템 Ver 1.22 - 금색 테마 & 레이아웃 안정화] */
+/* [통합 디자인 시스템 Ver 1.23 - 전역 버전 배지 및 레이아웃 안정화] */
 :root {
     --primary-navy: #0A2342; --accent-gold: #C5A47E; --accent-orange: #FFB800;
     --text-dark: #111; --text-gray: #666; --bg-light: #F5F7FA; --card-bg: #FFF;
@@ -9,10 +9,18 @@
 body { font-family: 'Pretendard', sans-serif; background-color: var(--bg-light); color: var(--text-dark); margin: 0; padding: 0; line-height: 1.5; letter-spacing: -0.02em; }
 .container { max-width: 950px; margin: 0 auto; min-height: 100vh; padding: 20px; position: relative; }
 
+/* [추가] 모든 페이지 공통 버전 배지 스타일 */
+.global-version-badge {
+    position: fixed; top: 15px; right: 15px; background: var(--primary-navy);
+    color: white; padding: 4px 12px; border-radius: 20px;
+    font-size: 11px; font-weight: 800; z-index: 9999;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15); pointer-events: none; letter-spacing: 0.05em;
+}
+
 /* 공통 UI */
-.version-badge { background: #44619d; color: white; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; position: absolute; top: 20px; right: 20px; }
 .header-simple { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #ddd; }
 .back-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--primary-navy); }
+.btn-orange { background: var(--accent-orange); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 800; }
 
 /* 헤더 카드 */
 .header-card { background: var(--card-bg); border-radius: var(--radius-lg); box-shadow: var(--shadow-soft); padding: 25px; margin-bottom: 20px; border-top: 5px solid var(--primary-navy); }
@@ -47,11 +55,11 @@ body { font-family: 'Pretendard', sans-serif; background-color: var(--bg-light);
 .section-content { display: none; background: #FFF; }
 .section-content.show { display: block !important; }
 
-/* 추가 행 버튼 */
+/* 버튼 */
 .btn-add-row { width: calc(100% - 40px); padding: 10px; background: #FFF; border: 1px dashed #CCC; color: #777; font-weight: 600; border-radius: 8px; margin: 10px 20px; cursor: pointer; font-size: 13px; text-align: center; }
 .btn-del-row { background: #FFECEC; color: #E03E3E; border: none; width: 22px; height: 22px; border-radius: 4px; cursor: pointer; margin-left: 10px; }
 
-/* 하단 액션 바 */
+/* 하단 바 */
 .bottom-action-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); padding: 15px; display: flex; gap: 10px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); z-index: 1000; }
 .action-btn { flex: 1; height: 55px; border: none; border-radius: 12px; color: white; font-weight: bold; cursor: pointer; font-size: 14px; }
 .btn-reset { background: white; border: 1px solid #DDD; color: #666; flex: 0.6; }
@@ -59,20 +67,24 @@ body { font-family: 'Pretendard', sans-serif; background-color: var(--bg-light);
 .btn-print { background: var(--primary-navy); }
 .btn-next { background: var(--danger-red); }
 
-/* 총계 카드 */
+/* 총계 & 기타 */
 .total-card { background: white; border: 2px solid var(--primary-navy); padding: 30px; text-align: center; border-radius: var(--radius-lg); margin-top: 30px; }
 .total-val { font-size: 42px; font-weight: 900; color: var(--danger-red); }
+.display-text { border-bottom: 1px solid #ddd; padding: 5px 0; font-weight: 800; font-size: 16px; color: #000; min-height: 28px; }
+.contract-section-header { background: #f1f3f5; padding: 8px 15px; border-bottom: 1px solid #e9ecef; font-size: 14px; font-weight: 800; color: var(--primary-navy); }
+.spec-field { width: 100%; border: 1px solid #eee; border-radius: 4px; padding: 8px; font-size: 14px; background: #fdfdfd; outline: none; resize: none; }
+.toast { visibility: hidden; position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 15px 30px; border-radius: 50px; z-index: 2000; }
+.toast.show { visibility: visible; }
 
-/* 인쇄 모드 최적화 */
+/* 인쇄 및 모바일 */
 @media print {
-    .no-print, .bottom-action-bar, .header-simple, .btn-add-row, .btn-del-row { display: none !important; }
+    .no-print, .bottom-action-bar, .header-simple, .btn-add-row, .btn-del-row, .global-version-badge { display: none !important; }
     .container { padding: 0; max-width: 100%; }
     .header-card, .estimate-section, .total-card { box-shadow: none !important; border: 1px solid #ccc !important; border-radius: 0 !important; }
     .in-num { background: transparent !important; border: none !important; text-align: right; }
     .checkmark, .item-label input { display: none !important; }
     .hidden-print { display: none !important; }
 }
-
 @media (max-width: 480px) {
     .master-grid { grid-template-columns: 3.2fr 1.2fr 1.8fr 2fr !important; gap: 5px; }
 }
