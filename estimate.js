@@ -1,4 +1,4 @@
-/* [estimate.js Ver 1.57 - 전체 로직 정상화] */
+/* [estimate.js Ver 1.58 - 삭제 기능 및 동적 추가 완벽화] */
 
 document.addEventListener('DOMContentLoaded', function() {
     const body = document.getElementById('estimate-body');
@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const cont = document.createElement('div');
             const h = document.createElement('div');
             h.className = 'section-bar';
-            h.innerHTML = `<span><span class="section-icon">${icons[sec.key] || ''}</span>${sec.category}</span> <span>▼</span>`;
+            h.innerHTML = `<div><span class="section-icon">${icons[sec.key] || ''}</span>${sec.category}</div> <span>▼</span>`;
             
             // 초기 닫힘 상태 유지
             h.onclick = () => document.getElementById('c-' + idx).classList.toggle('show');
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>`;
             });
 
-            // [복구] 동적 추가 영역 및 버튼
+            // 직접 추가 항목 및 삭제 지원 컨테이너
             c.innerHTML = `
                 <div id="fixed-${idx}">${html}</div>
                 <div id="dynamic-${idx}"></div>
@@ -49,22 +49,27 @@ document.addEventListener('DOMContentLoaded', function() {
     initTelFormat();
 });
 
+// [Ver 1.58] 직접 입력 항목 추가 + 삭제 버튼 세트 구성
 function addCustomRow(idx) {
+    const target = document.getElementById(`dynamic-${idx}`);
     const div = document.createElement('div');
     div.className = 'grid-row quote-grid';
     div.innerHTML = `
-        <div>
-            <label class="item-label">
+        <div style="display:flex; align-items:center;">
+            <label class="item-label" style="width:auto;">
                 <input type="checkbox" class="chk" checked onchange="updateSum()">
                 <span class="checkmark"></span>
-                <input type="text" class="info-input" style="padding:4px; font-size:13px; height:28px;" placeholder="항목명 입력" oninput="updateSum()">
             </label>
+            <input type="text" class="info-input" style="padding:4px; font-size:13px; height:28px; flex:1;" placeholder="항목명" oninput="updateSum()">
         </div>
         <div class="col-center"><input type="number" class="input-num qty" value="1" oninput="updateSum()"></div>
         <div class="col-center"><input type="number" class="input-num price" value="0" oninput="updateSum()"></div>
-        <div class="col-right row-sum">0</div>
+        <div class="col-right" style="display:flex; align-items:center; justify-content:flex-end;">
+            <span class="row-sum" style="margin-right:5px;">0</span>
+            <button class="btn-del-row" onclick="this.closest('.grid-row').remove(); updateSum();">×</button>
+        </div>
     `;
-    document.getElementById(`dynamic-${idx}`).appendChild(div);
+    target.appendChild(div);
     updateSum();
 }
 
@@ -86,17 +91,18 @@ function updateSum() {
     document.querySelectorAll('.grid-row').forEach(row => {
         const chk = row.querySelector('.chk');
         if (chk && chk.checked) {
-            const q = row.querySelector('.qty').value || 0;
-            const p = row.querySelector('.price').value || 0;
+            const q = row.querySelector('.qty')?.value || 0;
+            const p = row.querySelector('.price')?.value || 0;
             const sum = q * p * 10000;
             total += sum;
-            if(row.querySelector('.row-sum')) row.querySelector('.row-sum').innerText = sum.toLocaleString();
+            const sEl = row.querySelector('.row-sum');
+            if(sEl) sEl.innerText = sum.toLocaleString();
         } else if(row.querySelector('.row-sum')) {
             row.querySelector('.row-sum').innerText = "0";
         }
     });
-    const finalSum = document.getElementById('final-sum');
-    if(finalSum) finalSum.innerText = total.toLocaleString() + " 원";
+    const fs = document.getElementById('final-sum');
+    if(fs) fs.innerText = total.toLocaleString() + " 원";
     return total;
 }
 
@@ -117,10 +123,10 @@ function switchToDetailed() {
     
     data.forEach((sec, idx) => {
         const rows = document.querySelectorAll(`#c-${idx} .grid-row`);
-        let hasChecked = false;
-        rows.forEach(r => { if(r.querySelector('.chk')?.checked) hasChecked = true; });
+        let groupHasChecked = false;
+        rows.forEach(r => { if(r.querySelector('.chk')?.checked) groupHasChecked = true; });
         
-        if(hasChecked) {
+        if(groupHasChecked) {
             const sh = document.createElement('div');
             sh.className = 'grid-row'; sh.style.backgroundColor = '#f8f9fa'; sh.style.fontWeight = 'bold'; sh.style.gridTemplateColumns = '1fr';
             sh.innerText = sec.category; dBody.appendChild(sh);
@@ -156,6 +162,6 @@ function backToGeneral() {
     document.getElementById('btn-group-sub').style.display = 'none';
 }
 
+function saveToLocal() { alert('저장되었습니다.'); }
 function resetForm() { if(confirm('초기화하시겠습니까?')) location.reload(); }
 function smartPrint() { if(!validateInputs()) return; window.print(); }
-function saveToLocal() { alert('저장되었습니다.'); }
