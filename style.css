@@ -1,4 +1,4 @@
-/* [다함 디자인 시스템 Ver 1.42 - 로고/아이콘 크기 완전 고정] */
+/* [다함 디자인 시스템 Ver 1.39 - 레이아웃 완전 정렬 및 픽스] */
 :root {
     --primary-navy: #0A2342;
     --accent-gold: #C5A47E;
@@ -21,25 +21,13 @@ body {
 .container { max-width: 900px; margin: 0 auto; min-height: 100vh; padding: 25px; background: #fff; position: relative; }
 .container-narrow { max-width: 480px; display: flex; flex-direction: column; justify-content: center; min-height: 90vh; }
 
-/* 버전 표시 (본문 상단 절대 위치) */
-.global-version-badge {
-    position: absolute; top: 15px; right: 15px; 
-    background: rgba(10, 35, 66, 0.8); color: white; 
-    padding: 4px 12px; border-radius: 20px; 
-    font-size: 11px; font-weight: 800; z-index: 999; 
-    backdrop-filter: blur(4px); pointer-events: none;
-}
+/* 전역 버전 배지 (고정형) */
+.version-badge { position: fixed; top: 15px; right: 15px; background: rgba(10,35,66,0.9); color: white; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 800; z-index: 9999; }
 
-/* [Ver 1.42] 로고 이미지 크기 강제 고정 (폭주 방지) */
-img.img-logo { 
-    height: 50px !important; 
-    width: auto !important; 
-    display: block; 
-}
-
-/* 로그인 & 메뉴 */
+/* 로그인/메인 카드 디자인 */
 .login-wrap { background: #fff; padding: 50px 40px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; border: 1px solid #eee; }
 .login-logo-box { margin-bottom: 30px; display: flex; justify-content: center; }
+.login-logo-img { width: 100%; max-width: 200px; height: auto; display: block; }
 .login-input { width: 100%; padding: 15px; background: #f4f7fc; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 10px; font-size: 16px; outline: none; }
 .btn-login-action { width: 100%; padding: 15px; background: var(--accent-orange); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: 800; cursor: pointer; margin-top: 10px; }
 
@@ -54,38 +42,14 @@ img.img-logo {
 .info-input { width: 100%; padding: 10px; border: 1px solid #ddd; background: #f9f9f9; border-radius: 6px; outline: none; }
 .info-input:focus { border-color: var(--accent-gold); background: #fff; }
 
-/* 그리드 시스템 */
+/* 그리드 시스템 (비율 완전 고정) */
 .estimate-section { background: white; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; margin-bottom: 30px; }
 .grid-header { background: var(--primary-navy); color: white; padding: 12px 20px; font-weight: 600; font-size: 14px; }
 .grid-row { display: grid; align-items: center; padding: 12px 20px; border-bottom: 1px solid #f0f0f0; background: white; }
 .quote-grid { grid-template-columns: 4.5fr 1fr 2.5fr 2fr; gap: 15px; }
 .contract-grid { grid-template-columns: 2fr 3.5fr 1fr 2fr !important; gap: 15px; }
 
-/* [Ver 1.42] 아이콘 SVG 크기 강제 고정 */
-.section-icon { 
-    display: inline-flex; align-items: center; justify-content: center; 
-    width: 24px; height: 24px; margin-right: 8px; vertical-align: middle; 
-}
-.section-icon svg { 
-    width: 24px !important; 
-    height: 24px !important; 
-    fill: var(--accent-gold); 
-}
-
-/* 체크박스 디자인 */
-.item-label input { display: none !important; }
-.checkmark { width: 20px; height: 20px; border: 2px solid #ddd; border-radius: 4px; margin-right: 10px; position: relative; flex-shrink: 0; }
-.item-label input:checked + .checkmark { background: var(--accent-gold); border-color: var(--accent-gold); }
-.checkmark:after { content: ""; position: absolute; display: none; left: 6px; top: 2px; width: 4px; height: 9px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); }
-.item-label input:checked + .checkmark:after { display: block; }
-.input-num { width: 100%; padding: 8px; text-align: center; background: #f8f9fa; border: none; border-radius: 4px; font-weight: 600; }
-
-/* 아코디언 */
-.section-bar { padding: 15px 20px; background: #fff; border-bottom: 1px solid #eee; cursor: pointer; display: flex; justify-content: space-between; font-weight: 800; color: var(--primary-navy); }
-.section-content { display: none; }
-.section-content.show { display: block; }
-
-/* 하단바 수학적 중앙 정렬 (절대 고정) */
+/* 하단 버튼바 정중앙 고정 */
 .floating-action-bar { 
     position: fixed !important; bottom: 0 !important; left: 50% !important; transform: translateX(-50%) !important;
     width: 100% !important; max-width: 900px !important;
@@ -94,21 +58,25 @@ img.img-logo {
     justify-content: center !important; align-items: center !important;
     border-top: 1px solid #ddd; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); z-index: 9999; box-sizing: border-box;
 }
-.fab-btn { flex: 1 1 0% !important; height: 52px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: white; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+.fab-btn { 
+    flex: 1 1 0% !important; height: 52px; border: none; border-radius: 10px; 
+    font-weight: 700; cursor: pointer; color: white; font-size: 14px; 
+    display: flex; align-items: center; justify-content: center;
+    white-space: nowrap; min-width: 0;
+}
 .btn-reset { background: #eee; color: #333; }
 .btn-save { background: var(--accent-gold); }
 .btn-print { background: var(--primary-navy); }
 .btn-contract { background: var(--danger-red); }
 
-/* 총계 및 인쇄 */
+/* 총계 및 부가세 */
 .total-card { background: #fff; border: 2px solid var(--primary-navy); padding: 30px 20px; text-align: center; border-radius: 10px; margin-top: 20px; }
 .total-amount { font-size: 40px; font-weight: 900; color: var(--danger-red); letter-spacing: -1px; }
-.vat-notice { font-size: 13px; color: #888; margin-top: 5px; font-weight: 500; }
+.vat-notice { font-size: 13px; color: #888; font-weight: 500; margin-top: 5px; }
 
 @media print {
-    .no-print, .floating-action-bar, .global-version-badge { display: none !important; }
-    .container { max-width: 100%; padding: 0; box-shadow: none; }
+    body { padding-bottom: 0; background: white; }
+    .no-print, .floating-action-bar, .version-badge, .btn-add-row, .btn-del-row { display: none !important; }
+    .container { max-width: 100%; padding: 0; margin: 0; box-shadow: none; }
     .header-card, .estimate-section, .total-card { border: 1px solid #000; border-radius: 0; }
-    .section-icon svg, .checkmark, .arrow-icon { display: none !important; }
-    .input-num { background: transparent; text-align: right; border: none; }
 }
