@@ -1,4 +1,4 @@
-/* [estimate.js Ver 1.72 - 아이콘 제거 및 안정 로직 통합] */
+/* [estimate.js Ver 1.73 - 인쇄 잔상 방지 로직 보강] */
 
 document.addEventListener('DOMContentLoaded', function() {
     const body = document.getElementById('estimate-body');
@@ -46,22 +46,31 @@ function validateInputs() {
     return true;
 }
 
+// [Ver 1.73] 스마트 인쇄 (메시지 강제 종료 포함)
 function smartPrint() {
     if(!validateInputs()) return;
+    
+    // 메시지 레이어가 보이고 있다면 즉시 닫기
+    const toast = document.getElementById('toast-msg');
+    if(toast) toast.classList.remove('show');
+
     document.getElementById('t-name').innerText = document.getElementById('g-name').value;
     document.getElementById('t-tel').innerText = document.getElementById('g-tel').value;
     document.getElementById('t-addr').innerText = document.getElementById('g-addr').value;
+
     document.querySelectorAll('.item-line').forEach(row => {
         const txt = row.querySelector('.custom-name-input'), span = row.querySelector('.custom-name-print');
         if(txt && span) span.innerText = txt.value || "(내용 없음)";
         if(!row.querySelector('.chk').checked) row.classList.add('hidden-print');
         else row.classList.remove('hidden-print');
     });
+
     data.forEach((_, i) => {
         const cont = document.getElementById('cont-' + i);
         if(cont.querySelectorAll('.chk:checked').length === 0) cont.classList.add('hidden-print');
         else cont.classList.remove('hidden-print');
     });
+
     window.print();
     setTimeout(() => { document.querySelectorAll('.hidden-print').forEach(el => el.classList.remove('hidden-print')); }, 1000);
 }
@@ -75,21 +84,6 @@ function addCustomRow(idx) {
         <div class="col-center"><input type="number" class="input-num price" value="0" oninput="updateSum()"></div>
         <div class="col-right" style="display:flex; align-items:center; justify-content:flex-end;"><span class="row-sum" style="margin-right:5px;">0</span><button class="btn-del-row" onclick="this.closest('.grid-row').remove(); updateSum();">×</button></div>`;
     target.appendChild(div);
-    updateSum();
-}
-
-function updatePaintPrice(idx, select) {
-    const section = document.getElementById('c-' + idx), val = select.value;
-    let price = (val === 'elastic') ? 22 : (val === 'ceramic') ? 30 : 12;
-    section.querySelectorAll('.grid-row.item-line').forEach(row => {
-        const nameText = row.querySelector('.item-name-text')?.innerText || "";
-        if(nameText.includes('베란다')) row.querySelector('.price').value = price;
-    });
-    updateSum();
-}
-
-function toggleSec(idx, master) {
-    document.getElementById('c-' + idx).querySelectorAll('.chk').forEach(c => c.checked = master.checked);
     updateSum();
 }
 
@@ -117,9 +111,9 @@ function switchToDetailed() {
     const dBody = document.getElementById('detailed-body'); dBody.innerHTML = '';
     data.forEach((sec, idx) => {
         const rows = document.querySelectorAll(`#c-${idx} .item-line`);
-        let hasChecked = false;
-        rows.forEach(r => { if(r.querySelector('.chk')?.checked) hasChecked = true; });
-        if(hasChecked) {
+        let groupHasChecked = false;
+        rows.forEach(r => { if(r.querySelector('.chk')?.checked) groupHasChecked = true; });
+        if(groupHasChecked) {
             const sh = document.createElement('div');
             sh.className = 'grid-row'; sh.style.backgroundColor = '#f8f9fa'; sh.style.fontWeight = 'bold'; sh.style.gridTemplateColumns = '1fr';
             sh.innerText = sec.category; dBody.appendChild(sh);
@@ -156,6 +150,21 @@ function resetForm() { if(confirm('초기화하시겠습니까?')) location.relo
 function saveToLocal() {
     const t = document.getElementById('toast-msg');
     t.classList.add('show'); setTimeout(() => { t.classList.remove('show'); }, 2500);
+}
+
+function updatePaintPrice(idx, select) {
+    const section = document.getElementById('c-' + idx), val = select.value;
+    let price = (val === 'elastic') ? 22 : (val === 'ceramic') ? 30 : 12;
+    section.querySelectorAll('.grid-row.item-line').forEach(row => {
+        const nameText = row.querySelector('.item-name-text')?.innerText || "";
+        if(nameText.includes('베란다')) row.querySelector('.price').value = price;
+    });
+    updateSum();
+}
+
+function toggleSec(idx, master) {
+    document.getElementById('c-' + idx).querySelectorAll('.chk').forEach(c => c.checked = master.checked);
+    updateSum();
 }
 
 function initTelFormat() {
