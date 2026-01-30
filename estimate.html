@@ -2,8 +2,8 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>견적서</title>
-    <link rel="stylesheet" href="style.css?v=45">
+    <title>견적서 | 다함</title>
+    <link rel="stylesheet" href="style.css?v=46">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -22,35 +22,21 @@
                 </div>
             </div>
             <div class="info-grid">
-                <div>
-                    <label class="input-label">발주처 (고객명)</label>
-                    <input type="text" id="g-name" class="info-input" placeholder="이름 입력">
-                </div>
-                <div>
-                    <label class="input-label">연락처</label>
-                    <input type="tel" id="g-tel" class="info-input" placeholder="010-0000-0000">
-                </div>
-                <div class="full-row">
-                    <label class="input-label">현장 주소</label>
-                    <input type="text" id="g-addr" class="info-input" placeholder="주소를 입력해주세요">
-                </div>
+                <div><label class="input-label">발주처 (고객명)</label><input type="text" id="g-name" class="info-input" placeholder="이름 입력"></div>
+                <div><label class="input-label">연락처</label><input type="tel" id="g-tel" class="info-input" placeholder="010-0000-0000"></div>
+                <div class="full-row"><label class="input-label">현장 주소</label><input type="text" id="g-addr" class="info-input" placeholder="주소를 입력해주세요"></div>
             </div>
         </div>
 
         <div class="estimate-section">
-            <div class="grid-header">
-                <div class="col-name">공정 항목</div>
-                <div class="col-qty">수량</div>
-                <div class="col-price">단가</div>
-                <div class="col-sum">합계</div>
-            </div>
+            <div class="grid-header"><div class="col-name">공정 항목</div><div class="col-qty">수량</div><div class="col-price">단가</div><div class="col-sum">합계</div></div>
             <div id="estimate-body"></div>
         </div>
 
         <div class="total-card">
             <div class="total-label">예상 견적 합계</div>
             <div id="final-sum" class="total-amount">0 원</div>
-        </div>
+            <div class="vat-notice">* 부가세(VAT) 별도 금액입니다.</div> </div>
     </div>
 
     <div id="view-detailed" style="display:none;">
@@ -67,18 +53,13 @@
             </div>
         </div>
         <div class="estimate-section">
-            <div class="grid-header">
-                <div class="col-name" style="flex:2;">공정 및 항목</div>
-                <div class="col-name" style="flex:3;">자재 사양 (직접입력)</div>
-                <div class="col-qty">수량</div>
-                <div class="col-sum">금액</div>
-            </div>
+            <div class="grid-header"><div class="col-name" style="flex:2;">공정 및 항목</div><div class="col-name" style="flex:3;">자재 사양 (직접입력)</div><div class="col-qty">수량</div><div class="col-sum">금액</div></div>
             <div id="detailed-body"></div>
         </div>
         <div class="total-card">
             <div class="total-label">최종 시공 합계</div>
             <div id="d-total" class="total-amount">0 원</div>
-        </div>
+            <div class="vat-notice">* 부가세(VAT) 별도 금액입니다.</div> </div>
     </div>
 
     <div class="floating-action-bar no-print">
@@ -86,13 +67,11 @@
         <button id="btn-save" class="fab-btn btn-save" onclick="saveToLocal()">💾 임시저장</button>
         <button id="btn-print-est" class="fab-btn btn-print" onclick="smartPrint()">🖨️ 견적발행</button>
         <button id="btn-go-contract" class="fab-btn btn-contract" onclick="switchToDetailed()">📑 계약서</button>
-        
         <button id="btn-back" class="fab-btn btn-reset" onclick="backToGeneral()" style="display:none;">목록으로</button>
         <button id="btn-print-cont" class="fab-btn btn-print" onclick="printContract()" style="display:none; background:var(--primary-navy);">계약서 출력</button>
     </div>
-
     <div id="toast-msg" class="toast">저장되었습니다!</div>
-    <script src="data.js?v=45"></script>
-    <script src="estimate.js?v=45"></script>
+    <script src="data.js?v=46"></script>
+    <script src="estimate.js?v=46"></script>
 </body>
 </html>
