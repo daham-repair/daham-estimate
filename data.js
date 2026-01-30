@@ -1,4 +1,4 @@
-const SYSTEM_VERSION = "Ver 1.67";
+const SYSTEM_VERSION = "Ver 1.68";
 document.addEventListener('DOMContentLoaded', function() {
     const badge = document.createElement('div');
     badge.className = 'global-version-badge no-print';
