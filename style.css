@@ -1,4 +1,4 @@
-/* [다함 디자인 시스템 Ver 1.31 - 하단 메뉴바 고정 수정] */
+/* [다함 디자인 시스템 Ver 1.32 - 하단 메뉴바 고정 픽스] */
 :root {
     --primary-navy: #0A2342;
     --accent-gold: #C5A47E;
@@ -15,7 +15,7 @@ body {
     font-family: 'Pretendard', sans-serif; 
     background-color: var(--bg-light); color: var(--text-dark); 
     margin: 0; padding: 0; line-height: 1.5; 
-    /* [수정] 하단 버튼바 공간 충분히 확보 */
+    /* [수정] 하단 버튼바 공간 충분히 확보 (100px -> 120px) */
     padding-bottom: 120px; 
 }
 
@@ -64,8 +64,12 @@ body {
 .col-price { flex: 2; text-align: center; }
 .col-sum { flex: 2; text-align: right; font-weight: 800; }
 
+/* 체크박스 디자인 (중복 방지) */
 .item-label { display: flex; align-items: center; cursor: pointer; width: 100%; }
-.item-label input { display: none !important; }
+.item-label input { 
+    display: none !important; /* 화면에서 완전히 제거 */
+    -webkit-appearance: none; appearance: none; 
+}
 .checkmark { width: 20px; height: 20px; border: 2px solid #ddd; border-radius: 4px; margin-right: 10px; position: relative; flex-shrink: 0; }
 .item-label input:checked + .checkmark { background: var(--accent-gold); border-color: var(--accent-gold); }
 .checkmark:after { content: ""; position: absolute; display: none; left: 6px; top: 2px; width: 4px; height: 9px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); }
@@ -79,43 +83,40 @@ body {
 .section-content { display: none; }
 .section-content.show { display: block; }
 
-/* ==========================================================
-   [Ver 1.31 핵심 수정] 하단 플로팅 메뉴바 정렬 및 고정
-   ========================================================== */
+/* =========================================================
+   [Ver 1.32 핵심 수정] 하단 메뉴바 강제 중앙 정렬
+   ========================================================= */
 .floating-action-bar { 
     position: fixed; 
     bottom: 0; 
     left: 0; 
-    width: 100%; /* 전체 너비 차지 */
+    right: 0; /* 화면 양쪽 끝에 고정 */
+    width: 100%; /* 전체 너비 */
+    
     background: rgba(255,255,255,0.98); 
-    padding: 15px; 
+    padding: 15px 20px; /* 양옆 여백 */
+    
     display: flex; 
-    justify-content: center; /* 아이템 중앙 정렬 */
+    justify-content: center; /* 내부 아이템 중앙 정렬 */
     align-items: center;
-    gap: 10px; 
+    gap: 10px; /* 버튼 사이 간격 */
+    
     border-top: 1px solid #ddd; 
     box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
-    z-index: 9999; /* 최상위 노출 */
+    z-index: 9999; 
+    box-sizing: border-box; /* 패딩 포함 크기 계산 */
 }
 
-/* 버튼 너비 균등 분배 (최대폭 제한으로 쏠림 방지) */
+/* 버튼 스타일 (균등 분배) */
 .fab-btn { 
-    flex: 1; 
-    max-width: 140px; /* 너무 넓어지지 않게 */
-    min-width: 80px;  /* 너무 좁아지지 않게 */
+    flex: 1; /* 공간 균등 차지 */
+    max-width: 140px; /* 너무 커지지 않게 제한 */
+    min-width: 80px; /* 너무 작아지지 않게 제한 */
     height: 50px; 
-    border: none; 
-    border-radius: 10px; 
-    font-weight: 700; 
-    cursor: pointer; 
-    color: white; 
-    font-size: 14px; 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    white-space: nowrap; /* 글자 줄바꿈 방지 */
+    border: none; border-radius: 10px; 
+    font-weight: 700; cursor: pointer; color: white; font-size: 14px; 
+    display: flex; align-items: center; justify-content: center;
 }
-
 .btn-reset { background: #eee; color: #333; }
 .btn-save { background: var(--accent-gold); }
 .btn-print { background: var(--primary-navy); }
@@ -140,3 +141,14 @@ body {
 .toast.show { visibility: visible; }
 
 /* 인쇄 모드 */
+@media print {
+    body { padding-bottom: 0; background: white; }
+    .no-print, .floating-action-bar, .version-badge, .btn-add-row, .btn-del-row, .back-nav { display: none !important; }
+    .arrow-icon { display: none !important; }
+    .container { max-width: 100%; padding: 0; margin: 0; box-shadow: none; }
+    .header-card, .estimate-section, .total-card { box-shadow: none; border: 1px solid #000; border-radius: 0; }
+    .total-card { border: 2px solid #000; padding: 20px; margin-top: 30px; }
+    .section-icon svg, .checkmark { display: none !important; }
+    .input-num { background: transparent; text-align: right; border: none; }
+    .hidden-print { display: none !important; }
+}
