@@ -11,7 +11,6 @@
             <button class="back-nav" onclick="location.href='main.html'">←</button>
             <h2 id="page-title" class="header-doc-title">견적서 작성</h2>
         </div>
-
         <div id="view-general">
             <div class="header-card">
                 <div class="header-top">
@@ -28,13 +27,8 @@
                 <div class="grid-header-fixed quote-grid"><div>공정</div><div class="col-center">수량</div><div class="col-center">단가</div><div class="col-right">합계</div></div>
                 <div id="estimate-body"></div>
             </div>
-            <div class="total-card">
-                <div style="font-weight:700; color:#555; font-size:14px;">예상 견적 합계</div>
-                <div id="final-sum" class="total-amount">0 원</div>
-                <div class="vat-notice">* 부가세(VAT) 별도 금액입니다.</div>
-            </div>
+            <div class="total-card"><div style="font-weight:700; color:#555; font-size:14px;">예상 견적 합계</div><div id="final-sum" class="total-amount">0 원</div><div class="vat-notice">* 부가세(VAT) 별도 금액입니다.</div></div>
         </div>
-
         <div id="view-detailed" style="display:none;">
             <div class="header-card">
                 <div class="header-top"><img src="logo.png" alt="다함" class="img-logo"><div class="rep-info"><strong>공급자: 김재영 (인)</strong><span class="tel">010.5404.8747</span></div></div>
@@ -44,14 +38,10 @@
                     <div class="full-row"><label class="input-label">현장 주소</label><div id="d-addr-display" class="info-input" style="background:#eee; min-height:42px;"></div></div>
                 </div>
             </div>
-            <div class="estimate-section">
-                <div class="grid-header-fixed contract-grid"><div>공정</div><div>자재 사양 (직접입력)</div><div class="col-center">수량</div><div class="col-right">금액</div></div>
-                <div id="detailed-body"></div>
-            </div>
+            <div class="estimate-section"><div class="grid-header-fixed contract-grid"><div>공정</div><div>자재 사양 (직접입력)</div><div class="col-center">수량</div><div class="col-right">금액</div></div><div id="detailed-body"></div></div>
             <div class="total-card"><div style="font-weight:700; color:#555; font-size:14px;">최종 시공 합계</div><div id="d-total" class="total-amount">0 원</div><div class="vat-notice">* 부가세(VAT) 별도 금액입니다.</div></div>
         </div>
     </div>
-
     <div class="floating-action-bar no-print">
         <div id="btn-group-main" class="btn-group active">
             <button class="fab-btn btn-reset" onclick="resetForm()">🔄 초기화</button>
