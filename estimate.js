@@ -1,4 +1,4 @@
-/* [estimate.js Ver 1.34 - 최종 로직] */
+/* [estimate.js Ver 1.36 - 버튼 표시/숨김 및 계약서 전환 픽스] */
 const supabaseUrl = 'YOUR_SUPABASE_URL';
 const supabaseKey = 'YOUR_SUPABASE_KEY';
 let dbClient = null;
@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const cont = document.createElement('div'); cont.id = 'cont-'+idx;
             const h = document.createElement('div'); h.className = 'section-bar';
             
-            // [핵심] 화살표에 'arrow-icon' 클래스 추가 -> CSS에서 인쇄 시 숨김 처리됨
+            // 화살표에 arrow-icon 클래스 추가 (인쇄 시 숨김)
             h.innerHTML = `<span class="section-title"><svg class="section-icon" viewBox="0 0 24 24">${icons[sec.key]}</svg> ${sec.category}</span> <span class="arrow-icon">▼</span>`;
             
             h.onclick = () => {
@@ -106,8 +106,6 @@ function update() {
     document.getElementById('final-sum').innerText = total.toLocaleString() + " 원";
 }
 
-function formatKRW(num) { if (!num && num !== 0) return "0"; return Math.floor(parseFloat(num) * 10000).toLocaleString(); }
-
 function toggleSec(idx, master) {
     const content = document.getElementById(`c-${idx}`);
     content.querySelectorAll('.chk').forEach(chk => {
@@ -145,6 +143,7 @@ function smartPrint() {
     }, 1000);
 }
 
+// [Ver 1.36 핵심] 계약서 화면 전환 및 버튼 제어 로직 수정
 function switchToDetailed() {
     update();
     const name = document.getElementById('g-name').value;
@@ -193,19 +192,36 @@ function switchToDetailed() {
     });
     
     document.getElementById('d-total').innerText = dTotal.toLocaleString() + " 원";
+    
+    // 화면 전환
     document.getElementById('view-general').style.display = 'none';
     document.getElementById('view-detailed').style.display = 'block';
     
-    document.querySelectorAll('.fab-btn').forEach(b => b.style.display = 'none');
+    // [중요] 버튼 교체 로직
+    // 1. 기존 버튼 4개 숨김
+    document.getElementById('btn-reset').style.display = 'none';
+    document.getElementById('btn-save').style.display = 'none';
+    document.getElementById('btn-print-est').style.display = 'none';
+    document.getElementById('btn-go-contract').style.display = 'none';
+    
+    // 2. 계약서용 버튼 2개 표시 (flex로 해야 가로 정렬 유지됨)
     document.getElementById('btn-back').style.display = 'flex';
     document.getElementById('btn-print-cont').style.display = 'flex';
+    
     window.scrollTo(0,0);
 }
 
 function backToGeneral() {
+    // 화면 복구
     document.getElementById('view-detailed').style.display = 'none';
     document.getElementById('view-general').style.display = 'block';
-    document.querySelectorAll('.fab-btn').forEach(b => b.style.display = 'flex');
+    
+    // 버튼 복구
+    document.getElementById('btn-reset').style.display = 'flex';
+    document.getElementById('btn-save').style.display = 'flex';
+    document.getElementById('btn-print-est').style.display = 'flex';
+    document.getElementById('btn-go-contract').style.display = 'flex';
+    
     document.getElementById('btn-back').style.display = 'none';
     document.getElementById('btn-print-cont').style.display = 'none';
 }
