@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>견적서 작성 | 다함 인테리어</title>
-    <link rel="stylesheet" href="style.css?v=30">
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>견적서 작성 | 다함</title>
+    <link rel="stylesheet" href="style.css?v=32">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -14,35 +13,23 @@
             <button class="back-btn" onclick="location.href='main.html'">←</button>
             <h2>견적서 작성</h2>
         </div>
-        <div class="notice-banner no-print">
-            <span>⚠️ 실측 전 참고용 '공식 가견적서'입니다</span>
-            <span class="version-badge" style="position:static; margin-left:10px;">Ver 1.20</span>
-        </div>
-
         <div class="header-card">
             <div class="header-top">
                 <div class="logo-box"><img src="logo.png" alt="다함" class="img-logo"></div>
                 <h1 class="doc-title">견적서</h1>
-                <div class="rep-info"><strong>대표 김재영</strong><div style="color:var(--danger-red); font-weight:800; font-size:18px;">010.5404.8747</div></div>
+                <div class="rep-info"><strong>대표 김재영</strong><div style="color:var(--danger-red); font-weight:800;">010.5404.8747</div></div>
             </div>
             <div class="info-grid">
-                <div class="input-group"><label>발주처(고객명)</label><input type="text" id="g-name" class="input-field" placeholder="고객 성함"></div>
+                <div class="input-group"><label>발주처</label><input type="text" id="g-name" class="input-field" placeholder="고객 성함"></div>
                 <div class="input-group"><label>연락처</label><input type="tel" id="g-tel" class="input-field" placeholder="010.0000.0000"></div>
                 <div class="input-group full-row"><label>현장 주소</label><input type="text" id="g-addr" class="input-field" placeholder="현장 주소를 입력하세요"></div>
             </div>
         </div>
-
         <div class="estimate-section">
-            <div class="grid-header master-grid">
-                <div>공정 항목</div><div>수량</div><div>단가</div><div style="text-align:right;">합계</div>
-            </div>
+            <div class="grid-header master-grid"><div>공정 항목</div><div>수량</div><div>단가</div><div style="text-align:right;">합계</div></div>
             <div id="estimate-body"></div>
         </div>
-
-        <div class="total-card">
-            <div style="font-weight:700; color:var(--primary-navy); margin-bottom:10px;">예상 견적 합계</div>
-            <div id="final-sum" class="total-val">0 원</div>
-        </div>
+        <div class="total-card"><div>예상 견적 합계</div><div id="final-sum" class="total-val">0 원</div></div>
     </div>
 
     <div id="view-detailed" style="display:none;">
@@ -50,7 +37,7 @@
             <div class="header-top">
                 <div class="logo-box"><img src="logo.png" alt="다함" class="img-logo"></div>
                 <h1 class="doc-title">계약서</h1>
-                <div class="rep-info"><strong>공급자: 김재영 (인)</strong><div style="color:var(--danger-red); font-weight:800; font-size:18px;">010.5404.8747</div></div>
+                <div class="rep-info"><strong>공급자: 김재영 (인)</strong><div style="color:var(--danger-red); font-weight:800;">010.5404.8747</div></div>
             </div>
             <div class="info-grid">
                 <div class="input-group"><label>발주처</label><div id="d-name-display" class="display-text"></div></div>
@@ -59,15 +46,10 @@
             </div>
         </div>
         <div class="estimate-section">
-            <div class="grid-header detail-grid">
-                <div>공정 및 항목</div><div>자재 사양</div><div>수량</div><div>단가</div><div style="text-align:right;">금액</div>
-            </div>
+            <div class="grid-header detail-grid"><div>공정 및 항목</div><div>자재 사양</div><div>수량</div><div>단가</div><div style="text-align:right;">금액</div></div>
             <div id="detailed-body"></div>
         </div>
-        <div class="total-card">
-            <div style="font-weight:700; color:var(--primary-navy); margin-bottom:10px;">최종 시공 합계</div>
-            <div id="d-total" class="total-val">0 원</div>
-        </div>
+        <div class="total-card"><div>최종 시공 합계</div><div id="d-total" class="total-val">0 원</div></div>
     </div>
 
     <div class="bottom-action-bar no-print">
@@ -75,15 +57,12 @@
         <button id="btn-save" class="action-btn btn-save" onclick="saveToLocal()">임시저장</button>
         <button id="btn-print-est" class="action-btn btn-print" onclick="smartPrint()">견적발행</button>
         <button id="btn-go-contract" class="action-btn btn-next" onclick="switchToDetailed()">계약서</button>
-
         <button id="btn-back" class="action-btn btn-reset" onclick="backToGeneral()" style="display:none;">목록으로</button>
         <button id="btn-print-cont" class="action-btn btn-print" onclick="printContract()" style="display:none; flex: 2; background:var(--primary-navy);">계약서 출력</button>
     </div>
-
     <div id="toast-msg" class="toast">저장되었습니다!</div>
 </div>
-
-<script src="data.js?v=30"></script>
-<script src="estimate.js?v=30"></script>
+<script src="data.js?v=32"></script>
+<script src="estimate.js?v=32"></script>
 </body>
 </html>
