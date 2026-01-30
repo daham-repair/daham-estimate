@@ -1,4 +1,4 @@
-/* [estimate.js Ver 1.22 - 기능 완전 복구 및 최적화] */
+/* [estimate.js Ver 1.23 - 로직 완전 복구 및 최적화] */
 const supabaseUrl = 'YOUR_SUPABASE_URL';
 const supabaseKey = 'YOUR_SUPABASE_KEY';
 let dbClient = null;
@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const h = document.createElement('div'); h.className = 'section-header'; 
             h.innerHTML = `<span><div class="section-icon">${icons[sec.key]}</div> ${sec.category}<span id="pv-${idx}" class="paint-print-val"></span></span><span class="no-print">▼</span>`;
             
-            // 아코디언 로직
             h.onclick = () => {
                 const target = document.getElementById('c-' + idx);
                 const isShown = target.classList.contains('show');
@@ -30,28 +29,29 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     loadFromLocal();
+    const telInput = document.getElementById('g-tel');
+    if(telInput) {
+        telInput.addEventListener('input', function(e) {
+            let v = e.target.value.replace(/[^0-9]/g, ''); if (v.length > 11) v = v.substr(0, 11); 
+            if (v.length > 3 && v.length <= 7) e.target.value = v.replace(/(\d{3})(\d{1,4})/, '$1.$2');
+            else if (v.length > 7) e.target.value = v.startsWith('02') ? v.replace(/(\d{2})(\d{3,4})(\d{4})/, '$1.$2.$3') : v.replace(/(\d{3})(\d{3,4})(\d{4})/, '$1.$2.$3');
+            else e.target.value = v;
+        });
+    }
 });
 
-// 스마트 인쇄 기능 (빈 섹션 및 체크 안 된 항목 숨기기)
 async function smartPrint() {
     update();
     const nameEl = document.getElementById('g-name'); const telEl = document.getElementById('g-tel'); const addrEl = document.getElementById('g-addr');
-    if(!nameEl.value || !telEl.value || !addrEl.value) { alert("고객 정보(이름, 연락처, 주소)를 모두 입력해주세요."); return; }
-
+    if(!nameEl.value || !telEl.value || !addrEl.value) { alert("고객 정보를 입력해주세요."); return; }
     const inputs = document.querySelectorAll('.in-num');
     inputs.forEach(input => { if (input.classList.contains('price')) { input.dataset.orig = input.value; input.type = "text"; input.value = formatKRW(parseFloat(input.value.toString().replace(/,/g, ''))||0); } });
-
-    document.querySelectorAll('.item-line').forEach(row => {
-        if(!row.querySelector('.chk').checked) row.classList.add('hidden-print');
-        else row.classList.remove('hidden-print');
-    });
-    
+    document.querySelectorAll('.item-line').forEach(row => { if(!row.querySelector('.chk').checked) row.classList.add('hidden-print'); else row.classList.remove('hidden-print'); });
     data.forEach((_, idx) => {
         const hasChecked = document.querySelectorAll(`.row-${idx} .chk:checked`).length > 0;
         const cont = document.getElementById('cont-'+idx);
         if(cont) { if(hasChecked) { cont.classList.remove('hidden-print'); document.getElementById('c-'+idx).classList.add('show'); } else cont.classList.add('hidden-print'); }
     });
-
     window.print();
     setTimeout(() => {
         inputs.forEach(input => { if (input.classList.contains('price')) { input.type = "number"; input.value = input.dataset.orig; } });
@@ -60,7 +60,6 @@ async function smartPrint() {
     }, 1000);
 }
 
-// 동적 행 추가 (그리드 정렬 최적화)
 function addCustomRow(secIdx, savedData = null) {
     const container = document.getElementById(`dynamic-rows-container-${secIdx}`);
     if(!container) return;
@@ -75,8 +74,7 @@ function update() {
     document.querySelectorAll('#view-general .item-line').forEach(row => {
         const chk = row.querySelector('.chk'); const qtyVal = parseFloat(row.querySelector('.qty').value) || 0;
         let pRaw = row.querySelector('.price').value.toString().replace(/,/g, ''); const priceVal = parseFloat(pRaw) || 0;
-        if(chk.checked) { const sum = qtyVal * priceVal; total += sum; row.querySelector('.row-total').innerText = formatKRW(sum); } 
-        else row.querySelector('.row-total').innerText = "0";
+        if(chk.checked) { const sum = qtyVal * priceVal; total += sum; row.querySelector('.row-total').innerText = formatKRW(sum); } else row.querySelector('.row-total').innerText = "0";
     });
     const sumEl = document.getElementById('final-sum'); if(sumEl) sumEl.innerText = formatKRW(total) + " 원";
 }
@@ -115,21 +113,18 @@ function switchToDetailed() {
     document.getElementById('view-general').style.display = 'none'; document.getElementById('view-detailed').style.display = 'block';
     toggleButtons(true); window.scrollTo(0,0);
 }
-
 function backToGeneral() { document.getElementById('view-detailed').style.display = 'none'; document.getElementById('view-general').style.display = 'block'; toggleButtons(false); update(); }
 function toggleButtons(isContractMode) {
     const estBtns = ['btn-reset', 'btn-save', 'btn-print-est', 'btn-go-contract']; const contBtns = ['btn-back', 'btn-print-cont'];
     estBtns.forEach(id => { const el = document.getElementById(id); if(el) el.style.display = isContractMode ? 'none' : 'flex'; }); 
     contBtns.forEach(id => { const el = document.getElementById(id); if(el) el.style.display = isContractMode ? 'flex' : 'none'; });
 }
-
 function saveToLocal() {
     update(); const saveData = { name: document.getElementById('g-name').value, tel: document.getElementById('g-tel').value, addr: document.getElementById('g-addr').value, items: [], customItems: [] };
     document.querySelectorAll('.item-line:not(.custom-dynamic-row)').forEach((row) => { if(row.querySelector('.chk').checked) { const secIdx = row.classList[2].split('-')[1]; saveData.items.push({ secIdx: secIdx, name: row.querySelector('.chk').dataset.name, qty: row.querySelector('.qty').value, price: parseFloat(row.querySelector('.price').value.toString().replace(/,/g, '')) * 10000 }); } });
     document.querySelectorAll('.custom-dynamic-row').forEach(row => { const secIdx = row.classList[2].split('-')[1]; if(row.querySelector('.chk').checked) { saveData.customItems.push({ secIdx: secIdx, name: row.querySelector('.custom-name').value, qty: row.querySelector('.qty').value, price: parseFloat(row.querySelector('.price').value.toString().replace(/,/g, '')) * 10000 }); } });
     localStorage.setItem('daham_estimate_draft', JSON.stringify(saveData)); showToast("임시 저장되었습니다.");
 }
-
 function loadFromLocal() {
     const saved = localStorage.getItem('daham_estimate_draft'); if(!saved) return; if(!confirm("저장된 내용을 불러오시겠습니까?")) return;
     const d = JSON.parse(saved); document.getElementById('g-name').value = d.name || ''; document.getElementById('g-tel').value = d.tel || ''; document.getElementById('g-addr').value = d.addr || '';
