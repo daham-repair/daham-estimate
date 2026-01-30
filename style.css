@@ -1,4 +1,4 @@
-/* [다함 디자인 시스템 Ver 1.64 - 유효성 검사 및 정렬 완전판] */
+/* [다함 디자인 시스템 Ver 1.65 - 욕실 항목 복구 및 안정화] */
 :root {
     --primary-navy: #0A2342;
     --accent-gold: #C5A47E;
@@ -21,9 +21,9 @@ body { font-family: 'Pretendard', sans-serif; margin: 0; padding: 0; background-
 .login-input { width: 100%; padding: 15px; background: #f4f7fc; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 12px; font-size: 16px; outline: none; }
 .btn-login { width: 100%; padding: 16px; background: var(--accent-orange); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: 800; cursor: pointer; }
 
-/* [견적서/계약서 공용] */
+/* [견적서/계약서 공용 레이아웃] */
 .estimate-body .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 15px; min-height: 100vh; position: relative; padding-bottom: 140px; }
-.header-simple { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #333; }
+.header-simple { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #333; }
 .header-doc-title { font-size: 18px; font-weight: 800; margin: 0; }
 .back-nav { background: none; border: none; font-size: 20px; cursor: pointer; padding: 0; }
 
@@ -46,10 +46,9 @@ img.img-logo { height: 42px !important; width: auto !important; display: block; 
 .grid-header-fixed { background: var(--primary-navy); color: white; padding: 12px 10px; font-weight: 600; font-size: 12px; display: grid; }
 .grid-row { display: grid; align-items: center; padding: 12px 10px; border-bottom: 1px solid #f0f0f0; background: white; }
 
-.quote-grid { grid-template-columns: 4fr 38px 70px 80px !important; gap: 6px; }
+.quote-grid { grid-template-columns: 1fr 38px 70px 80px !important; gap: 6px; }
 .contract-grid { grid-template-columns: 1fr 1.2fr 38px 80px !important; gap: 6px; }
 
-/* 공정명 줄바꿈 허용 */
 .grid-row .col-name, .grid-row .item-name-text { white-space: normal !important; word-break: keep-all; line-height: 1.3; }
 .grid-header-fixed div, .col-center, .col-right { white-space: nowrap !important; }
 
