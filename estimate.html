@@ -2,8 +2,8 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>견적서</title>
-    <link rel="stylesheet" href="style.css?v=47">
+    <title>견적서 | 다함</title>
+    <link rel="stylesheet" href="style.css?v=48">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -26,7 +26,9 @@
                 </div>
             </div>
             <div class="estimate-section">
-                <div class="grid-header"><div class="col-name">공정 항목</div><div class="col-qty">수량</div><div class="col-price">단가</div><div class="col-sum">합계</div></div>
+                <div class="grid-header grid-row quote-grid">
+                    <div>공정 항목</div><div class="col-center">수량</div><div class="col-center">단가</div><div class="col-right">합계</div>
+                </div>
                 <div id="estimate-body"></div>
             </div>
             <div class="total-card">
@@ -43,13 +45,15 @@
                     <div class="rep-info"><strong>공급자: 김재영 (인)</strong><br>010.5404.8747</div>
                 </div>
                 <div class="info-grid">
-                    <div><label class="input-label">발주처</label><div id="d-name-display" class="info-input" style="background:#eee;"></div></div>
-                    <div><label class="input-label">연락처</label><div id="d-tel-display" class="info-input" style="background:#eee;"></div></div>
-                    <div class="full-row"><label class="input-label">현장 주소</label><div id="d-addr-display" class="info-input" style="background:#eee;"></div></div>
+                    <div><label class="input-label">발주처</label><div id="d-name-display" class="info-input" style="background:#eee; min-height:38px;"></div></div>
+                    <div><label class="input-label">연락처</label><div id="d-tel-display" class="info-input" style="background:#eee; min-height:38px;"></div></div>
+                    <div class="full-row"><label class="input-label">현장 주소</label><div id="d-addr-display" class="info-input" style="background:#eee; min-height:38px;"></div></div>
                 </div>
             </div>
             <div class="estimate-section">
-                <div class="grid-header"><div class="col-name" style="flex:2;">공정 및 항목</div><div class="col-name" style="flex:3;">자재 사양 (직접입력)</div><div class="col-qty">수량</div><div class="col-sum">금액</div></div>
+                <div class="grid-header grid-row contract-grid">
+                    <div>공정 및 항목</div><div>자재 사양 (직접입력)</div><div class="col-center">수량</div><div class="col-right">금액</div>
+                </div>
                 <div id="detailed-body"></div>
             </div>
             <div class="total-card">
@@ -69,7 +73,7 @@
         <button id="btn-print-cont" class="fab-btn btn-print" onclick="printContract()" style="display:none; background:var(--primary-navy);">계약서 출력</button>
     </div>
     <div id="toast-msg" class="toast">저장되었습니다!</div>
-    <script src="data.js?v=47"></script>
-    <script src="estimate.js?v=47"></script>
+    <script src="data.js?v=48"></script>
+    <script src="estimate.js?v=48"></script>
 </body>
 </html>
