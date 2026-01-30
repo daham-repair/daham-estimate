@@ -1,5 +1,5 @@
-/* [data.js Ver 1.58 - 전수 데이터 보존판] */
-const SYSTEM_VERSION = "Ver 1.58";
+/* [data.js Ver 1.59 - 시공 데이터 보존] */
+const SYSTEM_VERSION = "Ver 1.59";
 
 document.addEventListener('DOMContentLoaded', function() {
     const badge = document.createElement('div');
@@ -35,7 +35,7 @@ const data = [
     { key: 'paint', category: '페인트', items: [{n:'베란다 (개소)', p:350000}, {n:'방 문/틀', p:100000}, {n:'몰딩/걸레받이', p:150000}] },
     { key: 'bath', category: '욕실', items: [{n:'욕실 전체 리모델링', p:2800000}, {n:'변기 교체', p:350000}, {n:'세면대 교체', p:300000}, {n:'욕조 교체', p:600000}, {n:'샤워 파티션', p:250000}] },
     { key: 'paper', category: '도배', items: [{n:'광폭 합지 (평)', p:45000}, {n:'실크 벽지 (평)', p:75000}] },
-    { key: 'floor', category: '바닥', items: [{n:'1.8T 장판 (평)', p:45000}, {n:'강마루 (평)', p:120000}, {n:'데코타일 (평)', p:60000}] },
+    { key: 'floor', category: '바닥', items: [{n:'1.8T 장판 (평)', p:45000}, {n:'2.2T 장판 (평)', p:65000}, {n:'강마루 (평)', p:120000}, {n:'강화마루 (평)', p:90000}, {n:'데코타일 (평)', p:60000}] },
     { key: 'kitchen', category: '가구', items: [{n:'싱크대 (m)', p:400000}, {n:'아일랜드 식탁', p:600000}, {n:'냉장고장', p:500000}, {n:'신발장', p:400000}] },
     { key: 'etc', category: '기타', items: [{n:'입주 청소 (평)', p:15000}, {n:'엘리베이터 보양', p:150000}, {n:'폐기물 처리 (1톤)', p:400000}] },
     { key: 'custom', category: '직접 입력', items: [] }
