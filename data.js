@@ -1,11 +1,10 @@
-/* [data.js Ver 1.40 - 데이터 중앙 관리] */
-const SYSTEM_VERSION = "Ver 1.40";
+/* [data.js Ver 1.42 - 이미지 폭주 픽스 버전] */
+const SYSTEM_VERSION = "Ver 1.42";
 
 document.addEventListener('DOMContentLoaded', function() {
     const badge = document.createElement('div');
     badge.className = 'global-version-badge no-print';
     badge.innerText = SYSTEM_VERSION;
-    // container 클래스가 있는 곳에 넣으면 absolute 기준이 잡힘
     const target = document.querySelector('.container') || document.body;
     target.appendChild(badge);
 });
