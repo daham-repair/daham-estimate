@@ -1,4 +1,4 @@
-/* [estimate.js Ver 1.39 - 원복 및 로직 고도화] */
+/* [estimate.js Ver 1.39 - 계약서 레이아웃 픽스] */
 
 document.addEventListener('DOMContentLoaded', function() {
     const body = document.getElementById('estimate-body');
@@ -107,41 +107,59 @@ function smartPrint() {
     }, 1000);
 }
 
+/* [Ver 1.39 핵심] 계약서 화면 전환 로직 - 그리드 정렬 수정 */
 function switchToDetailed() {
     if(!validateInputs()) return;
     update();
+    
     document.getElementById('d-name-display').innerText = document.getElementById('g-name').value;
     document.getElementById('d-tel-display').innerText = document.getElementById('g-tel').value;
     document.getElementById('d-addr-display').innerText = document.getElementById('g-addr').value;
-    const dBody = document.getElementById('detailed-body'); dBody.innerHTML = ''; let dTotal = 0;
+    
+    const dBody = document.getElementById('detailed-body');
+    dBody.innerHTML = '';
+    let dTotal = 0;
+
     data.forEach((sec, idx) => {
         const checked = document.querySelectorAll(`#c-${idx} .item-line .chk:checked`);
         if(checked.length > 0) {
             const sh = document.createElement('div');
             sh.className = 'grid-row'; sh.style.backgroundColor = '#f1f3f5'; sh.style.fontWeight = 'bold'; sh.style.gridTemplateColumns = '1fr'; 
-            sh.innerText = sec.category; dBody.appendChild(sh);
+            sh.innerText = sec.category;
+            dBody.appendChild(sh);
+            
             checked.forEach(chk => {
                 const row = chk.closest('.item-line');
                 const name = chk.dataset.name;
                 const qty = row.querySelector('.qty').value;
                 const price = row.querySelector('.price').value;
                 const sum = qty * price * 10000; dTotal += sum;
+                
                 const div = document.createElement('div');
-                div.className = 'grid-row contract-grid';
-                div.innerHTML = `<div style="text-align:left;">${name}</div><div><textarea class="spec-field" rows="1" placeholder="사양 입력"></textarea></div><div class="col-center">${qty}</div><div class="col-right">${sum.toLocaleString()}</div>`;
+                div.className = 'grid-row contract-grid'; // [Ver 1.39] 전용 그리드 적용
+                div.innerHTML = `
+                    <div style="text-align:left;">${name}</div>
+                    <div><textarea class="spec-field" rows="1" placeholder="사양 입력"></textarea></div>
+                    <div class="col-center">${qty}</div>
+                    <div class="col-right">${sum.toLocaleString()}</div>
+                `;
                 dBody.appendChild(div);
             });
         }
     });
+    
     document.getElementById('d-total').innerText = dTotal.toLocaleString() + " 원";
     document.getElementById('view-general').style.display = 'none';
     document.getElementById('view-detailed').style.display = 'block';
+    
+    // 버튼 제어
     document.getElementById('btn-reset').style.display = 'none';
     document.getElementById('btn-save').style.display = 'none';
     document.getElementById('btn-print-est').style.display = 'none';
     document.getElementById('btn-go-contract').style.display = 'none';
     document.getElementById('btn-back').style.display = 'flex';
     document.getElementById('btn-print-cont').style.display = 'flex';
+    
     window.scrollTo(0,0);
 }
 
@@ -158,5 +176,5 @@ function backToGeneral() {
 
 function saveToLocal() { const t = document.getElementById('toast-msg'); t.className = "toast show"; setTimeout(()=>t.className="toast", 2000); }
 function loadFromLocal() {}
-function resetForm() { if(confirm('초기화?')) location.reload(); }
+function resetForm() { if(confirm('초기화하시겠습니까?')) location.reload(); }
 function printContract() { window.print(); }
