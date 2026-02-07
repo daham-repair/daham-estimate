@@ -1,0 +1,169 @@
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session, g
+import sqlite3
+import json
+import os
+from datetime import datetime
+
+app = Flask(__name__)
+app.secret_key = 'daham_secret_key'
+DATABASE = 'daham.db'
+
+# --- [DB 연결 함수] ---
+def get_db():
+    db = getattr(g, '_database', None)
+    if db is None:
+        db = g._database = sqlite3.connect(DATABASE)
+        db.row_factory = sqlite3.Row
+    return db
+
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
+
+def init_db():
+    with app.app_context():
+        db = get_db()
+        c = db.cursor()
+        # 회원 테이블 생성
+        c.execute('''CREATE TABLE IF NOT EXISTS users 
+                     (id TEXT PRIMARY KEY, pw TEXT, name TEXT)''')
+        # 견적서 테이블 생성
+        c.execute('''CREATE TABLE IF NOT EXISTS estimates 
+                     (id INTEGER PRIMARY KEY AUTOINCREMENT, 
+                      user_id TEXT, customer_name TEXT, phone TEXT, 
+                      address TEXT, total_amount INTEGER, details TEXT, reg_date TEXT)''')
+        
+        # 초기 관리자 계정 생성
+        c.execute("SELECT * FROM users WHERE id='admin'")
+        if not c.fetchone():
+            c.execute("INSERT INTO users VALUES (?, ?, ?)", ('admin', '1234', '관리자'))
+        db.commit()
+
+# 초기화 실행
+if not os.path.exists(DATABASE):
+    init_db()
+
+# --- [라우트] ---
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if 'user' in session: return redirect(url_for('main'))
+    return render_template('index.html')
+
+@app.route('/login', methods=['POST'])
+def login():
+    username = request.form.get('username')
+    password = request.form.get('password')
+    db = get_db()
+    user = db.execute("SELECT * FROM users WHERE id=? AND pw=?", (username, password)).fetchone()
+    
+    if user:
+        session['user'] = user['id']
+        session['name'] = user['name']
+        return redirect(url_for('main'))
+    return "<script>alert('아이디 또는 비밀번호가 일치하지 않습니다.'); history.back();</script>"
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        uid, upw, uname = request.form.get('username'), request.form.get('password'), request.form.get('name')
+        db = get_db()
+        if db.execute("SELECT id FROM users WHERE id=?", (uid,)).fetchone():
+            return "<script>alert('이미 사용 중인 아이디입니다.'); history.back();</script>"
+        db.execute("INSERT INTO users VALUES (?, ?, ?)", (uid, upw, uname))
+        db.commit()
+        return "<script>alert('회원가입 완료! 로그인해주세요.'); location.href='/';</script>"
+    return render_template('register.html')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('index'))
+
+@app.route('/main')
+def main():
+    if 'user' not in session: return redirect(url_for('index'))
+    return render_template('main.html', name=session.get('name', '관리자'))
+
+@app.route('/estimate')
+def estimate():
+    if 'user' not in session: return redirect(url_for('index'))
+    return render_template('estimate.html')
+
+@app.route('/list')
+def history():
+    if 'user' not in session: return redirect(url_for('index'))
+    keyword = request.args.get('keyword', '').strip()
+    db = get_db()
+    query = "SELECT * FROM estimates WHERE user_id=? ORDER BY id DESC"
+    if keyword:
+        query = "SELECT * FROM estimates WHERE user_id=? AND (customer_name LIKE ? OR phone LIKE ?) ORDER BY id DESC"
+        estimates = db.execute(query, (session['user'], f'%{keyword}%', f'%{keyword}%')).fetchall()
+    else:
+        estimates = db.execute(query, (session['user'],)).fetchall()
+    
+    # 템플릿 호환을 위해 row 객체를 딕셔너리 리스트로 변환
+    data = []
+    for row in estimates:
+        item = dict(row)
+        item['details'] = json.loads(item['details'])
+        data.append(item)
+    return render_template('list.html', estimates=data, keyword=keyword)
+
+@app.route('/material')
+def material():
+    if 'user' not in session: return redirect(url_for('index'))
+    return render_template('material.html')
+
+# --- [API] ---
+
+@app.route('/save_estimate', methods=['POST'])
+def save_estimate():
+    if 'user' not in session: return jsonify({'msg': '로그인 필요'}), 401
+    try:
+        req = request.json
+        est_id = req.get('id')
+        db = get_db()
+        now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        details_str = json.dumps(req['details'], ensure_ascii=False)
+        
+        if est_id: # 업데이트 (덮어쓰기)
+            db.execute('''UPDATE estimates SET customer_name=?, phone=?, address=?, 
+                          total_amount=?, details=?, reg_date=? WHERE id=? AND user_id=?''',
+                       (req['name'], req['tel'], req['addr'], req['total'], details_str, now, est_id, session['user']))
+            msg, return_id = "수정되었습니다.", est_id
+        else: # 신규 저장
+            cursor = db.execute('''INSERT INTO estimates (user_id, customer_name, phone, address, total_amount, details, reg_date) 
+                                   VALUES (?, ?, ?, ?, ?, ?, ?)''',
+                                (session['user'], req['name'], req['tel'], req['addr'], req['total'], details_str, now))
+            msg, return_id = "저장되었습니다.", cursor.lastrowid
+        
+        db.commit()
+        return jsonify({'msg': msg, 'id': return_id})
+    except Exception as e:
+        return jsonify({'msg': f'오류 발생: {str(e)}'}), 500
+
+@app.route('/get_estimate/<int:id>', methods=['GET'])
+def get_estimate(id):
+    if 'user' not in session: return jsonify({'error': '로그인 필요'}), 401
+    db = get_db()
+    item = db.execute("SELECT * FROM estimates WHERE id=? AND user_id=?", (id, session['user'])).fetchone()
+    if item:
+        return jsonify({
+            'id': item['id'], 'name': item['customer_name'], 'tel': item['phone'], 
+            'addr': item['address'], 'details': json.loads(item['details'])
+        })
+    return jsonify({'error': 'not found'})
+
+@app.route('/delete_estimate/<int:id>', methods=['DELETE'])
+def delete_estimate(id):
+    if 'user' not in session: return jsonify({'msg': '로그인 필요'}), 401
+    db = get_db()
+    db.execute("DELETE FROM estimates WHERE id=? AND user_id=?", (id, session['user']))
+    db.commit()
+    return jsonify({'msg': '삭제됨'})
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)
